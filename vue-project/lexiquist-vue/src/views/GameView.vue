@@ -1,0 +1,270 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useGameStore } from '@/stores/gameStore'
+import CharacterStats from '@/components/game/CharacterStats.vue'
+import StoryDisplay from '@/components/game/StoryDisplay.vue'
+import ActionButtons from '@/components/game/ActionButtons.vue'
+import ProgressPanel from '@/components/game/ProgressPanel.vue'
+import DictionaryModal from '@/components/game/DictionaryModal.vue'
+import AchievementNotification from '@/components/game/AchievementNotification.vue'
+
+// Game store
+const gameStore = useGameStore()
+
+// UI state
+const showDictionary = ref(false)
+const showAchievement = ref(false)
+const achievementText = ref('')
+
+// Methods
+const toggleDictionary = () => {
+  showDictionary.value = !showDictionary.value
+}
+
+const saveGame = () => {
+  gameStore.saveGame()
+  console.log('Game saved!')
+}
+
+const selectWord = (word: string) => {
+  gameStore.selectWord(word)
+}
+
+const performAction = (action: string) => {
+  // Action logic would go here
+  console.log(`Performing action: ${action} on word: ${gameStore.vocabulary.selectedWord}`)
+  gameStore.clearSelectedWord()
+}
+
+const generateActionPrompt = () => {
+  // Generate prompt logic would go here
+  console.log('Generating action prompt')
+}
+
+const handleActionPrompt = (choice: string) => {
+  // Handle prompt logic would go here
+  console.log(`Handling action prompt choice: ${choice}`)
+}
+
+// Initialize game
+onMounted(() => {
+  gameStore.loadGame()
+  console.log('Game initialized')
+})
+</script>
+
+<template>
+  <div class="game-container">
+    <!-- Navigation Bar -->
+    <nav class="bg-black bg-opacity-30 backdrop-blur-md border-b border-yellow-600 border-opacity-30 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center space-x-4">
+            <img src="@/assets/logo.svg" alt="LexiQuest" class="h-10 w-auto" />
+            <h1 class="fantasy-title text-2xl font-bold">LexiQuest</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-white font-medium">{{ gameStore.character.name }}</span>
+            <button @click="toggleDictionary" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors">
+              📚 词典
+            </button>
+            <button @click="saveGame" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+              💾 保存
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Game Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Character Stats Panel -->
+        <div class="lg:col-span-1">
+          <CharacterStats :character="gameStore.character" :vocab-count="gameStore.progress.wordsLearnedToday" />
+        </div>
+
+        <!-- Story Display Area -->
+        <div class="lg:col-span-2">
+          <StoryDisplay 
+            :story-text="gameStore.story.text" 
+            :selected-word="gameStore.vocabulary.selectedWord"
+            @word-selected="selectWord"
+          />
+          
+          <!-- Action Buttons -->
+          <ActionButtons 
+            :selected-word="gameStore.vocabulary.selectedWord"
+            @perform-action="performAction"
+            @generate-prompt="generateActionPrompt"
+          />
+        </div>
+
+        <!-- Progress & Achievements Panel -->
+        <div class="lg:col-span-1">
+          <ProgressPanel 
+            :module="gameStore.currentModule"
+            :progress="gameStore.progress"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Dictionary Modal -->
+    <DictionaryModal 
+      :show="showDictionary" 
+      @close="toggleDictionary"
+    />
+
+    <!-- Achievement Notification -->
+    <AchievementNotification 
+      :show="showAchievement" 
+      :text="achievementText"
+      @close="showAchievement = false"
+    />
+  </div>
+</template>
+
+<style scoped>
+:root {
+  --primary-green: #2D5016;
+  --primary-gold: #D4AF37;
+  --primary-burgundy: #800020;
+  --secondary-parchment: #F5F5DC;
+  --secondary-purple: #663399;
+  --accent-cyan: #00FFFF;
+  --text-charcoal: #36454F;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-purple) 100%);
+  min-height: 100vh;
+  color: var(--text-charcoal);
+}
+
+.fantasy-title {
+  font-family: 'Cinzel', serif;
+  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+.parchment-bg {
+  background: linear-gradient(135deg, var(--secondary-parchment) 0%, #F0E68C 100%);
+  border: 2px solid var(--primary-gold);
+  box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+}
+
+.magical-glow {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.1);
+  border: 1px solid var(--primary-gold);
+}
+
+.interactive-word {
+  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  font-weight: 600;
+}
+
+.interactive-word:hover {
+  text-shadow: 0 0 15px var(--primary-gold);
+  transform: scale(1.05);
+}
+
+.interactive-word.selected {
+  background: linear-gradient(45deg, var(--accent-cyan), #00CED1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px var(--accent-cyan);
+}
+
+.action-button {
+  background: linear-gradient(135deg, var(--primary-burgundy), #B22222);
+  border: 2px solid var(--primary-gold);
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(128, 0, 32, 0.4);
+}
+
+.action-button:active {
+  transform: translateY(0);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.stat-bar {
+  background: linear-gradient(90deg, var(--primary-green), #32CD32);
+  height: 8px;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.story-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text-charcoal);
+}
+
+.chinese-text {
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+.dictionary-card {
+  background: var(--secondary-parchment);
+  border: 1px solid var(--primary-gold);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.dictionary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+}
+
+.achievement-notification {
+  background: linear-gradient(135deg, var(--primary-gold), #FFD700);
+  color: var(--primary-burgundy);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+</style>

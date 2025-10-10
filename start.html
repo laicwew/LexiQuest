@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexiQuest - Start Your Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #2D5016;
+            --primary-gold: #D4AF37;
+            --primary-burgundy: #800020;
+            --secondary-parchment: #F5F5DC;
+            --secondary-purple: #663399;
+            --accent-cyan: #00FFFF;
+            --text-charcoal: #36454F;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-purple) 100%);
+            min-height: 100vh;
+            color: var(--text-charcoal);
+        }
+        
+        .fantasy-title {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(45deg, var(--primary-gold), #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .parchment-bg {
+            background: linear-gradient(135deg, var(--secondary-parchment) 0%, #F0E68C 100%);
+            border: 2px solid var(--primary-gold);
+            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+        }
+        
+        .magical-glow {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--primary-gold);
+        }
+        
+        .start-button {
+            background: linear-gradient(135deg, var(--primary-burgundy), #B22222);
+            border: 2px solid var(--primary-gold);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(128, 0, 32, 0.4);
+        }
+        
+        .start-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .save-slot {
+            background: var(--secondary-parchment);
+            border: 2px solid var(--primary-gold);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .save-slot:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .save-slot.selected {
+            border-color: var(--accent-cyan);
+            background: linear-gradient(135deg, #E6F7FF, #B3E5FC);
+        }
+        
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            color: var(--primary-gold);
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .typewriter-container {
+            min-height: 60px;
+        }
+        
+        .error-message {
+            color: #DC2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        .success-message {
+            color: #059669;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles Background -->
+    <div class="floating-particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;">✦</div>
+        <div class="particle" style="left: 20%; animation-delay: 1s;">✧</div>
+        <div class="particle" style="left: 30%; animation-delay: 2s;">✨</div>
+        <div class="particle" style="left: 40%; animation-delay: 3s;">✦</div>
+        <div class="particle" style="left: 50%; animation-delay: 4s;">✧</div>
+        <div class="particle" style="left: 60%; animation-delay: 5s;">✨</div>
+        <div class="particle" style="left: 70%; animation-delay: 0.5s;">✦</div>
+        <div class="particle" style="left: 80%; animation-delay: 1.5s;">✧</div>
+        <div class="particle" style="left: 90%; animation-delay: 2.5s;">✨</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-4xl w-full">
+            
+            <!-- Logo and Title -->
+            <div class="text-center mb-8">
+                <img src="resources/logo.png" alt="LexiQuest" class="h-24 w-auto mx-auto mb-4">
+                <h1 class="fantasy-title text-5xl font-bold mb-2">LexiQuest</h1>
+                <div class="typewriter-container">
+                    <p class="text-white text-xl" id="subtitle"></p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Welcome Section -->
+                <div class="parchment-bg rounded-lg p-8 magical-glow">
+                    <h2 class="fantasy-title text-2xl font-bold mb-4">Welcome, Adventurer!</h2>
+                    <p class="text-gray-700 mb-6 leading-relaxed">
+                        Embark on an epic journey where learning vocabulary becomes an adventure. 
+                        Explore magical realms, interact with fascinating characters, and master 
+                        new languages through immersive storytelling.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold">1</div>
+                            <span>Create your character and choose your learning path</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold">2</div>
+                            <span>Select from various story modules and adventures</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold">3</div>
+                            <span>Learn vocabulary through interactive gameplay</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold">4</div>
+                            <span>Track your progress and unlock achievements</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setup Section -->
+                <div class="parchment-bg rounded-lg p-8 magical-glow">
+                    <h2 class="fantasy-title text-2xl font-bold mb-6">Begin Your Adventure</h2>
+                    
+                    <!-- Username Input -->
+                    <div class="mb-6">
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                            Choose Your Adventurer Name
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            placeholder="Enter your name..."
+                            class="w-full px-4 py-3 border-2 border-yellow-600 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-lg"
+                            maxlength="20"
+                            autocomplete="off"
+                        >
+                        <div id="username-error" class="error-message hidden"></div>
+                    </div>
+
+                    <!-- Language Selection -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label for="native-language" class="block text-sm font-medium text-gray-700 mb-2">
+                                Native Language
+                            </label>
+                            <select id="native-language" class="w-full px-4 py-3 border-2 border-yellow-600 rounded-lg focus:ring-2 focus:ring-yellow-500">
+                                <option value="zh">中文 (Chinese)</option>
+                                <option value="en">English</option>
+                                <option value="es">Español (Spanish)</option>
+                                <option value="fr">Français (French)</option>
+                                <option value="de">Deutsch (German)</option>
+                                <option value="ja">日本語 (Japanese)</option>
+                                <option value="ko">한국어 (Korean)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="target-language" class="block text-sm font-medium text-gray-700 mb-2">
+                                Target Language
+                            </label>
+                            <select id="target-language" class="w-full px-4 py-3 border-2 border-yellow-600 rounded-lg focus:ring-2 focus:ring-yellow-500">
+                                <option value="en">English</option>
+                                <option value="zh">中文 (Chinese)</option>
+                                <option value="es">Español (Spanish)</option>
+                                <option value="fr">Français (French)</option>
+                                <option value="de">Deutsch (German)</option>
+                                <option value="ja">日本語 (Japanese)</option>
+                                <option value="ko">한국어 (Korean)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Difficulty Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            Learning Difficulty
+                        </label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button 
+                                class="difficulty-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600"
+                                data-difficulty="easy"
+                            >
+                                <div class="font-bold text-green-600">Easy</div>
+                                <div class="text-xs text-gray-500">Guided learning</div>
+                            </button>
+                            <button 
+                                class="difficulty-btn p-3 border-2 border-yellow-600 rounded-lg text-center transition-all bg-yellow-50"
+                                data-difficulty="normal"
+                            >
+                                <div class="font-bold text-yellow-600">Normal</div>
+                                <div class="text-xs text-gray-500">Balanced challenge</div>
+                            </button>
+                            <button 
+                                class="difficulty-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600"
+                                data-difficulty="hard"
+                            >
+                                <div class="font-bold text-red-600">Hard</div>
+                                <div class="text-xs text-gray-500">Advanced learning</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Save Game Slots -->
+                    <div class="mb-6" id="save-slots-container">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            Continue Existing Adventure
+                        </label>
+                        <div class="space-y-2" id="save-slots">
+                            <!-- Save slots will be dynamically generated -->
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <button 
+                            id="start-new-btn" 
+                            class="start-button w-full py-4 px-6 rounded-lg text-lg font-bold"
+                            onclick="startNewGame()"
+                        >
+                            🚀 Start New Adventure
+                        </button>
+                        
+                        <button 
+                            id="continue-btn" 
+                            class="start-button w-full py-4 px-6 rounded-lg text-lg font-bold bg-gray-600 hover:bg-gray-700"
+                            onclick="continueGame()"
+                            style="display: none;"
+                        >
+                            ⭐ Continue Adventure
+                        </button>
+                    </div>
+
+                    <!-- Messages -->
+                    <div id="message-container" class="mt-4">
+                        <!-- Success/error messages will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="mt-8 parchment-bg rounded-lg p-8 magical-glow">
+                <h2 class="fantasy-title text-2xl font-bold mb-6 text-center">Game Features</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl">
+                            📚
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Interactive Learning</h3>
+                        <p class="text-gray-600 text-sm">Learn vocabulary through context and interaction with story elements</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl">
+                            🎮
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">RPG Adventure</h3>
+                        <p class="text-gray-600 text-sm">Immersive storytelling with character progression and achievements</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl">
+                            📊
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Progress Tracking</h3>
+                        <p class="text-gray-600 text-sm">Monitor your learning progress with detailed analytics and insights</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class StartScreen {
+            constructor() {
+                this.selectedDifficulty = 'normal';
+                this.selectedSaveSlot = null;
+                this.saveGames = this.loadSaveGames();
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupTypewriter();
+                this.setupEventListeners();
+                this.renderSaveSlots();
+                this.loadUserPreferences();
+                this.animateElements();
+            }
+            
+            setupTypewriter() {
+                const typed = new Typed('#subtitle', {
+                    strings: [
+                        'Where Learning Becomes an Adventure',
+                        'Master Languages Through Storytelling',
+                        'Your Vocabulary Quest Awaits'
+                    ],
+                    typeSpeed: 50,
+                    backSpeed: 30,
+                    backDelay: 2000,
+                    loop: true,
+                    showCursor: true,
+                    cursorChar: '✦'
+                });
+            }
+            
+            setupEventListeners() {
+                // Username input validation
+                document.getElementById('username').addEventListener('input', (e) => {
+                    this.validateUsername(e.target.value);
+                });
+                
+                // Difficulty selection
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.selectDifficulty(e.currentTarget.dataset.difficulty);
+                    });
+                });
+                
+                // Language selection change handlers
+                document.getElementById('native-language').addEventListener('change', () => {
+                    this.validateLanguageSelection();
+                });
+                
+                document.getElementById('target-language').addEventListener('change', () => {
+                    this.validateLanguageSelection();
+                });
+                
+                // Enter key to start game
+                document.getElementById('username').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.startNewGame();
+                    }
+                });
+            }
+            
+            validateUsername(username) {
+                const errorElement = document.getElementById('username-error');
+                
+                if (!username.trim()) {
+                    this.showMessage('Please enter a username', 'error');
+                    return false;
+                }
+                
+                if (username.length < 3) {
+                    this.showMessage('Username must be at least 3 characters long', 'error');
+                    return false;
+                }
+                
+                if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                    this.showMessage('Username can only contain letters, numbers, and underscores', 'error');
+                    return false;
+                }
+                
+                errorElement.classList.add('hidden');
+                return true;
+            }
+            
+            validateLanguageSelection() {
+                const nativeLang = document.getElementById('native-language').value;
+                const targetLang = document.getElementById('target-language').value;
+                
+                if (nativeLang === targetLang) {
+                    this.showMessage('Native and target languages must be different', 'error');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            selectDifficulty(difficulty) {
+                // Remove selection from all buttons
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.classList.remove('border-yellow-600', 'bg-yellow-50');
+                    btn.classList.add('border-gray-300');
+                });
+                
+                // Add selection to clicked button
+                const selectedBtn = document.querySelector(`[data-difficulty="${difficulty}"]`);
+                selectedBtn.classList.remove('border-gray-300');
+                selectedBtn.classList.add('border-yellow-600', 'bg-yellow-50');
+                
+                this.selectedDifficulty = difficulty;
+                
+                // Animate selection
+                anime({
+                    targets: selectedBtn,
+                    scale: [1, 1.05, 1],
+                    duration: 300,
+                    easing: 'easeOutElastic(1, .8)'
+                });
+            }
+            
+            loadSaveGames() {
+                const saves = [];
+                for (let i = 0; i < 5; i++) {
+                    const saveData = localStorage.getItem(`lexiquest-save-${i}`);
+                    if (saveData) {
+                        saves.push({
+                            index: i,
+                            data: JSON.parse(saveData),
+                            timestamp: new Date(JSON.parse(saveData).lastSaved || Date.now())
+                        });
+                    } else {
+                        saves.push({ index: i, empty: true });
+                    }
+                }
+                return saves;
+            }
+            
+            renderSaveSlots() {
+                const container = document.getElementById('save-slots');
+                container.innerHTML = '';
+                
+                this.saveGames.forEach(save => {
+                    const slotElement = document.createElement('div');
+                    slotElement.className = 'save-slot p-3 rounded-lg';
+                    
+                    if (save.empty) {
+                        slotElement.innerHTML = `
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center text-gray-500">
+                                    ➕
+                                </div>
+                                <div>
+                                    <div class="font-medium">Empty Slot ${save.index + 1}</div>
+                                    <div class="text-sm text-gray-500">Available for new adventure</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        const character = save.data.character || {};
+                        const progress = save.data.progress || {};
+                        
+                        slotElement.innerHTML = `
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center text-white">
+                                    🧙‍♂️
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-medium">${character.name || 'Adventurer'}</div>
+                                    <div class="text-sm text-gray-600">
+                                        Level ${character.level || 1} • ${progress.wordsLearnedToday || 0} words today
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        Last played: ${save.timestamp.toLocaleDateString()}
+                                    </div>
+                                </div>
+                                <div class="text-yellow-600">
+                                    ⭐
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    slotElement.addEventListener('click', () => {
+                        this.selectSaveSlot(save);
+                    });
+                    
+                    container.appendChild(slotElement);
+                });
+            }
+            
+            selectSaveSlot(save) {
+                // Remove selection from all slots
+                document.querySelectorAll('.save-slot').forEach(slot => {
+                    slot.classList.remove('selected');
+                });
+                
+                // Add selection to clicked slot
+                event.currentTarget.classList.add('selected');
+                
+                this.selectedSaveSlot = save;
+                
+                if (save.empty) {
+                    document.getElementById('start-new-btn').style.display = 'block';
+                    document.getElementById('continue-btn').style.display = 'none';
+                } else {
+                    document.getElementById('start-new-btn').style.display = 'none';
+                    document.getElementById('continue-btn').style.display = 'block';
+                }
+                
+                // Animate selection
+                anime({
+                    targets: event.currentTarget,
+                    scale: [1, 1.02, 1],
+                    duration: 300,
+                    easing: 'easeOutElastic(1, .8)'
+                });
+            }
+            
+            startNewGame() {
+                const username = document.getElementById('username').value.trim();
+                
+                if (!this.validateUsername(username)) {
+                    return;
+                }
+                
+                if (!this.validateLanguageSelection()) {
+                    return;
+                }
+                
+                // Save user preferences
+                const preferences = {
+                    username: username,
+                    nativeLanguage: document.getElementById('native-language').value,
+                    targetLanguage: document.getElementById('target-language').value,
+                    difficulty: this.selectedDifficulty,
+                    timestamp: Date.now()
+                };
+                
+                localStorage.setItem('lexiquest-preferences', JSON.stringify(preferences));
+                localStorage.setItem('lexiquest-username', username);
+                
+                this.showMessage('Starting your adventure! Redirecting to character creation...', 'success');
+                
+                // Animate button and redirect
+                const button = document.getElementById('start-new-btn');
+                anime({
+                    targets: button,
+                    scale: [1, 1.1, 1],
+                    duration: 500,
+                    easing: 'easeOutElastic(1, .8)',
+                    complete: () => {
+                        setTimeout(() => {
+                            window.location.href = 'character.html';
+                        }, 1000);
+                    }
+                });
+            }
+            
+            continueGame() {
+                if (!this.selectedSaveSlot || this.selectedSaveSlot.empty) {
+                    this.showMessage('Please select a save game to continue', 'error');
+                    return;
+                }
+                
+                // Restore save game
+                const saveData = this.selectedSaveSlot.data;
+                localStorage.setItem('lexiquest-save', JSON.stringify(saveData));
+                
+                // Set username from save
+                if (saveData.character && saveData.character.name) {
+                    localStorage.setItem('lexiquest-username', saveData.character.name);
+                }
+                
+                this.showMessage('Loading your adventure...', 'success');
+                
+                // Animate button and redirect
+                const button = document.getElementById('continue-btn');
+                anime({
+                    targets: button,
+                    scale: [1, 1.1, 1],
+                    duration: 500,
+                    easing: 'easeOutElastic(1, .8)',
+                    complete: () => {
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1000);
+                    }
+                });
+            }
+            
+            loadUserPreferences() {
+                const preferences = localStorage.getItem('lexiquest-preferences');
+                if (preferences) {
+                    const prefs = JSON.parse(preferences);
+                    
+                    if (prefs.username) {
+                        document.getElementById('username').value = prefs.username;
+                    }
+                    
+                    if (prefs.nativeLanguage) {
+                        document.getElementById('native-language').value = prefs.nativeLanguage;
+                    }
+                    
+                    if (prefs.targetLanguage) {
+                        document.getElementById('target-language').value = prefs.targetLanguage;
+                    }
+                    
+                    if (prefs.difficulty) {
+                        this.selectDifficulty(prefs.difficulty);
+                    }
+                }
+            }
+            
+            showMessage(message, type) {
+                const container = document.getElementById('message-container');
+                container.innerHTML = '';
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = type === 'error' ? 'error-message' : 'success-message';
+                messageElement.textContent = message;
+                
+                container.appendChild(messageElement);
+                
+                // Animate message
+                anime({
+                    targets: messageElement,
+                    opacity: [0, 1],
+                    translateY: [-10, 0],
+                    duration: 300,
+                    easing: 'easeOutQuad'
+                });
+                
+                // Auto-hide success messages
+                if (type === 'success') {
+                    setTimeout(() => {
+                        anime({
+                            targets: messageElement,
+                            opacity: [1, 0],
+                            duration: 300,
+                            easing: 'easeOutQuad',
+                            complete: () => {
+                                if (messageElement.parentNode) {
+                                    messageElement.parentNode.removeChild(messageElement);
+                                }
+                            }
+                        });
+                    }, 3000);
+                }
+            }
+            
+            animateElements() {
+                // Animate elements on load
+                anime({
+                    targets: '.parchment-bg',
+                    opacity: [0, 1],
+                    translateY: [30, 0],
+                    duration: 800,
+                    delay: anime.stagger(200),
+                    easing: 'easeOutQuad'
+                });
+                
+                anime({
+                    targets: '.fantasy-title',
+                    opacity: [0, 1],
+                    scale: [0.8, 1],
+                    duration: 1000,
+                    delay: 500,
+                    easing: 'easeOutElastic(1, .8)'
+                });
+            }
+        }
+        
+        // Global functions for HTML event handlers
+        function startNewGame() {
+            startScreen.startNewGame();
+        }
+        
+        function continueGame() {
+            startScreen.continueGame();
+        }
+        
+        // Initialize start screen when page loads
+        let startScreen;
+        document.addEventListener('DOMContentLoaded', () => {
+            startScreen = new StartScreen();
+        });
+    </script>
+</body>
+</html>

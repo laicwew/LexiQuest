@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexiQuest - Choose Your Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.css"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #2D5016;
+            --primary-gold: #D4AF37;
+            --primary-burgundy: #800020;
+            --secondary-parchment: #F5F5DC;
+            --secondary-purple: #663399;
+            --accent-cyan: #00FFFF;
+            --text-charcoal: #36454F;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-purple) 100%);
+            min-height: 100vh;
+            color: var(--text-charcoal);
+        }
+        
+        .fantasy-title {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(45deg, var(--primary-gold), #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .parchment-bg {
+            background: linear-gradient(135deg, var(--secondary-parchment) 0%, #F0E68C 100%);
+            border: 2px solid var(--primary-gold);
+            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+        }
+        
+        .magical-glow {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--primary-gold);
+        }
+        
+        .module-card {
+            background: var(--secondary-parchment);
+            border: 2px solid var(--primary-gold);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.3);
+            border-color: var(--accent-cyan);
+        }
+        
+        .module-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .module-card.locked:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: var(--primary-gold);
+        }
+        
+        .module-card.completed {
+            border-color: #10B981;
+            background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+        }
+        
+        .module-card.in-progress {
+            border-color: #F59E0B;
+            background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+        }
+        
+        .module-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .module-card:hover .module-image {
+            transform: scale(1.05);
+        }
+        
+        .difficulty-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .difficulty-easy {
+            background: #10B981;
+            color: white;
+        }
+        
+        .difficulty-normal {
+            background: #F59E0B;
+            color: white;
+        }
+        
+        .difficulty-hard {
+            background: #EF4444;
+            color: white;
+        }
+        
+        .progress-bar {
+            background: #E5E7EB;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .filter-button {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--primary-gold);
+            transition: all 0.3s ease;
+        }
+        
+        .filter-button:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .filter-button.active {
+            background: var(--primary-gold);
+            color: white;
+            border-color: var(--primary-gold);
+        }
+        
+        .search-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--primary-gold);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .character-summary {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,230,140,0.95));
+            border: 2px solid var(--primary-gold);
+            backdrop-filter: blur(10px);
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(135deg, var(--primary-gold), #FFD700);
+            color: var(--primary-burgundy);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-element {
+            position: absolute;
+            color: var(--primary-gold);
+            opacity: 0.3;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--secondary-parchment);
+            border: 2px solid var(--primary-gold);
+            border-radius: 12px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .start-button {
+            background: linear-gradient(135deg, var(--primary-burgundy), #B22222);
+            border: 2px solid var(--primary-gold);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(128, 0, 32, 0.4);
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #6B7280, #4B5563);
+            border: 2px solid #9CA3AF;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(107, 114, 128, 0.4);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border: 1px solid var(--primary-gold);
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <div class="floating-element" style="left: 10%; top: 20%; animation-delay: 0s;">📚</div>
+        <div class="floating-element" style="left: 80%; top: 30%; animation-delay: 2s;">✨</div>
+        <div class="floating-element" style="left: 60%; top: 10%; animation-delay: 4s;">🎯</div>
+        <div class="floating-element" style="left: 20%; top: 70%; animation-delay: 1s;">🏆</div>
+        <div class="floating-element" style="left: 90%; top: 60%; animation-delay: 3s;">📖</div>
+        <div class="floating-element" style="left: 30%; top: 80%; animation-delay: 5s;">🌟</div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-30 backdrop-blur-md border-b border-yellow-600 border-opacity-30 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <img src="resources/logo.png" alt="LexiQuest" class="h-10 w-auto">
+                    <h1 class="fantasy-title text-2xl font-bold">LexiQuest</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-white font-medium" id="username-display">Adventurer</span>
+                    <button onclick="showCharacterInfo()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        👤 Character
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="fantasy-title text-4xl font-bold mb-2">Choose Your Adventure</h1>
+            <p class="text-white text-lg">Select a story module to begin your vocabulary learning quest</p>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="mb-8">
+            <div class="parchment-bg rounded-lg p-6 magical-glow">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    <!-- Search -->
+                    <div class="lg:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Search Modules</label>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Search by title, theme, or description..."
+                            class="search-input w-full px-4 py-3 rounded-lg"
+                            oninput="filterModules()"
+                        >
+                    </div>
+                    
+                    <!-- Difficulty Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
+                        <select id="difficulty-filter" class="filter-button w-full px-4 py-3 rounded-lg" onchange="filterModules()">
+                            <option value="">All Difficulties</option>
+                            <option value="easy">Easy</option>
+                            <option value="normal">Normal</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Status Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select id="status-filter" class="filter-button w-full px-4 py-3 rounded-lg" onchange="filterModules()">
+                            <option value="">All Modules</option>
+                            <option value="not-started">Not Started</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Character Summary -->
+        <div class="mb-8">
+            <div class="character-summary rounded-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-2xl" id="character-avatar">
+                            🧙‍♂️
+                        </div>
+                        <div>
+                            <h3 class="fantasy-title text-xl font-bold" id="character-name">Adventurer</h3>
+                            <p class="text-gray-600" id="character-title">The Explorer</p>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="text-sm text-gray-500">Level <span id="character-level">1</span></span>
+                                <span class="text-gray-300">•</span>
+                                <span class="text-sm text-gray-500"><span id="vocabulary-learned">0</span> words learned</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="text-2xl font-bold text-red-600" id="character-hp">100</div>
+                                <div class="text-xs text-gray-500">Health</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="text-2xl font-bold text-blue-600" id="character-energy">50</div>
+                                <div class="text-xs text-gray-500">Energy</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="text-2xl font-bold text-purple-600" id="character-xp">0</div>
+                                <div class="text-xs text-gray-500">XP</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modules-grid">
+            <!-- Modules will be dynamically generated here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-12 hidden">
+            <div class="text-6xl mb-4">🔍</div>
+            <h3 class="text-xl font-bold text-white mb-2">No modules found</h3>
+            <p class="text-gray-300">Try adjusting your search criteria or filters</p>
+        </div>
+    </div>
+
+    <!-- Module Detail Modal -->
+    <div id="module-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-content max-w-2xl w-full p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="fantasy-title text-2xl font-bold" id="modal-title">Module Title</h2>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span class="difficulty-badge" id="modal-difficulty">Normal</span>
+                        <span class="text-sm text-gray-500" id="modal-duration">30-45 minutes</span>
+                    </div>
+                </div>
+                <button onclick="closeModuleModal()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            
+            <img id="modal-image" src="" alt="" class="module-image mb-4">
+            
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-bold mb-2">Description</h3>
+                    <p class="text-gray-700" id="modal-description">Module description will appear here.</p>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold mb-2">Learning Objectives</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1" id="modal-objectives">
+                        <!-- Objectives will be dynamically added -->
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold mb-2">Vocabulary Focus</h3>
+                    <div class="flex flex-wrap gap-2" id="modal-vocabulary">
+                        <!-- Vocabulary tags will be dynamically added -->
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <div class="text-sm text-gray-500">Words to Learn</div>
+                        <div class="font-bold text-lg" id="modal-word-count">25</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500">Your Progress</div>
+                        <div class="font-bold text-lg" id="modal-progress">0%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-4">
+                <button onclick="closeModuleModal()" class="back-button flex-1 py-3 px-6 rounded-lg font-bold">
+                    ← Back to Modules
+                </button>
+                <button onclick="startModule()" class="start-button flex-1 py-3 px-6 rounded-lg font-bold" id="start-module-btn">
+                    🚀 Start Adventure
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Info Modal -->
+    <div id="character-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="modal-content max-w-lg w-full p-6">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="fantasy-title text-2xl font-bold">Character Profile</h2>
+                <button onclick="closeCharacterModal()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            
+            <div class="text-center mb-6">
+                <div class="character-avatar w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl" id="modal-character-avatar">
+                    🧙‍♂️
+                </div>
+                <h3 class="fantasy-title text-xl font-bold" id="modal-character-name">Adventurer</h3>
+                <p class="text-gray-600" id="modal-character-title">The Explorer</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="text-2xl font-bold text-purple-600" id="modal-intelligence">10</div>
+                        <div class="text-xs text-gray-500">Intelligence</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="text-2xl font-bold text-blue-600" id="modal-charisma">10</div>
+                        <div class="text-xs text-gray-500">Charisma</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="text-2xl font-bold text-green-600" id="modal-endurance">10</div>
+                        <div class="text-xs text-gray-500">Endurance</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="text-2xl font-bold text-yellow-600" id="modal-luck">10</div>
+                        <div class="text-xs text-gray-500">Luck</div>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-blue-50 rounded-lg">
+                    <h4 class="font-bold mb-2">Learning Preferences</h4>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div>Difficulty: <span class="font-bold" id="modal-difficulty-pref">Normal</span></div>
+                        <div>Pace: <span class="font-bold" id="modal-pace-pref">Normal</span></div>
+                        <div>Focus: <span class="font-bold" id="modal-focus-pref">Balanced</span></div>
+                        <div>Words Learned: <span class="font-bold" id="modal-words-learned">0</span></div>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-yellow-50 rounded-lg">
+                    <h4 class="font-bold mb-2">Achievements</h4>
+                    <div id="modal-achievements" class="flex flex-wrap gap-2">
+                        <!-- Achievement badges will be dynamically added -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <button onclick="closeCharacterModal()" class="back-button w-full py-3 px-6 rounded-lg font-bold">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ModuleSelection {
+            constructor() {
+                this.modules = [
+                    {
+                        id: 'supermarket_v1',
+                        title: '魔法市场',
+                        description: '在神秘的超市环境中学习基本的购物词汇。与商贩互动，探索魔法农产品，掌握日常购物用语。',
+                        image: 'resources/market-module.png',
+                        difficulty: 'easy',
+                        duration: '30-45分钟',
+                        wordsCount: 25,
+                        status: 'not-started',
+                        progress: 0,
+                        objectives: [
+                            '学习购物和食物词汇',
+                            '练习与NPC的对话技能',
+                            '理解价格和数量表达',
+                            '掌握产品的描述性形容词'
+                        ],
+                        vocabulary: ['food', 'shopping', 'market', 'price', 'quantity', 'adjectives', 'conversation']
+                    },
+                    {
+                        id: 'forest_v1',
+                        title: '魔法森林',
+                        description: '探索充满魔法生物和自然词汇的神秘森林。发现隐藏的小径，解开谜语，了解自然世界。',
+                        image: 'resources/forest-module.png',
+                        difficulty: 'normal',
+                        duration: '45-60分钟',
+                        wordsCount: 35,
+                        status: 'not-started',
+                        progress: 0,
+                        objectives: [
+                            '学习自然和动物词汇',
+                            '练习描述性语言',
+                            '理解环境概念',
+                            '掌握方向和位置术语'
+                        ],
+                        vocabulary: ['nature', 'animals', 'forest', 'magic', 'directions', 'descriptions', 'environment']
+                    },
+                    {
+                        id: 'library_v1',
+                        title: '古老图书馆',
+                        description: '在耸立的书架和古老的手稿中穿行。学习学术词汇，研究技能，发现隐藏的知识。',
+                        image: 'resources/library-interior.jpg',
+                        difficulty: 'hard',
+                        duration: '60-90分钟',
+                        wordsCount: 50,
+                        status: 'locked',
+                        progress: 0,
+                        objectives: [
+                            '掌握学术词汇',
+                            '学习研究和学习术语',
+                            '理解复杂句子结构',
+                            '练习正式写作表达'
+                        ],
+                        vocabulary: ['academic', 'research', 'literature', 'knowledge', 'formal', 'complex', 'scholarly']
+                    },
+                    {
+                        id: 'castle_v1',
+                        title: 'Royal Castle',
+                        description: 'Enter the majestic royal castle and learn about medieval life, court etiquette, and formal language. Meet nobles, servants, and the royal family.',
+                        image: 'resources/fantasy-landscape.jpg',
+                        difficulty: 'normal',
+                        duration: '45-60 minutes',
+                        wordsCount: 40,
+                        status: 'locked',
+                        progress: 0,
+                        objectives: [
+                            'Learn medieval and royal vocabulary',
+                            'Practice formal address and etiquette',
+                            'Understand social hierarchy terms',
+                            'Master ceremonial language'
+                        ],
+                        vocabulary: ['royal', 'medieval', 'castle', 'etiquette', 'formal', 'nobility', 'ceremony']
+                    },
+                    {
+                        id: 'village_v1',
+                        title: 'Peaceful Village',
+                        description: 'Experience daily life in a charming village. Learn community vocabulary, interact with villagers, and participate in local traditions and festivals.',
+                        image: 'resources/fantasy-marketplace.jpg',
+                        difficulty: 'easy',
+                        duration: '30-45 minutes',
+                        wordsCount: 30,
+                        status: 'locked',
+                        progress: 0,
+                        objectives: [
+                            'Learn community and social vocabulary',
+                            'Practice everyday conversations',
+                            'Understand cultural traditions',
+                            'Master time and schedule expressions'
+                        ],
+                        vocabulary: ['community', 'village', 'daily', 'social', 'traditions', 'time', 'routine']
+                    },
+                    {
+                        id: 'mountain_v1',
+                        title: 'Mystic Mountains',
+                        description: 'Climb treacherous peaks and discover ancient mysteries. Learn geological terms, survival vocabulary, and uncover the secrets of the mountain.',
+                        image: 'resources/fantasy-landscape.jpg',
+                        difficulty: 'hard',
+                        duration: '60-90 minutes',
+                        wordsCount: 45,
+                        status: 'locked',
+                        progress: 0,
+                        objectives: [
+                            'Learn geological and nature vocabulary',
+                            'Practice survival and adventure terms',
+                            'Understand weather and climate concepts',
+                            'Master problem-solving language'
+                        ],
+                        vocabulary: ['mountain', 'geology', 'survival', 'weather', 'adventure', 'nature', 'challenge']
+                    }
+                ];
+                
+                this.selectedModule = null;
+                this.characterData = this.loadCharacterData();
+                
+                this.init();
+            }
+            
+            init() {
+                this.loadProgressData();
+                this.updateCharacterDisplay();
+                this.renderModules();
+                this.setupEventListeners();
+                this.animateElements();
+            }
+            
+            loadCharacterData() {
+                const characterData = localStorage.getItem('lexiquest-character');
+                if (characterData) {
+                    return JSON.parse(characterData);
+                }
+                
+                // Default character data
+                return {
+                    name: 'Adventurer',
+                    title: 'Explorer',
+                    avatar: '🧙‍♂️',
+                    level: 1,
+                    stats: {
+                        intelligence: 10,
+                        charisma: 10,
+                        endurance: 10,
+                        luck: 10,
+                        health: 100,
+                        maxHealth: 100,
+                        energy: 50,
+                        maxEnergy: 50
+                    },
+                    preferences: {
+                        difficulty: 'normal',
+                        pace: 'normal',
+                        focus: 'balanced'
+                    }
+                };
+            }
+            
+            loadProgressData() {
+                const savedProgress = localStorage.getItem('lexiquest-progress');
+                if (savedProgress) {
+                    const progress = JSON.parse(savedProgress);
+                    
+                    // Update module progress based on saved data
+                    this.modules.forEach(module => {
+                        if (progress.modules && progress.modules[module.id]) {
+                            module.progress = progress.modules[module.id].progress || 0;
+                            module.status = progress.modules[module.id].status || 'not-started';
+                        }
+                    });
+                }
+                
+                // Unlock modules based on character level or other criteria
+                this.unlockModules();
+            }
+            
+            unlockModules() {
+                const level = this.characterData.level || 1;
+                const wordsLearned = this.getWordsLearnedCount();
+                
+                this.modules.forEach(module => {
+                    if (module.status === 'locked') {
+                        // Simple unlock logic: unlock based on level and words learned
+                        if (level >= 2 && wordsLearned >= 10) {
+                            if (module.difficulty === 'easy') {
+                                module.status = 'not-started';
+                            }
+                        }
+                        
+                        if (level >= 3 && wordsLearned >= 25) {
+                            if (module.difficulty === 'normal') {
+                                module.status = 'not-started';
+                            }
+                        }
+                        
+                        if (level >= 5 && wordsLearned >= 50) {
+                            if (module.difficulty === 'hard') {
+                                module.status = 'not-started';
+                            }
+                        }
+                    }
+                });
+            }
+            
+            getWordsLearnedCount() {
+                const vocabulary = localStorage.getItem('lexiquest-vocabulary');
+                if (vocabulary) {
+                    return Object.keys(JSON.parse(vocabulary)).length;
+                }
+                return 0;
+            }
+            
+            updateCharacterDisplay() {
+                document.getElementById('username-display').textContent = this.characterData.name;
+                document.getElementById('character-name').textContent = this.characterData.name;
+                document.getElementById('character-title').textContent = `The ${this.characterData.title}`;
+                document.getElementById('character-level').textContent = this.characterData.level;
+                document.getElementById('character-avatar').textContent = this.characterData.avatar;
+                
+                const stats = this.characterData.stats;
+                document.getElementById('character-hp').textContent = stats.health;
+                document.getElementById('character-energy').textContent = stats.energy;
+                document.getElementById('character-xp').textContent = stats.experience || 0;
+                document.getElementById('vocabulary-learned').textContent = this.getWordsLearnedCount();
+            }
+            
+            renderModules() {
+                const grid = document.getElementById('modules-grid');
+                const emptyState = document.getElementById('empty-state');
+                
+                grid.innerHTML = '';
+                
+                const filteredModules = this.getFilteredModules();
+                
+                if (filteredModules.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                
+                emptyState.classList.add('hidden');
+                
+                filteredModules.forEach((module, index) => {
+                    const moduleCard = this.createModuleCard(module, index);
+                    grid.appendChild(moduleCard);
+                });
+                
+                // Animate module cards
+                anime({
+                    targets: '.module-card',
+                    opacity: [0, 1],
+                    translateY: [30, 0],
+                    duration: 600,
+                    delay: anime.stagger(100),
+                    easing: 'easeOutQuad'
+                });
+            }
+            
+            createModuleCard(module, index) {
+                const card = document.createElement('div');
+                card.className = `module-card rounded-lg overflow-hidden ${module.status}`;
+                card.onclick = () => this.showModuleDetails(module);
+                
+                const progressPercentage = module.progress || 0;
+                const progressColor = this.getProgressColor(module.status);
+                
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${module.image}" alt="${module.title}" class="module-image">
+                        <div class="difficulty-badge difficulty-${module.difficulty}">${module.difficulty}</div>
+                        ${module.status === 'locked' ? '<div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-bold text-lg">🔒 Locked</div>' : ''}
+                        ${module.status === 'completed' ? '<div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">✓ Completed</div>' : ''}
+                        ${module.status === 'in-progress' ? `<div class="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">${progressPercentage}%</div>` : ''}
+                    </div>
+                    
+                    <div class="p-6">
+                        <h3 class="fantasy-title text-xl font-bold mb-2">${module.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">${module.description}</p>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Duration:</span>
+                                <span class="font-medium">${module.duration}</span>
+                            </div>
+                            
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Words to Learn:</span>
+                                <span class="font-medium">${module.wordsCount}</span>
+                            </div>
+                            
+                            ${module.status !== 'locked' ? `
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-500">Progress:</span>
+                                        <span class="font-medium">${progressPercentage}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill ${progressColor}" style="width: ${progressPercentage}%"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="flex flex-wrap gap-1 mt-3">
+                                ${module.vocabulary.slice(0, 3).map(tag => 
+                                    `<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">${tag}</span>`
+                                ).join('')}
+                                ${module.vocabulary.length > 3 ? `<span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">+${module.vocabulary.length - 3} more</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                return card;
+            }
+            
+            getProgressColor(status) {
+                switch(status) {
+                    case 'completed': return 'bg-gradient-to-r from-green-500 to-green-400';
+                    case 'in-progress': return 'bg-gradient-to-r from-yellow-500 to-yellow-400';
+                    default: return 'bg-gradient-to-r from-blue-500 to-blue-400';
+                }
+            }
+            
+            getFilteredModules() {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                const difficultyFilter = document.getElementById('difficulty-filter').value;
+                const statusFilter = document.getElementById('status-filter').value;
+                
+                return this.modules.filter(module => {
+                    const matchesSearch = !searchTerm || 
+                        module.title.toLowerCase().includes(searchTerm) ||
+                        module.description.toLowerCase().includes(searchTerm) ||
+                        module.vocabulary.some(tag => tag.toLowerCase().includes(searchTerm));
+                    
+                    const matchesDifficulty = !difficultyFilter || module.difficulty === difficultyFilter;
+                    
+                    const matchesStatus = !statusFilter || module.status === statusFilter;
+                    
+                    return matchesSearch && matchesDifficulty && matchesStatus;
+                });
+            }
+            
+            showModuleDetails(module) {
+                if (module.status === 'locked') {
+                    this.showMessage('This module is locked. Complete more adventures to unlock it!', 'info');
+                    return;
+                }
+                
+                this.selectedModule = module;
+                
+                // Populate modal content
+                document.getElementById('modal-title').textContent = module.title;
+                document.getElementById('modal-difficulty').textContent = module.difficulty;
+                document.getElementById('modal-difficulty').className = `difficulty-badge difficulty-${module.difficulty}`;
+                document.getElementById('modal-duration').textContent = module.duration;
+                document.getElementById('modal-image').src = module.image;
+                document.getElementById('modal-description').textContent = module.description;
+                document.getElementById('modal-word-count').textContent = module.wordsCount;
+                document.getElementById('modal-progress').textContent = `${module.progress || 0}%`;
+                
+                // Populate objectives
+                const objectivesList = document.getElementById('modal-objectives');
+                objectivesList.innerHTML = '';
+                module.objectives.forEach(objective => {
+                    const li = document.createElement('li');
+                    li.textContent = objective;
+                    objectivesList.appendChild(li);
+                });
+                
+                // Populate vocabulary tags
+                const vocabularyContainer = document.getElementById('modal-vocabulary');
+                vocabularyContainer.innerHTML = '';
+                module.vocabulary.forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = 'bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full';
+                    span.textContent = tag;
+                    vocabularyContainer.appendChild(span);
+                });
+                
+                // Update start button
+                const startBtn = document.getElementById('start-module-btn');
+                if (module.status === 'in-progress') {
+                    startBtn.innerHTML = '🔄 Continue Adventure';
+                } else {
+                    startBtn.innerHTML = '🚀 Start Adventure';
+                }
+                
+                // Show modal
+                document.getElementById('module-modal').classList.remove('hidden');
+                
+                // Animate modal appearance
+                anime({
+                    targets: '.modal-content',
+                    scale: [0.8, 1],
+                    opacity: [0, 1],
+                    duration: 300,
+                    easing: 'easeOutElastic(1, .8)'
+                });
+            }
+            
+            closeModuleModal() {
+                document.getElementById('module-modal').classList.add('hidden');
+            }
+            
+            startModule() {
+                if (!this.selectedModule) return;
+                
+                // Save selected module
+                localStorage.setItem('lexiquest-current-module', JSON.stringify(this.selectedModule));
+                
+                // Show loading animation
+                const button = document.getElementById('start-module-btn');
+                button.innerHTML = '⏳ Loading Adventure...';
+                button.disabled = true;
+                
+                // Animate button and redirect
+                anime({
+                    targets: button,
+                    scale: [1, 1.1, 1],
+                    duration: 1000,
+                    easing: 'easeOutElastic(1, .8)',
+                    complete: () => {
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1000);
+                    }
+                });
+            }
+            
+            showCharacterInfo() {
+                const modal = document.getElementById('character-modal');
+                
+                // Populate character info
+                document.getElementById('modal-character-avatar').textContent = this.characterData.avatar;
+                document.getElementById('modal-character-name').textContent = this.characterData.name;
+                document.getElementById('modal-character-title').textContent = `The ${this.characterData.title}`;
+                
+                const stats = this.characterData.stats;
+                document.getElementById('modal-intelligence').textContent = stats.intelligence;
+                document.getElementById('modal-charisma').textContent = stats.charisma;
+                document.getElementById('modal-endurance').textContent = stats.endurance;
+                document.getElementById('modal-luck').textContent = stats.luck;
+                
+                const prefs = this.characterData.preferences;
+                document.getElementById('modal-difficulty-pref').textContent = prefs.difficulty || 'normal';
+                document.getElementById('modal-pace-pref').textContent = prefs.pace || 'normal';
+                document.getElementById('modal-focus-pref').textContent = prefs.focus || 'balanced';
+                document.getElementById('modal-words-learned').textContent = this.getWordsLearnedCount();
+                
+                // Show achievements
+                const achievementsContainer = document.getElementById('modal-achievements');
+                achievementsContainer.innerHTML = '';
+                
+                // Add some sample achievements
+                const achievements = [
+                    { name: 'First Steps', icon: '🎯' },
+                    { name: 'Vocabulary Builder', icon: '📚' },
+                    { name: 'Adventurer', icon: '🗺️' }
+                ];
+                
+                achievements.forEach(achievement => {
+                    const badge = document.createElement('span');
+                    badge.className = 'achievement-badge';
+                    badge.innerHTML = `${achievement.icon} ${achievement.name}`;
+                    achievementsContainer.appendChild(badge);
+                });
+                
+                // Show modal
+                modal.classList.remove('hidden');
+                
+                // Animate modal appearance
+                anime({
+                    targets: '#character-modal .modal-content',
+                    scale: [0.8, 1],
+                    opacity: [0, 1],
+                    duration: 300,
+                    easing: 'easeOutElastic(1, .8)'
+                });
+            }
+            
+            closeCharacterModal() {
+                document.getElementById('character-modal').classList.add('hidden');
+            }
+            
+            filterModules() {
+                this.renderModules();
+            }
+            
+            setupEventListeners() {
+                // Search input
+                document.getElementById('search-input').addEventListener('input', () => {
+                    this.filterModules();
+                });
+                
+                // Filter selects
+                document.getElementById('difficulty-filter').addEventListener('change', () => {
+                    this.filterModules();
+                });
+                
+                document.getElementById('status-filter').addEventListener('change', () => {
+                    this.filterModules();
+                });
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.closeModuleModal();
+                        this.closeCharacterModal();
+                    }
+                });
+            }
+            
+            showMessage(message, type = 'info') {
+                // Create temporary notification
+                const notification = document.createElement('div');
+                notification.className = `fixed top-20 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                    type === 'success' ? 'bg-green-500 text-white' :
+                    type === 'error' ? 'bg-red-500 text-white' :
+                    type === 'achievement' ? 'bg-yellow-500 text-black' :
+                    'bg-blue-500 text-white'
+                }`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                // Animate in
+                anime({
+                    targets: notification,
+                    opacity: [0, 1],
+                    translateX: [100, 0],
+                    duration: 300,
+                    easing: 'easeOutQuad'
+                });
+                
+                // Auto-remove
+                setTimeout(() => {
+                    anime({
+                        targets: notification,
+                        opacity: [1, 0],
+                        translateX: [0, 100],
+                        duration: 300,
+                        easing: 'easeOutQuad',
+                        complete: () => {
+                            if (notification.parentNode) {
+                                document.body.removeChild(notification);
+                            }
+                        }
+                    });
+                }, 3000);
+            }
+            
+            animateElements() {
+                // Animate character summary
+                anime({
+                    targets: '.character-summary',
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 600,
+                    easing: 'easeOutQuad'
+                });
+                
+                // Animate filter section
+                anime({
+                    targets: '.parchment-bg',
+                    opacity: [0, 1],
+                    translateY: [30, 0],
+                    duration: 800,
+                    delay: 200,
+                    easing: 'easeOutQuad'
+                });
+                
+                // Animate floating elements
+                anime({
+                    targets: '.floating-element',
+                    opacity: [0, 0.3],
+                    scale: [0, 1],
+                    duration: 1000,
+                    delay: anime.stagger(200, {start: 1000}),
+                    easing: 'easeOutElastic(1, .8)'
+                });
+            }
+        }
+        
+        // Global functions for HTML event handlers
+        let moduleSelection;
+        
+        function filterModules() {
+            moduleSelection.filterModules();
+        }
+        
+        function showCharacterInfo() {
+            moduleSelection.showCharacterInfo();
+        }
+        
+        function closeCharacterModal() {
+            moduleSelection.closeCharacterModal();
+        }
+        
+        function closeModuleModal() {
+            moduleSelection.closeModuleModal();
+        }
+        
+        function startModule() {
+            moduleSelection.startModule();
+        }
+        
+        // Initialize module selection when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            moduleSelection = new ModuleSelection();
+        });
+    </script>
+</body>
+</html>

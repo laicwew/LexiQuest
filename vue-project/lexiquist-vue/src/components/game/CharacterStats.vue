@@ -1,0 +1,99 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+const props = defineProps<{
+  character: {
+    name: string
+    level: number
+    hp: number
+    maxHp: number
+    energy: number
+    maxEnergy: number
+    experience: number
+    maxExperience: number
+  }
+  vocabCount: number
+}>()
+
+const hpPercent = computed(() => (props.character.hp / props.character.maxHp) * 100)
+const energyPercent = computed(() => (props.character.energy / props.character.maxEnergy) * 100)
+const xpPercent = computed(() => (props.character.experience / props.character.maxExperience) * 100)
+</script>
+
+<template>
+  <div class="parchment-bg rounded-lg p-6 magical-glow">
+    <h2 class="fantasy-title text-xl font-bold mb-4">角色</h2>
+    <div class="text-center mb-6">
+      <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl">
+        🧙‍♂️
+      </div>
+      <h3 class="font-bold text-lg">{{ character.name }}</h3>
+      <p class="text-sm text-gray-600">Level {{ character.level }} Scholar</p>
+    </div>
+    
+    <!-- Stats -->
+    <div class="space-y-4">
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>生命值</span>
+          <span>{{ character.hp }}/{{ character.maxHp }}</span>
+        </div>
+        <div class="bg-gray-300 rounded-full h-2">
+          <div class="stat-bar h-2 rounded-full" :style="{ width: hpPercent + '%' }"></div>
+        </div>
+      </div>
+      
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>能量</span>
+          <span>{{ character.energy }}/{{ character.maxEnergy }}</span>
+        </div>
+        <div class="bg-gray-300 rounded-full h-2">
+          <div class="stat-bar h-2 rounded-full" :style="{ width: energyPercent + '%' }"></div>
+        </div>
+      </div>
+      
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>经验值</span>
+          <span>{{ character.experience }}/{{ character.maxExperience }}</span>
+        </div>
+        <div class="bg-gray-300 rounded-full h-2">
+          <div class="stat-bar h-2 rounded-full" :style="{ width: xpPercent + '%' }"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Vocabulary Count -->
+    <div class="mt-6 p-3 bg-yellow-100 rounded-lg">
+      <div class="text-center">
+        <div class="text-2xl font-bold text-yellow-700">{{ vocabCount }}</div>
+        <div class="text-sm text-yellow-600">已学词汇</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.parchment-bg {
+  background: linear-gradient(135deg, var(--secondary-parchment) 0%, #F0E68C 100%);
+  border: 2px solid var(--primary-gold);
+  box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+}
+
+.fantasy-title {
+  font-family: 'Cinzel', serif;
+  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+.stat-bar {
+  background: linear-gradient(90deg, var(--primary-green), #32CD32);
+  height: 8px;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+</style>
