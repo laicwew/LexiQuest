@@ -36,8 +36,7 @@ export const useGameStore = defineStore('game', () => {
   const progress = ref({
     wordsLearnedToday: 0,
     timeSpent: 0, // seconds
-    actionsTaken: 0,
-    achievements: [] as string[]
+    actionsTaken: 0
   })
 
   const settings = ref({
@@ -103,14 +102,6 @@ export const useGameStore = defineStore('game', () => {
       default: '你模仿了这个词。你的发音随着每次尝试都在进步。'
     }
   })
-
-  const achievements = ref([
-    { id: 'first_word', name: '第一步', description: '学会第一个词汇', unlocked: false },
-    { id: 'five_words', name: '词汇增长', description: '学会5个新词汇', unlocked: false },
-    { id: 'first_action', name: '采取行动', description: '执行第一个动作', unlocked: false },
-    { id: 'explorer', name: '探险家', description: '尝试所有四种动作类型', unlocked: false },
-    { id: 'persistent', name: '坚持学习者', description: '游戏15分钟', unlocked: false }
-  ])
 
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
@@ -201,9 +192,6 @@ export const useGameStore = defineStore('game', () => {
     // Clear word selection
     clearSelectedWord()
 
-    // Check for achievements
-    checkAchievements()
-
     // Save game state
     saveGame()
 
@@ -261,42 +249,10 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  function checkAchievements() {
-    achievements.value.forEach(achievement => {
-      if (!achievement.unlocked) {
-        let shouldUnlock = false
-
-        switch(achievement.id) {
-          case 'first_word':
-            shouldUnlock = vocabulary.value.learned.size >= 1
-            break
-          case 'five_words':
-            shouldUnlock = vocabulary.value.learned.size >= 5
-            break
-          case 'first_action':
-            shouldUnlock = progress.value.actionsTaken >= 1
-            break
-          case 'explorer':
-            shouldUnlock = progress.value.actionsTaken >= 4
-            break
-          case 'persistent':
-            shouldUnlock = progress.value.timeSpent >= 900 // 15 minutes
-            break
-        }
-
-        if (shouldUnlock) {
-          achievement.unlocked = true
-          progress.value.achievements.push(achievement.id)
-        }
-      }
-    })
-  }
-
   function startProgressTracking() {
     // Track time spent in game
     setInterval(() => {
       progress.value.timeSpent++
-      checkAchievements()
     }, 1000)
   }
 
@@ -310,7 +266,6 @@ export const useGameStore = defineStore('game', () => {
     settings,
     modules,
     actionResponses,
-    achievements,
 
     // Getters
     hpPercent,
@@ -329,7 +284,6 @@ export const useGameStore = defineStore('game', () => {
     updateCharacterStatsByAction,
     levelUp,
     learnWord,
-    checkAchievements,
     startProgressTracking
   }
 })

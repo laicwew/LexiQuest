@@ -6,7 +6,6 @@ import StoryDisplay from '@/components/game/StoryDisplay.vue'
 import ActionButtons from '@/components/game/ActionButtons.vue'
 import ProgressPanel from '@/components/game/ProgressPanel.vue'
 import DictionaryModal from '@/components/game/DictionaryModal.vue'
-import AchievementNotification from '@/components/game/AchievementNotification.vue'
 import Notification from '@/components/game/Notification.vue'
 
 // Game store
@@ -14,8 +13,6 @@ const gameStore = useGameStore()
 
 // UI state
 const showDictionary = ref(false)
-const showAchievement = ref(false)
-const achievementText = ref('')
 const actionResponse = ref('')
 const showActionPrompt = ref(false)
 const actionPromptText = ref('')
@@ -95,7 +92,6 @@ onMounted(() => {
   // Set up progress tracking
   progressTimer = window.setInterval(() => {
     gameStore.updateProgress({ timeSpent: gameStore.progress.timeSpent + 1 })
-    gameStore.checkAchievements()
   }, 1000) as unknown as number
 })
 
@@ -201,13 +197,6 @@ onUnmounted(() => {
     <DictionaryModal 
       :show="showDictionary" 
       @close="toggleDictionary"
-    />
-
-    <!-- Achievement Notification -->
-    <AchievementNotification 
-      :show="showAchievement" 
-      :text="achievementText"
-      @close="showAchievement = false"
     />
 
     <!-- General Notification -->
@@ -317,15 +306,6 @@ body {
 .dictionary-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
-}
-
-.achievement-notification {
-  background: linear-gradient(135deg, var(--primary-gold), #FFD700);
-  color: var(--primary-burgundy);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-top: 1rem;
-  animation: slideInRight 0.5s ease;
 }
 
 @keyframes slideInRight {
