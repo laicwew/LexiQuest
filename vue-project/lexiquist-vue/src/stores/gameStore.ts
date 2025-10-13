@@ -23,7 +23,7 @@ export const useGameStore = defineStore('game', () => {
 
   const story = ref({
     currentScene: 'entrance',
-    text: '你走进魔法超市，看到一个红色的apple放在shelf上。一个友好的clerk正在cleaning地面。明亮的灯光照亮了各种fruits和vegetables，它们被整齐地排列在架子上。',
+    text: '',
     history: [] as string[]
   })
 
@@ -77,6 +77,19 @@ export const useGameStore = defineStore('game', () => {
           ]
         }
       }
+    },
+    // 新增的空模块
+    empty_market: {
+      title: 'Empty Market',
+      description: 'An empty magical market for testing',
+      scenes: {
+        entrance: {
+          text: '', // 空文本
+          vocabulary: [],
+          interactions: []
+        }
+      },
+      npcs: {}
     }
   })
 
@@ -102,6 +115,9 @@ export const useGameStore = defineStore('game', () => {
       default: '你模仿了这个词。你的发音随着每次尝试都在进步。'
     }
   })
+
+  // 当前选中的标签页
+  const activeTab = ref('GENERATED')
 
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
@@ -136,7 +152,8 @@ export const useGameStore = defineStore('game', () => {
         learned: Array.from(vocabulary.value.learned.entries())
       },
       progress: progress.value,
-      settings: settings.value
+      settings: settings.value,
+      activeTab: activeTab.value
     }
     
     localStorage.setItem('lexiquest-save', JSON.stringify(gameState))
@@ -154,6 +171,14 @@ export const useGameStore = defineStore('game', () => {
         vocabulary.value = parsed.vocabulary
         progress.value = parsed.progress
         settings.value = parsed.settings || settings.value
+        activeTab.value = parsed.activeTab || 'GENERATED'
+        
+        // 根据保存的标签页状态设置正确的文本
+        if (activeTab.value === 'GENERATED') {
+          story.value.text = modules.value.empty_market.scenes.entrance.text
+        } else if (activeTab.value === 'DUMMY') {
+          story.value.text = modules.value.supermarket_v1.scenes.entrance.text
+        }
         
         // Restore Map objects
         if (parsed.vocabulary && parsed.vocabulary.learned) {
@@ -168,6 +193,10 @@ export const useGameStore = defineStore('game', () => {
       if (username) {
         character.value.name = username
       }
+      
+      // 默认情况下，设置为GENERATED标签页并显示空文本
+      activeTab.value = 'GENERATED'
+      story.value.text = modules.value.empty_market.scenes.entrance.text
     }
   }
 
@@ -249,6 +278,19 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
+  // 切换标签页
+  function switchTab(tab: string) {
+    activeTab.value = tab
+    // 根据标签页更新显示的文本
+    if (tab === 'GENERATED') {
+      // 显示空模块的文本
+      story.value.text = modules.value.empty_market.scenes.entrance.text
+    } else if (tab === 'DUMMY') {
+      // 显示当前模块的文本
+      story.value.text = modules.value.supermarket_v1.scenes.entrance.text
+    }
+  }
+
   function startProgressTracking() {
     // Track time spent in game
     setInterval(() => {
@@ -266,6 +308,7 @@ export const useGameStore = defineStore('game', () => {
     settings,
     modules,
     actionResponses,
+    activeTab,
 
     // Getters
     hpPercent,
@@ -284,6 +327,7 @@ export const useGameStore = defineStore('game', () => {
     updateCharacterStatsByAction,
     levelUp,
     learnWord,
+    switchTab,
     startProgressTracking
   }
 })

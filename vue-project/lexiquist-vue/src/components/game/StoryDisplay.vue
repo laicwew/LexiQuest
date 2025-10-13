@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
+import { useGameStore } from '@/stores/gameStore'
+
+const gameStore = useGameStore()
 
 const props = defineProps<{
   storyText: string
@@ -83,6 +86,11 @@ const updateSelectedWordStyling = () => {
   })
 }
 
+// 切换标签页
+const switchTab = (tab: string) => {
+  gameStore.switchTab(tab)
+}
+
 onMounted(() => {
   processStoryText()
 })
@@ -90,6 +98,33 @@ onMounted(() => {
 
 <template>
   <div class="parchment-bg rounded-lg p-8 magical-glow min-h-96">
+    <!-- Tabs -->
+    <div class="flex mb-4 border-b border-gray-300">
+      <button 
+        class="px-4 py-2 font-medium text-sm rounded-t-lg transition-colors"
+        :class="[
+          'GENERATED' === gameStore.activeTab 
+            ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500' 
+            : 'text-gray-600 hover:text-gray-900'
+        ]"
+        @click="switchTab('GENERATED')"
+      >
+        GENERATED
+      </button>
+      <button 
+        class="px-4 py-2 font-medium text-sm rounded-t-lg transition-colors"
+        :class="[
+          'DUMMY' === gameStore.activeTab 
+            ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500' 
+            : 'text-gray-600 hover:text-gray-900'
+        ]"
+        @click="switchTab('DUMMY')"
+      >
+        DUMMY
+      </button>
+    </div>
+    
+    <!-- Story Content -->
     <div 
       class="story-text" 
       v-html="storyContent" 
