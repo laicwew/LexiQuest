@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 
 const props = defineProps<{
   storyText: string
@@ -12,14 +12,75 @@ const emit = defineEmits<{
 
 const storyContent = ref('')
 
+// Vocabulary for the current scene
+const currentVocabulary = ref([
+  { word: 'apple', translation: '苹果', pos: 'noun', difficulty: 1 },
+  { word: 'shelf', translation: '架子', pos: 'noun', difficulty: 2 },
+  { word: 'clerk', translation: '店员', pos: 'noun', difficulty: 2 },
+  { word: 'cleaning', translation: '打扫', pos: 'verb', difficulty: 2 },
+  { word: 'bright', translation: '明亮的', pos: 'adjective', difficulty: 2 },
+  { word: 'fruits', translation: '水果', pos: 'noun', difficulty: 1 },
+  { word: 'vegetables', translation: '蔬菜', pos: 'noun', difficulty: 1 }
+])
+
 // Process text to highlight vocabulary words
 const processStoryText = () => {
-  // This would be replaced with actual vocabulary processing logic
-  storyContent.value = '你走进魔法超市，看到一个红色的apple放在shelf上。一个友好的clerk正在cleaning地面。明亮的灯光照亮了各种fruits和vegetables，它们被整齐地排列在架子上。'
+  let processedText = props.storyText
+  
+  // Process each vocabulary word
+  currentVocabulary.value.forEach(wordData => {
+    const regex = new RegExp(`\\b${wordData.word}\\b`, 'gi')
+    processedText = processedText.replace(
+      regex, 
+      `<span class="interactive-word" data-word="${wordData.word}">${wordData.word}</span>`
+    )
+  })
+  
+  storyContent.value = processedText
 }
 
 const selectWord = (word: string) => {
   emit('wordSelected', word)
+}
+
+// Process story text when it changes
+watch(() => props.storyText, () => {
+  processStoryText()
+})
+
+// Update selected word styling when selection changes
+watch(() => props.selectedWord, () => {
+  updateSelectedWordStyling()
+})
+
+// Handle word clicks in the processed HTML
+const handleStoryClick = (event: Event) => {
+  const target = event.target as HTMLElement
+  if (target.classList.contains('interactive-word')) {
+    const word = target.getAttribute('data-word')
+    if (word) {
+      selectWord(word)
+    }
+  }
+}
+
+// Update styling for selected word
+const updateSelectedWordStyling = () => {
+  nextTick(() => {
+    // Remove selected class from all words
+    const allWords = document.querySelectorAll('.interactive-word')
+    allWords.forEach(word => {
+      word.classList.remove('selected')
+    })
+    
+    // Add selected class to the currently selected word
+    if (props.selectedWord) {
+      const selectedWords = document.querySelectorAll(`[data-word="${props.selectedWord}"]`)
+      selectedWords.forEach(word => {
+        word.classList.add('selected')
+      })
+    }
+  })
 }
 
 onMounted(() => {
@@ -29,26 +90,11 @@ onMounted(() => {
 
 <template>
   <div class="parchment-bg rounded-lg p-8 magical-glow min-h-96">
-    <div class="story-text">
-      <!-- In a real implementation, we would dynamically insert the story content with interactive words -->
-      <p>你走进魔法超市，看到一个红色的<span class="interactive-word" :class="{ selected: selectedWord === 'apple' }" @click="selectWord('apple')">apple</span>放在<span class="interactive-word" :class="{ selected: selectedWord === 'shelf' }" @click="selectWord('shelf')">shelf</span>上。一个友好的<span class="interactive-word" :class="{ selected: selectedWord === 'clerk' }" @click="selectWord('clerk')">clerk</span>正在<span class="interactive-word" :class="{ selected: selectedWord === 'cleaning' }" @click="selectWord('cleaning')">cleaning</span>地面。明亮的灯光照亮了各种<span class="interactive-word" :class="{ selected: selectedWord === 'fruits' }" @click="selectWord('fruits')">fruits</span>和<span class="interactive-word" :class="{ selected: selectedWord === 'vegetables' }" @click="selectWord('vegetables')">vegetables</span>，它们被整齐地排列在架子上。</p>
-    </div>
-    
-    <!-- Action Prompt -->
-    <div id="action-prompt" class="mt-6 p-4 bg-blue-100 rounded-lg hidden">
-      <p class="font-medium text-blue-800 mb-3">你想深入探索市场吗？</p>
-      <div class="flex space-x-3">
-        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
-          Yes
-        </button>
-        <button class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors">
-          Try Another
-        </button>
-        <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
-          No
-        </button>
-      </div>
-    </div>
+    <div 
+      class="story-text" 
+      v-html="storyContent" 
+      @click="handleStoryClick"
+    ></div>
   </div>
 </template>
 
@@ -65,27 +111,23 @@ onMounted(() => {
   color: var(--text-charcoal);
 }
 
-.interactive-word {
-  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* 使用深度选择器来确保样式能应用到动态插入的元素 */
+:deep(.interactive-word) {
+  color: #1E90FF; /* 蓝色 */
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   font-weight: 600;
+  text-decoration: underline;
 }
 
-.interactive-word:hover {
-  text-shadow: 0 0 15px var(--primary-gold);
+:deep(.interactive-word:hover) {
+  color: #00BFFF; /* 浅蓝色 */
   transform: scale(1.05);
 }
 
-.interactive-word.selected {
-  background: linear-gradient(45deg, var(--accent-cyan), #00CED1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 20px var(--accent-cyan);
+:deep(.interactive-word.selected) {
+  color: #FFA500 !important; /* 橙色 */
+  text-shadow: 0 0 10px rgba(255, 165, 0, 0.5) !important;
 }
 </style>

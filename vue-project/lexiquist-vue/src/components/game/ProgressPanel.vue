@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useGameStore } from '@/stores/gameStore'
+
 const props = defineProps<{
   module: {
     id: string
@@ -14,8 +17,15 @@ const props = defineProps<{
   }
 }>()
 
+const gameStore = useGameStore()
+
 const moduleProgressPercent = props.module.progress
 const completionPercent = `${moduleProgressPercent}%`
+
+// Get unlocked achievements
+const unlockedAchievements = computed(() => {
+  return gameStore.achievements.filter(achievement => achievement.unlocked)
+})
 </script>
 
 <template>
@@ -39,18 +49,17 @@ const completionPercent = `${moduleProgressPercent}%`
     <!-- Recent Achievements -->
     <div class="parchment-bg rounded-lg p-6 magical-glow">
       <h3 class="fantasy-title text-lg font-bold mb-3">成就</h3>
-      <div class="space-y-2">
-        <div class="flex items-center space-x-2 text-sm">
+      <div class="space-y-2" id="achievements-list">
+        <div 
+          v-for="achievement in unlockedAchievements" 
+          :key="achievement.id"
+          class="flex items-center space-x-2 text-sm"
+        >
           <span class="text-yellow-500">🏆</span>
-          <span class="font-medium">第一步</span>
+          <span class="font-medium">{{ achievement.name }}</span>
         </div>
-        <div class="flex items-center space-x-2 text-sm">
-          <span class="text-yellow-500">🏆</span>
-          <span class="font-medium">词汇增长</span>
-        </div>
-        <div class="flex items-center space-x-2 text-sm">
-          <span class="text-yellow-500">🏆</span>
-          <span class="font-medium">采取行动</span>
+        <div v-if="unlockedAchievements.length === 0" class="text-sm text-gray-500 text-center">
+          还没有解锁任何成就
         </div>
       </div>
     </div>

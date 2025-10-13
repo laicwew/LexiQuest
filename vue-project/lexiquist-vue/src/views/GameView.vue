@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import CharacterStats from '@/components/game/CharacterStats.vue'
 import StoryDisplay from '@/components/game/StoryDisplay.vue'
@@ -7,6 +7,7 @@ import ActionButtons from '@/components/game/ActionButtons.vue'
 import ProgressPanel from '@/components/game/ProgressPanel.vue'
 import DictionaryModal from '@/components/game/DictionaryModal.vue'
 import AchievementNotification from '@/components/game/AchievementNotification.vue'
+import Notification from '@/components/game/Notification.vue'
 
 // Game store
 const gameStore = useGameStore()
@@ -15,6 +16,15 @@ const gameStore = useGameStore()
 const showDictionary = ref(false)
 const showAchievement = ref(false)
 const achievementText = ref('')
+const actionResponse = ref('')
+const showActionPrompt = ref(false)
+const actionPromptText = ref('')
+const showNotification = ref(false)
+const notificationMessage = ref('')
+const notificationType = ref<'success' | 'error' | 'info' | 'achievement'>('info')
+
+// Timer for progress tracking
+let progressTimer: number | null = null
 
 // Methods
 const toggleDictionary = () => {
@@ -23,7 +33,7 @@ const toggleDictionary = () => {
 
 const saveGame = () => {
   gameStore.saveGame()
-  console.log('Game saved!')
+  showGameNotification('Game saved successfully!', 'success')
 }
 
 const selectWord = (word: string) => {
@@ -31,25 +41,69 @@ const selectWord = (word: string) => {
 }
 
 const performAction = (action: string) => {
-  // Action logic would go here
-  console.log(`Performing action: ${action} on word: ${gameStore.vocabulary.selectedWord}`)
-  gameStore.clearSelectedWord()
+  const response = gameStore.performAction(action)
+  if (response) {
+    actionResponse.value = response
+    // Scroll to response
+    setTimeout(() => {
+      const responseElement = document.querySelector('.action-response')
+      if (responseElement) {
+        responseElement.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 100)
+  }
 }
 
 const generateActionPrompt = () => {
-  // Generate prompt logic would go here
-  console.log('Generating action prompt')
+  const prompts = [
+    '你想深入探索市场吗？',
+    '店员似乎还有更多话要说。你要不要再和他谈谈？',
+    '你注意到远处的架子上有闪闪发光的东西。要调查一下吗？',
+    '魔法的氛围让你感到好奇。要多看看周围吗？',
+    '你想练习更多词汇。要试试另一个词吗？'
+  ]
+  
+  const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)]
+  actionPromptText.value = randomPrompt || ''
+  showActionPrompt.value = true
 }
 
 const handleActionPrompt = (choice: string) => {
-  // Handle prompt logic would go here
-  console.log(`Handling action prompt choice: ${choice}`)
+  showActionPrompt.value = false
+  
+  if (choice === 'yes') {
+    const continuationText = '你决定进一步探索。魔法市场似乎隐藏着许多秘密和学习机会...'
+    actionResponse.value = continuationText
+  }
+}
+
+const showGameNotification = (message: string, type: 'success' | 'error' | 'info' | 'achievement' = 'info') => {
+  notificationMessage.value = message
+  notificationType.value = type
+  showNotification.value = true
+}
+
+const closeNotification = () => {
+  showNotification.value = false
 }
 
 // Initialize game
 onMounted(() => {
   gameStore.loadGame()
-  console.log('Game initialized')
+  gameStore.startProgressTracking()
+  
+  // Set up progress tracking
+  progressTimer = window.setInterval(() => {
+    gameStore.updateProgress({ timeSpent: gameStore.progress.timeSpent + 1 })
+    gameStore.checkAchievements()
+  }, 1000) as unknown as number
+})
+
+// Clean up
+onUnmounted(() => {
+  if (progressTimer) {
+    clearInterval(progressTimer)
+  }
 })
 </script>
 
@@ -81,7 +135,10 @@ onMounted(() => {
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- Character Stats Panel -->
         <div class="lg:col-span-1">
-          <CharacterStats :character="gameStore.character" :vocab-count="gameStore.progress.wordsLearnedToday" />
+          <CharacterStats 
+            :character="gameStore.character" 
+            :vocab-count="gameStore.vocabCount" 
+          />
         </div>
 
         <!-- Story Display Area -->
@@ -91,6 +148,36 @@ onMounted(() => {
             :selected-word="gameStore.vocabulary.selectedWord"
             @word-selected="selectWord"
           />
+          
+          <!-- Action Response -->
+          <div v-if="actionResponse" class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg action-response">
+            <p class="italic text-blue-800">{{ actionResponse }}</p>
+          </div>
+          
+          <!-- Action Prompt -->
+          <div v-if="showActionPrompt" class="mt-6 p-4 bg-blue-100 rounded-lg">
+            <p class="font-medium text-blue-800 mb-3">{{ actionPromptText }}</p>
+            <div class="flex space-x-3">
+              <button 
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                @click="handleActionPrompt('yes')"
+              >
+                Yes
+              </button>
+              <button 
+                class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
+                @click="handleActionPrompt('retry')"
+              >
+                Try Another
+              </button>
+              <button 
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                @click="handleActionPrompt('no')"
+              >
+                No
+              </button>
+            </div>
+          </div>
           
           <!-- Action Buttons -->
           <ActionButtons 
@@ -121,6 +208,14 @@ onMounted(() => {
       :show="showAchievement" 
       :text="achievementText"
       @close="showAchievement = false"
+    />
+
+    <!-- General Notification -->
+    <Notification 
+      :message="notificationMessage"
+      :type="notificationType"
+      :show="showNotification"
+      @close="closeNotification"
     />
   </div>
 </template>
@@ -161,30 +256,6 @@ body {
 .magical-glow {
   box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.1);
   border: 1px solid var(--primary-gold);
-}
-
-.interactive-word {
-  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  font-weight: 600;
-}
-
-.interactive-word:hover {
-  text-shadow: 0 0 15px var(--primary-gold);
-  transform: scale(1.05);
-}
-
-.interactive-word.selected {
-  background: linear-gradient(45deg, var(--accent-cyan), #00CED1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 20px var(--accent-cyan);
 }
 
 .action-button {
