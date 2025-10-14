@@ -57,6 +57,19 @@ npm run build
 npm run preview
 ```
 
+## 环境变量配置
+
+项目使用环境变量来存储敏感信息，如API密钥。请按以下步骤配置：
+
+1. 复制 `.env.example` 文件并重命名为 `.env`
+2. 在 `.env` 文件中填入你的 DeepSeek API Key
+
+```bash
+cp .env.example .env
+```
+
+注意：`.env` 文件已被添加到 `.gitignore` 中，不会被提交到版本控制系统。
+
 ## 组件说明
 
 ### 主要视图组件
