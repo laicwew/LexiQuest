@@ -2,6 +2,10 @@
 import { ref, onMounted } from 'vue'
 import OpenAI from 'openai'
 
+const emit = defineEmits<{
+  (e: 'aiResponse', response: string): void
+}>()
+
 // 定义响应数据
 const aiResponse = ref<string>('')
 const isLoading = ref<boolean>(false)
@@ -33,6 +37,8 @@ async function testOpenAI() {
       const choice = completion.choices[0]
       if (choice && choice.message && choice.message.content) {
         aiResponse.value = choice.message.content
+        // 发射事件，将AI响应传递给父组件
+        emit('aiResponse', choice.message.content)
       } else {
         aiResponse.value = 'No response content'
       }

@@ -88,6 +88,12 @@ const closeNotification = () => {
   showNotification.value = false
 }
 
+// 处理AI响应
+const handleAIResponse = (response: string) => {
+  // 更新AI生成的内容
+  gameStore.updateGeneratedContent(response)
+}
+
 // Initialize game
 onMounted(() => {
   gameStore.loadGame()
@@ -195,7 +201,7 @@ onUnmounted(() => {
           />
 
           <!-- AI Console Tester -->
-          <AIConsoleTester />
+          <AIConsoleTester @ai-response="handleAIResponse" />
         </div>
 
         <!-- Progress & Achievements Panel -->
