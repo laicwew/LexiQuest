@@ -7,6 +7,7 @@ import ActionButtons from '@/components/game/ActionButtons.vue'
 import ProgressPanel from '@/components/game/ProgressPanel.vue'
 import DictionaryModal from '@/components/game/DictionaryModal.vue'
 import Notification from '@/components/game/Notification.vue'
+import AIConsoleTester from '@/components/game/AIConsoleTester.vue'
 
 // Game store
 const gameStore = useGameStore()
@@ -57,9 +58,9 @@ const generateActionPrompt = () => {
     '店员似乎还有更多话要说。你要不要再和他谈谈？',
     '你注意到远处的架子上有闪闪发光的东西。要调查一下吗？',
     '魔法的氛围让你感到好奇。要多看看周围吗？',
-    '你想练习更多词汇。要试试另一个词吗？'
+    '你想练习更多词汇。要试试另一个词吗？',
   ]
-  
+
   const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)]
   actionPromptText.value = randomPrompt || ''
   showActionPrompt.value = true
@@ -67,14 +68,17 @@ const generateActionPrompt = () => {
 
 const handleActionPrompt = (choice: string) => {
   showActionPrompt.value = false
-  
+
   if (choice === 'yes') {
     const continuationText = '你决定进一步探索。魔法市场似乎隐藏着许多秘密和学习机会...'
     actionResponse.value = continuationText
   }
 }
 
-const showGameNotification = (message: string, type: 'success' | 'error' | 'info' | 'achievement' = 'info') => {
+const showGameNotification = (
+  message: string,
+  type: 'success' | 'error' | 'info' | 'achievement' = 'info',
+) => {
   notificationMessage.value = message
   notificationType.value = type
   showNotification.value = true
@@ -88,7 +92,7 @@ const closeNotification = () => {
 onMounted(() => {
   gameStore.loadGame()
   gameStore.startProgressTracking()
-  
+
   // Set up progress tracking
   progressTimer = window.setInterval(() => {
     gameStore.updateProgress({ timeSpent: gameStore.progress.timeSpent + 1 })
@@ -106,7 +110,9 @@ onUnmounted(() => {
 <template>
   <div class="game-container">
     <!-- Navigation Bar -->
-    <nav class="bg-black bg-opacity-30 backdrop-blur-md border-b border-yellow-600 border-opacity-30 sticky top-0 z-50">
+    <nav
+      class="bg-black bg-opacity-30 backdrop-blur-md border-b border-yellow-600 border-opacity-30 sticky top-0 z-50"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center space-x-4">
@@ -115,10 +121,16 @@ onUnmounted(() => {
           </div>
           <div class="flex items-center space-x-4">
             <span class="text-white font-medium">{{ gameStore.character.name }}</span>
-            <button @click="toggleDictionary" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors">
+            <button
+              @click="toggleDictionary"
+              class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
               📚 词典
             </button>
-            <button @click="saveGame" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+            <button
+              @click="saveGame"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
               💾 保存
             </button>
           </div>
@@ -131,42 +143,42 @@ onUnmounted(() => {
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- Character Stats Panel -->
         <div class="lg:col-span-1">
-          <CharacterStats 
-            :character="gameStore.character" 
-            :vocab-count="gameStore.vocabCount" 
-          />
+          <CharacterStats :character="gameStore.character" :vocab-count="gameStore.vocabCount" />
         </div>
 
         <!-- Story Display Area -->
         <div class="lg:col-span-2">
-          <StoryDisplay 
-            :story-text="gameStore.story.text" 
+          <StoryDisplay
+            :story-text="gameStore.story.text"
             :selected-word="gameStore.vocabulary.selectedWord"
             @word-selected="selectWord"
           />
-          
+
           <!-- Action Response -->
-          <div v-if="actionResponse" class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg action-response">
+          <div
+            v-if="actionResponse"
+            class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg action-response"
+          >
             <p class="italic text-blue-800">{{ actionResponse }}</p>
           </div>
-          
+
           <!-- Action Prompt -->
           <div v-if="showActionPrompt" class="mt-6 p-4 bg-blue-100 rounded-lg">
             <p class="font-medium text-blue-800 mb-3">{{ actionPromptText }}</p>
             <div class="flex space-x-3">
-              <button 
+              <button
                 class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
                 @click="handleActionPrompt('yes')"
               >
                 Yes
               </button>
-              <button 
+              <button
                 class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
                 @click="handleActionPrompt('retry')"
               >
                 Try Another
               </button>
-              <button 
+              <button
                 class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
                 @click="handleActionPrompt('no')"
               >
@@ -174,33 +186,30 @@ onUnmounted(() => {
               </button>
             </div>
           </div>
-          
+
           <!-- Action Buttons -->
-          <ActionButtons 
+          <ActionButtons
             :selected-word="gameStore.vocabulary.selectedWord"
             @perform-action="performAction"
             @generate-prompt="generateActionPrompt"
           />
+
+          <!-- AI Console Tester -->
+          <AIConsoleTester />
         </div>
 
         <!-- Progress & Achievements Panel -->
         <div class="lg:col-span-1">
-          <ProgressPanel 
-            :module="gameStore.currentModule"
-            :progress="gameStore.progress"
-          />
+          <ProgressPanel :module="gameStore.currentModule" :progress="gameStore.progress" />
         </div>
       </div>
     </div>
 
     <!-- Dictionary Modal -->
-    <DictionaryModal 
-      :show="showDictionary" 
-      @close="toggleDictionary"
-    />
+    <DictionaryModal :show="showDictionary" @close="toggleDictionary" />
 
     <!-- General Notification -->
-    <Notification 
+    <Notification
       :message="notificationMessage"
       :type="notificationType"
       :show="showNotification"
@@ -211,13 +220,13 @@ onUnmounted(() => {
 
 <style scoped>
 :root {
-  --primary-green: #2D5016;
-  --primary-gold: #D4AF37;
+  --primary-green: #2d5016;
+  --primary-gold: #d4af37;
   --primary-burgundy: #800020;
-  --secondary-parchment: #F5F5DC;
+  --secondary-parchment: #f5f5dc;
   --secondary-purple: #663399;
-  --accent-cyan: #00FFFF;
-  --text-charcoal: #36454F;
+  --accent-cyan: #00ffff;
+  --text-charcoal: #36454f;
 }
 
 body {
@@ -229,7 +238,7 @@ body {
 
 .fantasy-title {
   font-family: 'Cinzel', serif;
-  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
+  background: linear-gradient(45deg, var(--primary-gold), #ffd700);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -237,18 +246,20 @@ body {
 }
 
 .parchment-bg {
-  background: linear-gradient(135deg, var(--secondary-parchment) 0%, #F0E68C 100%);
+  background: linear-gradient(135deg, var(--secondary-parchment) 0%, #f0e68c 100%);
   border: 2px solid var(--primary-gold);
   box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
 }
 
 .magical-glow {
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.1);
+  box-shadow:
+    0 0 20px rgba(212, 175, 55, 0.4),
+    inset 0 0 20px rgba(212, 175, 55, 0.1);
   border: 1px solid var(--primary-gold);
 }
 
 .action-button {
-  background: linear-gradient(135deg, var(--primary-burgundy), #B22222);
+  background: linear-gradient(135deg, var(--primary-burgundy), #b22222);
   border: 2px solid var(--primary-gold);
   color: white;
   font-weight: 600;
@@ -273,7 +284,7 @@ body {
 }
 
 .stat-bar {
-  background: linear-gradient(90deg, var(--primary-green), #32CD32);
+  background: linear-gradient(90deg, var(--primary-green), #32cd32);
   height: 8px;
   border-radius: 4px;
   transition: width 0.5s ease;
