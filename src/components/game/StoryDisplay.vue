@@ -131,7 +131,9 @@ onMounted(() => {
     </div>
 
     <!-- Story Content -->
-    <div class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
+    <div class="story-text-container">
+      <div class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
+    </div>
   </div>
 </template>
 
@@ -142,10 +144,37 @@ onMounted(() => {
   box-shadow: none; /* 移除阴影 */
 }
 
+.story-text-container {
+  max-height: 400px; /* 设置最大高度 */
+  overflow-y: auto; /* 启用垂直滚动条 */
+  padding: 10px; /* 添加内边距 */
+  border: 1px solid var(--primary-gold); /* 添加边框 */
+  background: var(--secondary-parchment); /* 背景色 */
+}
+
 .story-text {
   font-size: 1.1rem;
   line-height: 1.8;
   color: var(--text-charcoal);
+}
+
+/* 滚动条样式 */
+.story-text-container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.story-text-container::-webkit-scrollbar-track {
+  background: var(--secondary-parchment);
+  border-left: 1px solid var(--primary-gold);
+}
+
+.story-text-container::-webkit-scrollbar-thumb {
+  background: var(--primary-green);
+  border: 1px solid var(--primary-gold);
+}
+
+.story-text-container::-webkit-scrollbar-thumb:hover {
+  background: #1a2e0d;
 }
 
 /* 使用深度选择器来确保样式能应用到动态插入的元素 */
