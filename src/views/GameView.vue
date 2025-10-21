@@ -90,8 +90,14 @@ const closeNotification = () => {
 
 // 处理AI响应
 const handleAIResponse = (response: string) => {
+  // 解析response中被**包裹的词汇，将其转换为可点击的交互式词汇
+  const processedResponse = response.replace(
+    /\*\*(.*?)\*\*/g,
+    '<span class="interactive-word" data-word="$1">$1</span>',
+  )
+
   // 更新AI生成的内容
-  gameStore.updateGeneratedContent(response)
+  gameStore.updateGeneratedContent(processedResponse)
 }
 
 // Initialize game
