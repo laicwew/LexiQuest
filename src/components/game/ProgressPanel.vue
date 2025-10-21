@@ -25,7 +25,9 @@ const completionPercent = `${moduleProgressPercent}%`
     <div class="parchment-bg rounded-lg p-6 magical-glow">
       <h3 class="fantasy-title text-lg font-bold mb-3">当前冒险</h3>
       <div class="text-center">
-        <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg mx-auto mb-3 flex items-center justify-center text-2xl">
+        <div
+          class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg mx-auto mb-3 flex items-center justify-center text-2xl"
+        >
           🏪
         </div>
         <h4 class="font-bold">{{ module.title }}</h4>
@@ -36,7 +38,7 @@ const completionPercent = `${moduleProgressPercent}%`
         <p class="text-xs text-gray-600">{{ completionPercent }} 完成</p>
       </div>
     </div>
-    
+
     <!-- Quick Stats -->
     <div class="parchment-bg rounded-lg p-6 magical-glow">
       <h3 class="fantasy-title text-lg font-bold mb-3">今日进度</h3>
@@ -60,24 +62,21 @@ const completionPercent = `${moduleProgressPercent}%`
 
 <style scoped>
 .parchment-bg {
-  background: linear-gradient(135deg, var(--secondary-parchment) 0%, #F0E68C 100%);
+  background: var(--secondary-parchment); /* 扁平化背景 */
   border: 2px solid var(--primary-gold);
-  box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+  box-shadow: none; /* 移除阴影 */
 }
 
 .fantasy-title {
   font-family: 'Cinzel', serif;
-  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  color: var(--primary-gold);
+  text-shadow: none; /* 移除阴影 */
 }
 
 .stat-bar {
-  background: linear-gradient(90deg, var(--primary-green), #32CD32);
+  background: var(--primary-green); /* 扁平化背景 */
   height: 8px;
-  border-radius: 4px;
+  border-radius: 0; /* 移除圆角 */
   transition: width 0.5s ease;
 }
 </style>

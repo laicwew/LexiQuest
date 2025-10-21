@@ -19,18 +19,18 @@ const dictionaryData = ref([
   { word: 'cleaning', translation: '打扫', pos: 'verb', mastery: 50 },
   { word: 'bright', translation: '明亮的', pos: 'adjective', mastery: 40 },
   { word: 'fruits', translation: '水果', pos: 'noun', mastery: 90 },
-  { word: 'vegetables', translation: '蔬菜', pos: 'noun', mastery: 85 }
+  { word: 'vegetables', translation: '蔬菜', pos: 'noun', mastery: 85 },
 ])
 
 const filteredDictionary = computed(() => {
   if (!searchTerm.value) {
     return dictionaryData.value
   }
-  
+
   const term = searchTerm.value.toLowerCase()
-  return dictionaryData.value.filter(entry => 
-    entry.word.toLowerCase().includes(term) || 
-    entry.translation.toLowerCase().includes(term)
+  return dictionaryData.value.filter(
+    (entry) =>
+      entry.word.toLowerCase().includes(term) || entry.translation.toLowerCase().includes(term),
   )
 })
 
@@ -48,10 +48,10 @@ const close = () => {
           <button @click="close" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
         <div class="mt-4">
-          <input 
-            type="text" 
+          <input
+            type="text"
             v-model="searchTerm"
-            placeholder="Search vocabulary..." 
+            placeholder="Search vocabulary..."
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           />
         </div>
@@ -61,11 +61,7 @@ const close = () => {
           No words found matching your search.
         </div>
         <div v-else>
-          <div 
-            v-for="entry in filteredDictionary" 
-            :key="entry.word"
-            class="dictionary-card"
-          >
+          <div v-for="entry in filteredDictionary" :key="entry.word" class="dictionary-card">
             <div class="flex justify-between items-start">
               <div>
                 <h4 class="font-bold text-lg">{{ entry.word }}</h4>
@@ -75,8 +71,8 @@ const close = () => {
               <div class="text-right">
                 <div class="text-xs text-gray-400">Mastery</div>
                 <div class="w-16 bg-gray-200 rounded-full h-2 mt-1">
-                  <div 
-                    class="bg-yellow-500 h-2 rounded-full" 
+                  <div
+                    class="bg-yellow-500 h-2 rounded-full"
                     :style="{ width: entry.mastery + '%' }"
                   ></div>
                 </div>
@@ -92,30 +88,28 @@ const close = () => {
 <style scoped>
 .modal-overlay {
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
+  backdrop-filter: none;
 }
 
 .fantasy-title {
   font-family: 'Cinzel', serif;
-  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  color: var(--primary-gold);
+  text-shadow: none;
 }
 
 .dictionary-card {
   background: var(--secondary-parchment);
   border: 1px solid var(--primary-gold);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 1rem;
   margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
+  transition: none;
+  box-shadow: none;
 }
 
 .dictionary-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+  transform: none;
+  box-shadow: none;
 }
 
 .chinese-text {

@@ -137,9 +137,9 @@ onMounted(() => {
 
 <style scoped>
 .parchment-bg {
-  background: linear-gradient(135deg, var(--secondary-parchment) 0%, #f0e68c 100%);
+  background: var(--secondary-parchment); /* 扁平化背景 */
   border: 2px solid var(--primary-gold);
-  box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+  box-shadow: none; /* 移除阴影 */
 }
 
 .story-text {
@@ -150,21 +150,22 @@ onMounted(() => {
 
 /* 使用深度选择器来确保样式能应用到动态插入的元素 */
 :deep(.interactive-word) {
-  color: #1e90ff; /* 蓝色 */
+  color: var(--primary-green); /* 使用森林绿 */
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: none; /* 移除过渡效果 */
   position: relative;
   font-weight: 600;
   text-decoration: underline;
+  text-shadow: none; /* 移除阴影 */
 }
 
 :deep(.interactive-word:hover) {
-  color: #00bfff; /* 浅蓝色 */
-  transform: scale(1.05);
+  color: var(--primary-gold); /* 悬停时使用鹅黄色 */
+  transform: none; /* 移除变换效果 */
 }
 
 :deep(.interactive-word.selected) {
-  color: #ffa500 !important; /* 橙色 */
-  text-shadow: 0 0 10px rgba(255, 165, 0, 0.5) !important;
+  color: var(--primary-gold) !important; /* 选中时使用鹅黄色 */
+  text-shadow: none !important; /* 移除阴影 */
 }
 </style>

@@ -122,9 +122,7 @@ onUnmounted(() => {
 <template>
   <div class="game-container">
     <!-- Navigation Bar -->
-    <nav
-      class="bg-black bg-opacity-30 backdrop-blur-md border-b border-yellow-600 border-opacity-30 sticky top-0 z-50"
-    >
+    <nav class="bg-gray-900 border-b border-yellow-600 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center space-x-4">
@@ -135,13 +133,13 @@ onUnmounted(() => {
             <span class="text-white font-medium">{{ gameStore.character.name }}</span>
             <button
               @click="toggleDictionary"
-              class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
+              class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 transition-colors border border-yellow-700"
             >
               📚 词典
             </button>
             <button
               @click="saveGame"
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+              class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 transition-colors border border-green-800"
             >
               💾 保存
             </button>
@@ -167,31 +165,28 @@ onUnmounted(() => {
           />
 
           <!-- Action Response -->
-          <div
-            v-if="actionResponse"
-            class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg action-response"
-          >
+          <div v-if="actionResponse" class="mt-4 p-4 bg-blue-100 border border-blue-300">
             <p class="italic text-blue-800">{{ actionResponse }}</p>
           </div>
 
           <!-- Action Prompt -->
-          <div v-if="showActionPrompt" class="mt-6 p-4 bg-blue-100 rounded-lg">
+          <div v-if="showActionPrompt" class="mt-6 p-4 bg-blue-100 border border-blue-300">
             <p class="font-medium text-blue-800 mb-3">{{ actionPromptText }}</p>
             <div class="flex space-x-3">
               <button
-                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 transition-colors border border-green-800"
                 @click="handleActionPrompt('yes')"
               >
                 Yes
               </button>
               <button
-                class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
+                class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 transition-colors border border-yellow-700"
                 @click="handleActionPrompt('retry')"
               >
                 Try Another
               </button>
               <button
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 transition-colors border border-red-800"
                 @click="handleActionPrompt('no')"
               >
                 No
@@ -243,50 +238,47 @@ onUnmounted(() => {
 
 body {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-purple) 100%);
+  background: var(--primary-green); /* 扁平化背景 */
   min-height: 100vh;
   color: var(--text-charcoal);
 }
 
 .fantasy-title {
   font-family: 'Cinzel', serif;
-  background: linear-gradient(45deg, var(--primary-gold), #ffd700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  color: var(--primary-gold);
+  text-shadow: none; /* 移除渐变和阴影 */
 }
 
 .parchment-bg {
-  background: linear-gradient(135deg, var(--secondary-parchment) 0%, #f0e68c 100%);
+  background: var(--secondary-parchment); /* 扁平化背景 */
   border: 2px solid var(--primary-gold);
-  box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+  box-shadow: none; /* 移除阴影 */
 }
 
 .magical-glow {
-  box-shadow:
-    0 0 20px rgba(212, 175, 55, 0.4),
-    inset 0 0 20px rgba(212, 175, 55, 0.1);
+  box-shadow: none; /* 移除发光效果 */
   border: 1px solid var(--primary-gold);
 }
 
 .action-button {
-  background: linear-gradient(135deg, var(--primary-burgundy), #b22222);
+  background: var(--primary-burgundy); /* 扁平化背景 */
   border: 2px solid var(--primary-gold);
   color: white;
   font-weight: 600;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  box-shadow: none; /* 移除阴影 */
 }
 
 .action-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(128, 0, 32, 0.4);
+  transform: none; /* 移除变换效果 */
+  box-shadow: none; /* 移除阴影 */
+  background: #a00028; /* 稍微亮一点的 burgundy */
 }
 
 .action-button:active {
-  transform: translateY(0);
+  transform: none; /* 移除变换效果 */
 }
 
 .action-button:disabled {
@@ -296,9 +288,9 @@ body {
 }
 
 .stat-bar {
-  background: linear-gradient(90deg, var(--primary-green), #32cd32);
+  background: var(--primary-green); /* 扁平化背景 */
   height: 8px;
-  border-radius: 4px;
+  border-radius: 0; /* 移除圆角 */
   transition: width 0.5s ease;
 }
 
@@ -314,21 +306,22 @@ body {
 
 .modal-overlay {
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
+  backdrop-filter: none; /* 移除模糊效果 */
 }
 
 .dictionary-card {
   background: var(--secondary-parchment);
   border: 1px solid var(--primary-gold);
-  border-radius: 8px;
+  border-radius: 0; /* 移除圆角 */
   padding: 1rem;
   margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
+  transition: none; /* 移除过渡效果 */
+  box-shadow: none; /* 移除阴影 */
 }
 
 .dictionary-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+  transform: none; /* 移除变换效果 */
+  box-shadow: none; /* 移除阴影 */
 }
 
 @keyframes slideInRight {

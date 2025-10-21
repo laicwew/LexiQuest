@@ -13,27 +13,30 @@ const emit = defineEmits<{
 
 const isVisible = ref(false)
 
-watch(() => props.show, (newVal) => {
-  isVisible.value = newVal
-  if (newVal) {
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
-      isVisible.value = false
-      emit('close')
-    }, 3000)
-  }
-})
+watch(
+  () => props.show,
+  (newVal) => {
+    isVisible.value = newVal
+    if (newVal) {
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        isVisible.value = false
+        emit('close')
+      }, 3000)
+    }
+  },
+)
 </script>
 
 <template>
-  <div 
+  <div
     v-if="isVisible"
-    class="fixed top-20 right-4 p-4 rounded-lg shadow-lg z-50 transition-all duration-300"
+    class="fixed top-20 right-4 p-4 border z-50 transition-all duration-300"
     :class="{
-      'bg-green-500 text-white': type === 'success',
-      'bg-red-500 text-white': type === 'error',
-      'bg-blue-500 text-white': type === 'info',
-      'bg-yellow-500 text-black': type === 'achievement'
+      'bg-green-600 text-white border-green-700': type === 'success',
+      'bg-red-600 text-white border-red-700': type === 'error',
+      'bg-blue-600 text-white border-blue-700': type === 'info',
+      'bg-yellow-600 text-black border-yellow-700': type === 'achievement',
     }"
   >
     {{ message }}
@@ -41,5 +44,5 @@ watch(() => props.show, (newVal) => {
 </template>
 
 <style scoped>
-/* Add any additional styling if needed */
+/* 移除阴影和圆角，保持扁平化设计 */
 </style>

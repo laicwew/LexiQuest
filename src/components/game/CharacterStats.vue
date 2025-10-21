@@ -24,13 +24,15 @@ const xpPercent = computed(() => (props.character.experience / props.character.m
   <div class="parchment-bg rounded-lg p-6 magical-glow">
     <h2 class="fantasy-title text-xl font-bold mb-4">角色</h2>
     <div class="text-center mb-6">
-      <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl">
+      <div
+        class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl"
+      >
         🧙‍♂️
       </div>
       <h3 class="font-bold text-lg">{{ character.name }}</h3>
       <p class="text-sm text-gray-600">Level {{ character.level }} Scholar</p>
     </div>
-    
+
     <!-- Stats -->
     <div class="space-y-4">
       <div>
@@ -42,7 +44,7 @@ const xpPercent = computed(() => (props.character.experience / props.character.m
           <div class="stat-bar h-2 rounded-full" :style="{ width: hpPercent + '%' }"></div>
         </div>
       </div>
-      
+
       <div>
         <div class="flex justify-between text-sm mb-1">
           <span>能量</span>
@@ -52,7 +54,7 @@ const xpPercent = computed(() => (props.character.experience / props.character.m
           <div class="stat-bar h-2 rounded-full" :style="{ width: energyPercent + '%' }"></div>
         </div>
       </div>
-      
+
       <div>
         <div class="flex justify-between text-sm mb-1">
           <span>经验值</span>
@@ -63,7 +65,7 @@ const xpPercent = computed(() => (props.character.experience / props.character.m
         </div>
       </div>
     </div>
-    
+
     <!-- Vocabulary Count -->
     <div class="mt-6 p-3 bg-yellow-100 rounded-lg">
       <div class="text-center">
@@ -76,24 +78,21 @@ const xpPercent = computed(() => (props.character.experience / props.character.m
 
 <style scoped>
 .parchment-bg {
-  background: linear-gradient(135deg, var(--secondary-parchment) 0%, #F0E68C 100%);
+  background: var(--secondary-parchment); /* 扁平化背景 */
   border: 2px solid var(--primary-gold);
-  box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+  box-shadow: none; /* 移除阴影 */
 }
 
 .fantasy-title {
   font-family: 'Cinzel', serif;
-  background: linear-gradient(45deg, var(--primary-gold), #FFD700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  color: var(--primary-gold);
+  text-shadow: none; /* 移除阴影 */
 }
 
 .stat-bar {
-  background: linear-gradient(90deg, var(--primary-green), #32CD32);
+  background: var(--primary-green); /* 扁平化背景 */
   height: 8px;
-  border-radius: 4px;
+  border-radius: 0; /* 移除圆角 */
   transition: width 0.5s ease;
 }
 </style>

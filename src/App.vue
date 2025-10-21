@@ -8,18 +8,18 @@ import { RouterView } from 'vue-router'
 
 <style>
 :root {
-  --primary-green: #2D5016;
-  --primary-gold: #D4AF37;
+  --primary-green: #2d5016; /* 森林绿 */
+  --primary-gold: #d4af37; /* 鹅黄色 */
   --primary-burgundy: #800020;
-  --secondary-parchment: #F5F5DC;
+  --secondary-parchment: #f5f5dc;
   --secondary-purple: #663399;
-  --accent-cyan: #00FFFF;
-  --text-charcoal: #36454F;
+  --accent-cyan: #00ffff;
+  --text-charcoal: #36454f;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-purple) 100%);
+  background: var(--primary-green); /* 扁平化背景 */
   min-height: 100vh;
   color: var(--text-charcoal);
   margin: 0;

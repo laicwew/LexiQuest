@@ -35,8 +35,8 @@ async function testOpenAI() {
     const completion = await openai.chat.completions.create({
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content:  startPrompt },
-],
+        { role: 'user', content: startPrompt },
+      ],
       model: 'deepseek-chat',
     })
 
@@ -87,18 +87,18 @@ onMounted(() => {
     <button
       @click="testOpenAI"
       :disabled="isLoading"
-      class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded transition-colors mr-2"
+      class="bg-green-700 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 transition-colors mr-2 border border-yellow-500"
     >
       {{ isLoading ? '测试中...' : '运行测试' }}
     </button>
 
     <div v-if="isLoading" class="mt-3 text-yellow-300">正在请求AI服务...</div>
 
-    <div v-if="error" class="mt-3 p-3 bg-red-900 text-red-100 rounded">
+    <div v-if="error" class="mt-3 p-3 bg-red-800 text-red-100 border border-red-500">
       <strong>错误:</strong> {{ error }}
     </div>
 
-    <div v-if="aiResponse" class="mt-3 p-3 bg-green-900 text-green-100 rounded">
+    <div v-if="aiResponse" class="mt-3 p-3 bg-green-800 text-green-100 border border-green-500">
       <strong>AI响应:</strong>
       <pre class="whitespace-pre-wrap mt-2">{{ aiResponse }}</pre>
     </div>
@@ -108,10 +108,17 @@ onMounted(() => {
 <style scoped>
 .ai-console-tester {
   font-family: 'Courier New', monospace;
+  background: #2d5016; /* 森林绿背景 */
+  border: 1px solid #d4af37; /* 鹅黄色边框 */
+  border-radius: 0; /* 移除圆角 */
+  box-shadow: none; /* 移除阴影 */
 }
 
 code {
   font-family: 'Courier New', monospace;
-  color: #fbbf24;
+  color: #d4af37; /* 鹅黄色 */
+  background: #1a2e0d; /* 深森林绿 */
+  padding: 2px 4px;
+  border-radius: 0; /* 移除圆角 */
 }
 </style>
