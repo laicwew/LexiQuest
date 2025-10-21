@@ -71,9 +71,9 @@ export const useGameStore = defineStore('game', () => {
         clerk: {
           name: 'Shopkeeper',
           dialogue: [
-            'Welcome to our magical market!',
-            'Feel free to browse our fresh produce.',
-            'Would you like to try our special apples?',
+            '欢迎来到魔法集市!',
+            '请随机浏览我们的产品。',
+            '你想尝试一些我们的新品苹果吗？',
           ],
         },
       },
