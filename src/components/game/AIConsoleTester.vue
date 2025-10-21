@@ -26,12 +26,17 @@ async function testOpenAI() {
 
   try {
     // 从txt文件中读取系统提示内容
-    const response = await fetch('/src/assets/system-prompt.txt')
-    const systemPrompt = await response.text()
+    const responseSystem = await fetch('/src/assets/system-prompt.txt')
+    const systemPrompt = await responseSystem.text()
+    const responseStart = await fetch('/src/assets/start-prompt.txt')
+    const startPrompt = await responseStart.text()
 
     console.log('开始调用DeepSeek API...')
     const completion = await openai.chat.completions.create({
-      messages: [{ role: 'system', content: systemPrompt }],
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content:  startPrompt },
+],
       model: 'deepseek-chat',
     })
 
