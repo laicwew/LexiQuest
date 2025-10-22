@@ -1,6 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
+// 定义游戏历史记录的接口
+interface GameHistoryEntry {
+  gm_narrative: string
+  player_action: string
+  action_result: string
+}
+
 export const useGameStore = defineStore('game', () => {
   // State
   const character = ref({
@@ -26,6 +33,9 @@ export const useGameStore = defineStore('game', () => {
     text: '',
     history: [] as string[],
   })
+
+  // 添加游戏历史记录数组
+  const gameHistory = ref<GameHistoryEntry[]>([])
 
   const vocabulary = ref({
     selectedWord: null as string | null,
@@ -121,6 +131,9 @@ export const useGameStore = defineStore('game', () => {
 
   // 存储AI生成的内容
   const generatedContent = ref('')
+  
+  // 存储原始的AI生成内容（未处理的）
+  const rawGeneratedContent = ref('')
 
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
@@ -147,6 +160,85 @@ export const useGameStore = defineStore('game', () => {
     Object.assign(progress.value, progress.value, progressUpdate)
   }
 
+  // 修改performAction函数以保存历史记录
+  function performAction(action: string) {
+    const selectedWord = vocabulary.value.selectedWord
+    if (!selectedWord) return
+
+    progress.value.actionsTaken++
+
+    // Get appropriate response
+    const responses = actionResponses.value[action as keyof typeof actionResponses.value]
+    let response = responses[selectedWord as keyof typeof responses] || responses.default
+
+    // 保存游戏历史记录
+    const historyEntry: GameHistoryEntry = {
+      gm_narrative: rawGeneratedContent.value || story.value.text,  // 使用原始AI生成内容
+      player_action: `${action} ${selectedWord}`,
+      action_result: response
+    }
+    gameHistory.value.push(historyEntry)
+
+    // Handle special cases
+    if (action === 'imitate') {
+      learnWord(selectedWord)
+    }
+
+    // Update character stats based on action
+    updateCharacterStatsByAction(action)
+
+    // Clear word selection
+    clearSelectedWord()
+
+    // Save game state
+    saveGame()
+
+    return response
+  }
+  
+  // 添加一个函数来更新原始AI生成内容
+  function updateRawGeneratedContent(content: string) {
+    rawGeneratedContent.value = content
+  }
+
+  // 修改updateGeneratedContent函数
+  function updateGeneratedContent(content: string) {
+    generatedContent.value = content
+    // 如果当前是GENERATED标签，则更新显示文本
+    if (activeTab.value === 'GENERATED') {
+      story.value.text = content
+    }
+  }
+
+  // 添加获取续写上下文的函数
+  function getContextForContinuation(): string {
+    if (gameHistory.value.length === 0) {
+      return "START_JOURNEY\n\nGenerate the opening scene for a new adventurer in Middle-earth.\nBegin the story in a suitable location and provide the first interactive elements."
+    }
+
+    // 获取最后几条历史记录作为上下文
+    const recentHistory = gameHistory.value.slice(-3) // 获取最近3条记录
+    
+    // 构建上下文提示
+    let context = "Continue the story based on the following history:\n\n"
+    
+    recentHistory.forEach((entry, index) => {
+      context += `Turn ${index + 1}:\n`
+      context += `GM Narrative: ${entry.gm_narrative}\n`
+      context += `Player Action: ${entry.player_action}\n`
+      context += `Action Result: ${entry.action_result}\n\n`
+    })
+    
+    context += "Based on this history, continue the adventure in Middle-earth. Follow the same format as before:\n"
+    context += "1. Describe the new scene (3-4 sentences)\n"
+    context += "2. Include 2-4 new interactable objects wrapped in **double asterisks**\n"
+    context += "3. Maintain Tolkien's tone and lore\n"
+    context += "4. All output must be in English only"
+    
+    return context
+  }
+
+  // 修改saveGame函数以保存游戏历史
   function saveGame() {
     const gameState = {
       character: character.value,
@@ -160,12 +252,15 @@ export const useGameStore = defineStore('game', () => {
       settings: settings.value,
       activeTab: activeTab.value,
       generatedContent: generatedContent.value,
+      rawGeneratedContent: rawGeneratedContent.value,  // 保存原始内容
+      gameHistory: gameHistory.value, // 保存游戏历史
     }
 
     localStorage.setItem('lexiquest-save', JSON.stringify(gameState))
     console.log('Game saved!')
   }
 
+  // 修改loadGame函数以加载游戏历史
   function loadGame() {
     const savedState = localStorage.getItem('lexiquest-save')
     if (savedState) {
@@ -179,6 +274,10 @@ export const useGameStore = defineStore('game', () => {
         settings.value = parsed.settings || settings.value
         activeTab.value = parsed.activeTab || 'GENERATED'
         generatedContent.value = parsed.generatedContent || ''
+        rawGeneratedContent.value = parsed.rawGeneratedContent || ''  // 加载原始内容
+
+        // 加载游戏历史
+        gameHistory.value = parsed.gameHistory || []
 
         // 根据保存的标签页状态设置正确的文本
         if (activeTab.value === 'GENERATED') {
@@ -206,33 +305,6 @@ export const useGameStore = defineStore('game', () => {
       activeTab.value = 'GENERATED'
       story.value.text = modules.value.empty_market.scenes.entrance.text
     }
-  }
-
-  function performAction(action: string) {
-    const selectedWord = vocabulary.value.selectedWord
-    if (!selectedWord) return
-
-    progress.value.actionsTaken++
-
-    // Get appropriate response
-    const responses = actionResponses.value[action as keyof typeof actionResponses.value]
-    let response = responses[selectedWord as keyof typeof responses] || responses.default
-
-    // Handle special cases
-    if (action === 'imitate') {
-      learnWord(selectedWord)
-    }
-
-    // Update character stats based on action
-    updateCharacterStatsByAction(action)
-
-    // Clear word selection
-    clearSelectedWord()
-
-    // Save game state
-    saveGame()
-
-    return response
   }
 
   function updateCharacterStatsByAction(action: string) {
@@ -300,15 +372,6 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  // 更新AI生成的内容
-  function updateGeneratedContent(content: string) {
-    generatedContent.value = content
-    // 如果当前是GENERATED标签，则更新显示文本
-    if (activeTab.value === 'GENERATED') {
-      story.value.text = content
-    }
-  }
-
   function startProgressTracking() {
     // Track time spent in game
     setInterval(() => {
@@ -328,6 +391,8 @@ export const useGameStore = defineStore('game', () => {
     actionResponses,
     activeTab,
     generatedContent,
+    rawGeneratedContent,
+    gameHistory,  // 导出游戏历史
 
     // Getters
     hpPercent,
@@ -348,6 +413,8 @@ export const useGameStore = defineStore('game', () => {
     learnWord,
     switchTab,
     updateGeneratedContent,
+    updateRawGeneratedContent,  // 导出更新原始内容的函数
     startProgressTracking,
+    getContextForContinuation,
   }
 })

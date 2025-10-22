@@ -34,6 +34,13 @@ const saveGame = () => {
   showGameNotification('Game saved successfully!', 'success')
 }
 
+// 添加测试getContextForContinuation的函数
+const testGetContext = () => {
+  const context = gameStore.getContextForContinuation()
+  console.log('Generated context for continuation:', context)
+  alert('Context has been logged to console. Check the browser console for details.')
+}
+
 const selectWord = (word: string) => {
   gameStore.selectWord(word)
 }
@@ -90,14 +97,26 @@ const closeNotification = () => {
 
 // 处理AI响应
 const handleAIResponse = (response: string) => {
+  // 保存原始的AI生成内容
+  gameStore.updateRawGeneratedContent(response)
+  
   // 解析response中被**包裹的词汇，将其转换为可点击的交互式词汇
   const processedResponse = response.replace(
     /\*\*(.*?)\*\*/g,
     '<span class="interactive-word" data-word="$1">$1</span>',
   )
 
-  // 更新AI生成的内容
-  gameStore.updateGeneratedContent(processedResponse)
+  // 检查是否有游戏历史来决定如何更新内容
+  if (gameStore.gameHistory.length > 0) {
+    // 有游戏历史，在原有文本下面补充新生成的段落
+    const separator = "<br><br>---<br><br>"; // 添加分隔符
+    const currentContent = gameStore.generatedContent || '';
+    const newContent = currentContent ? currentContent + separator + processedResponse : processedResponse;
+    gameStore.updateGeneratedContent(newContent);
+  } else {
+    // 没有游戏历史，直接更新内容
+    gameStore.updateGeneratedContent(processedResponse);
+  }
 }
 
 // Initialize game
@@ -142,6 +161,13 @@ onUnmounted(() => {
               class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 transition-colors border border-green-800"
             >
               💾 保存
+            </button>
+            <!-- 添加测试按钮 -->
+            <button
+              @click="testGetContext"
+              class="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 transition-colors border border-blue-800"
+            >
+              🧪 测试上下文
             </button>
           </div>
         </div>

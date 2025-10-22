@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import OpenAI from 'openai'
+import { useGameStore } from '@/stores/gameStore'
+
+const gameStore = useGameStore()
 
 const emit = defineEmits<{
   (e: 'aiResponse', response: string): void
@@ -18,6 +21,27 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true, // 注意：在生产环境中应该通过后端代理API密钥
 })
 
+// 清除游戏历史的函数
+function clearGameHistory() {
+  // 清除游戏历史
+  gameStore.gameHistory = []
+  
+  // 清除原始生成内容
+  gameStore.updateRawGeneratedContent('')
+  
+  // 清除生成内容
+  gameStore.updateGeneratedContent('')
+  
+  // 重置故事文本
+  gameStore.story.text = ''
+  
+  // 保存到localStorage
+  gameStore.saveGame()
+  
+  console.log('游戏历史已清除')
+  alert('游戏历史已清除')
+}
+
 // 测试函数
 async function testOpenAI() {
   isLoading.value = true
@@ -28,14 +52,25 @@ async function testOpenAI() {
     // 从txt文件中读取系统提示内容
     const responseSystem = await fetch('/src/assets/system-prompt.txt')
     const systemPrompt = await responseSystem.text()
-    const responseStart = await fetch('/src/assets/start-prompt.txt')
-    const startPrompt = await responseStart.text()
+    
+    // 检查是否有游戏历史来决定使用哪种提示
+    let userPrompt
+    if (gameStore.gameHistory.length === 0) {
+      // 没有游戏历史，使用start prompt
+      const startResponse = await fetch('/src/assets/start-prompt.txt')
+      userPrompt = await startResponse.text()
+      console.log('使用start prompt')
+    } else {
+      // 有游戏历史，使用context prompt
+      userPrompt = gameStore.getContextForContinuation()
+      console.log('使用context prompt')
+    }
 
     console.log('开始调用DeepSeek API...')
     const completion = await openai.chat.completions.create({
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: startPrompt },
+        { role: 'user', content: userPrompt },
       ],
       model: 'deepseek-chat',
     })
@@ -48,6 +83,20 @@ async function testOpenAI() {
         aiResponse.value = choice.message.content
         // 发射事件，将AI响应传递给父组件
         emit('aiResponse', choice.message.content)
+        
+        // 如果是使用start prompt生成的初始故事，需要保存到游戏历史中
+        if (gameStore.gameHistory.length === 0) {
+          // 保存初始故事到游戏历史
+          const initialHistoryEntry = {
+            gm_narrative: choice.message.content,
+            player_action: "START_JOURNEY",
+            action_result: choice.message.content
+          }
+          gameStore.gameHistory.push(initialHistoryEntry)
+          
+          // 保存到localStorage
+          gameStore.saveGame()
+        }
       } else {
         aiResponse.value = 'No response content'
       }
@@ -84,13 +133,22 @@ onMounted(() => {
       <code class="bg-gray-700 px-1 rounded">testOpenAI()</code> 来测试AI功能。
     </p>
 
-    <button
-      @click="testOpenAI"
-      :disabled="isLoading"
-      class="bg-green-700 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 transition-colors mr-2 border border-yellow-500"
-    >
-      {{ isLoading ? '测试中...' : '运行测试' }}
-    </button>
+    <div class="flex flex-wrap gap-2 mb-3">
+      <button
+        @click="testOpenAI"
+        :disabled="isLoading"
+        class="bg-green-700 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-yellow-500"
+      >
+        {{ isLoading ? '测试中...' : '运行测试' }}
+      </button>
+      
+      <button
+        @click="clearGameHistory"
+        class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 transition-colors border border-yellow-500"
+      >
+        清除游戏历史
+      </button>
+    </div>
 
     <div v-if="isLoading" class="mt-3 text-yellow-300">正在请求AI服务...</div>
 
