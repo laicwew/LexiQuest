@@ -7,6 +7,7 @@ const gameStore = useGameStore()
 const props = defineProps<{
   storyText: string
   selectedWord: string | null
+  isLoading?: boolean // 添加加载状态属性
 }>()
 
 const emit = defineEmits<{
@@ -132,7 +133,20 @@ onMounted(() => {
 
     <!-- Story Content -->
     <div class="story-text-container">
+      <!-- 故事内容 -->
       <div class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
+      
+      <!-- 续写时的加载动画 -->
+      <div v-if="isLoading && storyContent" class="loading-container flex items-center py-4">
+        <div class="loading-spinner mr-3"></div>
+        <p class="text-gray-600">正在续写故事...</p>
+      </div>
+      
+      <!-- 初始加载动画 -->
+      <div v-else-if="isLoading" class="loading-container flex flex-col items-center justify-center py-8">
+        <div class="loading-spinner"></div>
+        <p class="mt-4 text-gray-600">正在生成故事...</p>
+      </div>
     </div>
   </div>
 </template>
@@ -150,6 +164,7 @@ onMounted(() => {
   padding: 10px; /* 添加内边距 */
   border: 1px solid var(--primary-gold); /* 添加边框 */
   background: var(--secondary-parchment); /* 背景色 */
+  min-height: 200px; /* 确保容器有最小高度 */
 }
 
 .story-text {
@@ -196,5 +211,25 @@ onMounted(() => {
 :deep(.interactive-word.selected) {
   color: var(--primary-gold) !important; /* 选中时使用鹅黄色 */
   text-shadow: none !important; /* 移除阴影 */
+}
+
+/* 加载动画样式 */
+.loading-container {
+  display: flex;
+  align-items: center;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid var(--primary-gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

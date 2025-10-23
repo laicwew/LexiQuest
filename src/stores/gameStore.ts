@@ -131,7 +131,7 @@ export const useGameStore = defineStore('game', () => {
 
   // 存储AI生成的内容
   const generatedContent = ref('')
-  
+
   // 存储原始的AI生成内容（未处理的）
   const rawGeneratedContent = ref('')
 
@@ -173,9 +173,9 @@ export const useGameStore = defineStore('game', () => {
 
     // 保存游戏历史记录
     const historyEntry: GameHistoryEntry = {
-      gm_narrative: rawGeneratedContent.value || story.value.text,  // 使用原始AI生成内容
+      gm_narrative: rawGeneratedContent.value || story.value.text, // 使用原始AI生成内容
       player_action: `${action} ${selectedWord}`,
-      action_result: response
+      action_result: response,
     }
     gameHistory.value.push(historyEntry)
 
@@ -195,7 +195,7 @@ export const useGameStore = defineStore('game', () => {
 
     return response
   }
-  
+
   // 添加一个函数来更新原始AI生成内容
   function updateRawGeneratedContent(content: string) {
     rawGeneratedContent.value = content
@@ -213,28 +213,29 @@ export const useGameStore = defineStore('game', () => {
   // 添加获取续写上下文的函数
   function getContextForContinuation(): string {
     if (gameHistory.value.length === 0) {
-      return "START_JOURNEY\n\nGenerate the opening scene for a new adventurer in Middle-earth.\nBegin the story in a suitable location and provide the first interactive elements."
+      return 'START_JOURNEY\n\nGenerate the opening scene for a new adventurer in Middle-earth.\nBegin the story in a suitable location and provide the first interactive elements.'
     }
 
     // 获取最后几条历史记录作为上下文
     const recentHistory = gameHistory.value.slice(-3) // 获取最近3条记录
-    
+
     // 构建上下文提示
-    let context = "Continue the story based on the following history:\n\n"
-    
+    let context = 'Continue the story based on the following history:\n\n'
+
     recentHistory.forEach((entry, index) => {
       context += `Turn ${index + 1}:\n`
       context += `GM Narrative: ${entry.gm_narrative}\n`
       context += `Player Action: ${entry.player_action}\n`
       context += `Action Result: ${entry.action_result}\n\n`
     })
-    
-    context += "Based on this history, continue the adventure in Middle-earth. Follow the same format as before:\n"
-    context += "1. Describe the new scene (3-4 sentences)\n"
-    context += "2. Include 2-4 new interactable objects wrapped in **double asterisks**\n"
+
+    context +=
+      'Based on this history, continue the adventure in Middle-earth. Follow the same format as before:\n'
+    context += '1. Describe the new scene (3-4 sentences)\n'
+    context += '2. Include 2-4 new interactable objects wrapped in **double asterisks**\n'
     context += "3. Maintain Tolkien's tone and lore\n"
-    context += "4. All output must be in English only"
-    
+    context += '4. All output must be in English only'
+
     return context
   }
 
@@ -252,7 +253,7 @@ export const useGameStore = defineStore('game', () => {
       settings: settings.value,
       activeTab: activeTab.value,
       generatedContent: generatedContent.value,
-      rawGeneratedContent: rawGeneratedContent.value,  // 保存原始内容
+      rawGeneratedContent: rawGeneratedContent.value, // 保存原始内容
       gameHistory: gameHistory.value, // 保存游戏历史
     }
 
@@ -274,7 +275,7 @@ export const useGameStore = defineStore('game', () => {
         settings.value = parsed.settings || settings.value
         activeTab.value = parsed.activeTab || 'GENERATED'
         generatedContent.value = parsed.generatedContent || ''
-        rawGeneratedContent.value = parsed.rawGeneratedContent || ''  // 加载原始内容
+        rawGeneratedContent.value = parsed.rawGeneratedContent || '' // 加载原始内容
 
         // 加载游戏历史
         gameHistory.value = parsed.gameHistory || []
@@ -392,7 +393,7 @@ export const useGameStore = defineStore('game', () => {
     activeTab,
     generatedContent,
     rawGeneratedContent,
-    gameHistory,  // 导出游戏历史
+    gameHistory, // 导出游戏历史
 
     // Getters
     hpPercent,
@@ -413,7 +414,7 @@ export const useGameStore = defineStore('game', () => {
     learnWord,
     switchTab,
     updateGeneratedContent,
-    updateRawGeneratedContent,  // 导出更新原始内容的函数
+    updateRawGeneratedContent, // 导出更新原始内容的函数
     startProgressTracking,
     getContextForContinuation,
   }

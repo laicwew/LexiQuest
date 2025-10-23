@@ -68,9 +68,9 @@ console.log(context)
 
 ```typescript
 interface GameHistoryEntry {
-  gm_narrative: string    // GM叙述（保存的是原始AI生成内容）
-  player_action: string   // 玩家动作
-  action_result: string   // 动作结果
+  gm_narrative: string // GM叙述（保存的是原始AI生成内容）
+  player_action: string // 玩家动作
+  action_result: string // 动作结果
 }
 ```
 
@@ -89,7 +89,7 @@ console.log(localStorage.getItem('lexiquest-save'))
 
 1. **rawGeneratedContent** - 存储原始的AI生成内容（未处理的）
 2. **generatedContent** - 存储经过前端处理的交互式内容
-3. 在游戏历史记录中，[gm_narrative](file://d:\__ARCHIEVE__\GamDev\LexiQuest\src\stores\gameStore.ts#L5-L5)字段保存的是原始内容，而不是处理后的内容
+3. 在游戏历史记录中，[gm_narrative](file://d:__ARCHIEVE__\GamDev\LexiQuest\src\stores\gameStore.ts#L5-L5)字段保存的是原始内容，而不是处理后的内容
 
 ## 内容续写机制
 
@@ -120,6 +120,7 @@ npm run test:unit
 ```
 
 相关的测试文件：
+
 - `src/components/game/__tests__/gameHistory.test.ts`
 - `src/components/game/__tests__/localStorage.test.ts`
 - `src/components/game/__tests__/rawContent.test.ts`
@@ -130,6 +131,7 @@ npm run test:unit
 ## 与AIConsoleTester集成
 
 AIConsoleTester组件已更新为：
+
 1. 使用`getContextForContinuation()`函数来生成发送给AI的提示
 2. 提供清除游戏历史的功能，同时清除内存和localStorage中的数据
 3. 根据是否有游戏历史自动选择使用start prompt还是context prompt

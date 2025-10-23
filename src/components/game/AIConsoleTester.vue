@@ -7,6 +7,7 @@ const gameStore = useGameStore()
 
 const emit = defineEmits<{
   (e: 'aiResponse', response: string): void
+  (e: 'loading', loading: boolean): void // 添加加载状态事件
 }>()
 
 // 定义响应数据
@@ -25,19 +26,19 @@ const openai = new OpenAI({
 function clearGameHistory() {
   // 清除游戏历史
   gameStore.gameHistory = []
-  
+
   // 清除原始生成内容
   gameStore.updateRawGeneratedContent('')
-  
+
   // 清除生成内容
   gameStore.updateGeneratedContent('')
-  
+
   // 重置故事文本
   gameStore.story.text = ''
-  
+
   // 保存到localStorage
   gameStore.saveGame()
-  
+
   console.log('游戏历史已清除')
   alert('游戏历史已清除')
 }
@@ -47,12 +48,15 @@ async function testOpenAI() {
   isLoading.value = true
   error.value = ''
   aiResponse.value = ''
+  
+  // 发射加载状态事件
+  emit('loading', true)
 
   try {
     // 从txt文件中读取系统提示内容
     const responseSystem = await fetch('/src/assets/system-prompt.txt')
     const systemPrompt = await responseSystem.text()
-    
+
     // 检查是否有游戏历史来决定使用哪种提示
     let userPrompt
     if (gameStore.gameHistory.length === 0) {
@@ -83,17 +87,17 @@ async function testOpenAI() {
         aiResponse.value = choice.message.content
         // 发射事件，将AI响应传递给父组件
         emit('aiResponse', choice.message.content)
-        
+
         // 如果是使用start prompt生成的初始故事，需要保存到游戏历史中
         if (gameStore.gameHistory.length === 0) {
           // 保存初始故事到游戏历史
           const initialHistoryEntry = {
             gm_narrative: choice.message.content,
-            player_action: "START_JOURNEY",
-            action_result: choice.message.content
+            player_action: 'START_JOURNEY',
+            action_result: choice.message.content,
           }
           gameStore.gameHistory.push(initialHistoryEntry)
-          
+
           // 保存到localStorage
           gameStore.saveGame()
         }
@@ -108,6 +112,8 @@ async function testOpenAI() {
     error.value = err instanceof Error ? err.message : 'Unknown error occurred'
   } finally {
     isLoading.value = false
+    // 发射加载完成事件
+    emit('loading', false)
   }
 }
 
@@ -141,7 +147,7 @@ onMounted(() => {
       >
         {{ isLoading ? '测试中...' : '运行测试' }}
       </button>
-      
+
       <button
         @click="clearGameHistory"
         class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 transition-colors border border-yellow-500"

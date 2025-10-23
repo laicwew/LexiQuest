@@ -20,6 +20,7 @@ const actionPromptText = ref('')
 const showNotification = ref(false)
 const notificationMessage = ref('')
 const notificationType = ref<'success' | 'error' | 'info' | 'achievement'>('info')
+const isLoading = ref(false) // 添加加载状态
 
 // Timer for progress tracking
 let progressTimer: number | null = null
@@ -99,7 +100,7 @@ const closeNotification = () => {
 const handleAIResponse = (response: string) => {
   // 保存原始的AI生成内容
   gameStore.updateRawGeneratedContent(response)
-  
+
   // 解析response中被**包裹的词汇，将其转换为可点击的交互式词汇
   const processedResponse = response.replace(
     /\*\*(.*?)\*\*/g,
@@ -109,14 +110,21 @@ const handleAIResponse = (response: string) => {
   // 检查是否有游戏历史来决定如何更新内容
   if (gameStore.gameHistory.length > 0) {
     // 有游戏历史，在原有文本下面补充新生成的段落
-    const separator = "<br><br>---<br><br>"; // 添加分隔符
-    const currentContent = gameStore.generatedContent || '';
-    const newContent = currentContent ? currentContent + separator + processedResponse : processedResponse;
-    gameStore.updateGeneratedContent(newContent);
+    const separator = '<br><br>---<br><br>' // 添加分隔符
+    const currentContent = gameStore.generatedContent || ''
+    const newContent = currentContent
+      ? currentContent + separator + processedResponse
+      : processedResponse
+    gameStore.updateGeneratedContent(newContent)
   } else {
     // 没有游戏历史，直接更新内容
-    gameStore.updateGeneratedContent(processedResponse);
+    gameStore.updateGeneratedContent(processedResponse)
   }
+}
+
+// 监听AI控制台的加载状态变化
+const handleAILoading = (loading: boolean) => {
+  isLoading.value = loading
 }
 
 // Initialize game
@@ -187,6 +195,7 @@ onUnmounted(() => {
           <StoryDisplay
             :story-text="gameStore.story.text"
             :selected-word="gameStore.vocabulary.selectedWord"
+            :is-loading="isLoading"
             @word-selected="selectWord"
           />
 
@@ -228,7 +237,7 @@ onUnmounted(() => {
           />
 
           <!-- AI Console Tester -->
-          <AIConsoleTester @ai-response="handleAIResponse" />
+          <AIConsoleTester @ai-response="handleAIResponse" @loading="handleAILoading" />
         </div>
 
         <!-- Progress & Achievements Panel -->
