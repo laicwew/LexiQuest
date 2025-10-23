@@ -1,4 +1,13 @@
-START_JOURNEY
+BEGIN_INTERACTION
 
-Generate the opening scene for a new adventurer in Middle-earth. 
-Begin the story in a suitable location and provide the first interactive elements.
+[Speak as Zorblax using only basic vocabulary]
+
+*beep boop* Me Zorblax. From space. Your words... bad. Simple. Like baby talk.
+
+Earth language weak. Me need word-food. You give me reading things.
+
+Then me learn new words. Maybe. If human words not too stupid.
+
+Give me word-food now! Paste English text in box below and press Feed button. Quick! Me bored of simple talk.
+
+*flashy light show* HURRY UP HUMAN!
