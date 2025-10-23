@@ -87,10 +87,11 @@ const xpPercent = computed(() => (props.character.experience / props.character.m
   font-family: 'Cinzel', serif;
   color: var(--primary-gold);
   text-shadow: none; /* 移除阴影 */
+  font-size: 20px; /* 设置字体大小 */
 }
 
 .stat-bar {
-  background: var(--primary-green); /* 扁平化背景 */
+  background: var(--primary-green); /* 扫平化背景 */
   height: 8px;
   border-radius: 0; /* 移除圆角 */
   transition: width 0.5s ease;

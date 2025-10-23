@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>字体测试页面</title>
+    <style>
+      @font-face {
+        font-family: 'ByteBounce';
+        src: url('/fonts/ByteBounce.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      body {
+        font-family: 'ByteBounce', sans-serif;
+        background: #2d5016;
+        color: #36454f;
+        padding: 20px;
+      }
+
+      .test-text {
+        font-size: 24px;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>字体测试页面</h1>
+    <div class="test-text">English Text: Hello World!</div>
+    <div class="test-text">中文文本：你好世界！</div>
+    <div class="test-text">Numbers: 1234567890</div>
+    <div class="test-text">Special Characters: !@#$%^&*()</div>
+  </body>
+</html>

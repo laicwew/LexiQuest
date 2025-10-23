@@ -165,11 +165,12 @@ onMounted(() => {
   border: 1px solid var(--primary-gold); /* 添加边框 */
   background: var(--secondary-parchment); /* 背景色 */
   min-height: 200px; /* 确保容器有最小高度 */
+  font-size: 20px; /* 设置字体大小 */
 }
 
 .story-text {
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: 1.5em;
+  line-height: 1;
   color: var(--text-charcoal);
 }
 

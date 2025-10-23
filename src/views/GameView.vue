@@ -272,10 +272,11 @@ onUnmounted(() => {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'ByteBounce', sans-serif; /* 使用自定义字体 */
   background: var(--primary-green); /* 扁平化背景 */
   min-height: 100vh;
   color: var(--text-charcoal);
+  font-size: 20px; /* 设置字体大小 */
 }
 
 .fantasy-title {
@@ -330,8 +331,8 @@ body {
 }
 
 .story-text {
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: 2em;
+  line-height: 1;
   color: var(--text-charcoal);
 }
 

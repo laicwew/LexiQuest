@@ -291,10 +291,11 @@ onMounted(() => {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'ByteBounce', sans-serif; /* 使用自定义字体 */
   background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-purple) 100%);
   min-height: 100vh;
   color: var(--text-charcoal);
+  font-size: 20px; /* 设置字体大小 */
 }
 
 .fantasy-title {

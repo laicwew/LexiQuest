@@ -73,6 +73,7 @@ const generatePrompt = () => {
   overflow: hidden;
   box-shadow: none; /* 移除阴影 */
   border-radius: 0; /* 移除圆角 */
+  font-size: 20px; /* 设置字体大小 */
 }
 
 .action-button:hover {

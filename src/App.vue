@@ -18,12 +18,13 @@ import { RouterView } from 'vue-router'
 }
 
 body {
-  font-family: 'Inter', sans-serif;
   background: var(--primary-green); /* 扁平化背景 */
   min-height: 100vh;
   color: var(--text-charcoal);
   margin: 0;
   padding: 0;
+  font-family: 'ByteBounce', sans-serif; /* 使用自定义字体 */
+  font-size: 20px; /* 设置字体大小 */
 }
 
 #app {
