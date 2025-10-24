@@ -238,8 +238,8 @@ onUnmounted(() => {
           />
 
           <!-- Word Feeder -->
-          <WordFeeder 
-            @ai-response="handleAIResponse" 
+          <WordFeeder
+            @ai-response="handleAIResponse"
             @loading="handleAILoading"
             @imitate-word="performAction"
           />

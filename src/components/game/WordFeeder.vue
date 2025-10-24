@@ -109,7 +109,7 @@ const imitateWord = () => {
       >
         {{ isLoading ? 'Feeding...' : 'Feed Alien' }}
       </button>
-      
+
       <button
         @click="imitateWord"
         :disabled="isLoading || !gameStore.vocabulary.selectedWord"
