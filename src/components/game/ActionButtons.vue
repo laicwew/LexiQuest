@@ -5,7 +5,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'performAction', action: string): void
-  (e: 'generatePrompt'): void
 }>()
 
 const performAction = (action: string) => {
@@ -13,52 +12,11 @@ const performAction = (action: string) => {
     emit('performAction', action)
   }
 }
-
-const generatePrompt = () => {
-  emit('generatePrompt')
-}
 </script>
 
 <template>
-  <div class="mt-6 grid grid-cols-2 gap-4">
-    <button
-      class="action-button py-3 px-6 text-lg border border-yellow-600"
-      :disabled="!selectedWord"
-      @click="performAction('eat')"
-    >
-      🍎 吃掉
-    </button>
-    <button
-      class="action-button py-3 px-6 text-lg border border-yellow-600"
-      :disabled="!selectedWord"
-      @click="performAction('attack')"
-    >
-      ⚔️ 攻击
-    </button>
-    <button
-      class="action-button py-3 px-6 text-lg border border-yellow-600"
-      :disabled="!selectedWord"
-      @click="performAction('talk')"
-    >
-      💬 对话
-    </button>
-    <button
-      class="action-button py-3 px-6 text-lg border border-yellow-600"
-      :disabled="!selectedWord"
-      @click="performAction('imitate')"
-    >
-      🎯 模仿
-    </button>
-  </div>
-
-  <div class="mt-4 text-center">
-    <button
-      id="action-prompt-btn"
-      class="bg-purple-700 hover:bg-purple-600 text-white px-6 py-3 text-lg transition-colors border border-purple-800"
-      @click="generatePrompt"
-    >
-      🎲 What should I do?
-    </button>
+  <div class="mt-6 flex justify-center">
+    <!-- 模仿按钮已移至WordFeeder组件中 -->
   </div>
 </template>
 

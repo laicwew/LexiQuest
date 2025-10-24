@@ -8,6 +8,7 @@ const gameStore = useGameStore()
 const emit = defineEmits<{
   (e: 'aiResponse', response: string): void
   (e: 'loading', loading: boolean): void
+  (e: 'imitate-word', action: string): void
 }>()
 
 // 定义响应数据
@@ -31,7 +32,7 @@ async function feedToAI() {
 
   isLoading.value = true
   error.value = ''
-  
+
   // 发射加载状态事件
   emit('loading', true)
 
@@ -74,6 +75,13 @@ async function feedToAI() {
     emit('loading', false)
   }
 }
+
+// 模仿功能 - 发出事件让父组件处理
+const imitateWord = () => {
+  // 发出事件让GameView处理模仿操作
+  // 这样可以复用原有的performAction逻辑
+  emit('imitate-word', 'imitate')
+}
 </script>
 
 <template>
@@ -100,6 +108,14 @@ async function feedToAI() {
         class="bg-purple-700 hover:bg-purple-600 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-yellow-500"
       >
         {{ isLoading ? 'Feeding...' : 'Feed Alien' }}
+      </button>
+      
+      <button
+        @click="imitateWord"
+        :disabled="isLoading || !gameStore.vocabulary.selectedWord"
+        class="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-blue-300"
+      >
+        Imitate
       </button>
     </div>
 

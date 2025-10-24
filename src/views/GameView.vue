@@ -237,11 +237,15 @@ onUnmounted(() => {
             @generate-prompt="generateActionPrompt"
           />
 
+          <!-- Word Feeder -->
+          <WordFeeder 
+            @ai-response="handleAIResponse" 
+            @loading="handleAILoading"
+            @imitate-word="performAction"
+          />
+
           <!-- AI Console Tester -->
           <AIConsoleTester @ai-response="handleAIResponse" @loading="handleAILoading" />
-          
-          <!-- Word Feeder -->
-          <WordFeeder @ai-response="handleAIResponse" @loading="handleAILoading" />
         </div>
 
         <!-- Progress & Achievements Panel -->
