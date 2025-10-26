@@ -28,10 +28,7 @@ const filteredDictionary = computed(() => {
   }
 
   const term = searchTerm.value.toLowerCase()
-  return learnedWords.value.filter(
-    (entry) =>
-      entry.word.toLowerCase().includes(term),
-  )
+  return learnedWords.value.filter((entry) => entry.word.toLowerCase().includes(term))
 })
 
 // 清空词典
@@ -68,13 +65,13 @@ const close = () => {
             placeholder="Search vocabulary..."
             class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           />
-          <button 
+          <button
             @click="clearDictionary"
             class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm"
           >
             清空词典
           </button>
-          <button 
+          <button
             @click="outputDictionaryData"
             class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm"
           >
@@ -89,9 +86,9 @@ const close = () => {
         <div v-else>
           <!-- 以小砖块形式显示单词，每行3个 -->
           <div class="grid grid-cols-3 gap-2">
-            <div 
-              v-for="entry in filteredDictionary" 
-              :key="entry.word" 
+            <div
+              v-for="entry in filteredDictionary"
+              :key="entry.word"
               class="dictionary-card bg-yellow-100 border border-yellow-300 p-3 text-center rounded"
             >
               <div class="font-bold text-lg">{{ entry.word }}</div>

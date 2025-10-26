@@ -83,10 +83,10 @@ const imitateWord = () => {
 
   // 调用游戏存储中的learnWord函数将单词添加到词典
   gameStore.learnWord(selectedWord)
-  
+
   // 显示通知
   emit('show-notification', `You have add ${selectedWord} to the dictionary.`)
-  
+
   // 清除选中的单词
   gameStore.clearSelectedWord()
 }

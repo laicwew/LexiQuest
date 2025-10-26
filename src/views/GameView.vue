@@ -128,7 +128,7 @@ const handleDictionaryNotification = (message: string) => {
   notificationMessage.value = message
   notificationType.value = 'success'
   showNotification.value = true
-  
+
   // 3秒后自动隐藏通知
   setTimeout(() => {
     showNotification.value = false

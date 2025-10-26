@@ -345,7 +345,7 @@ export const useGameStore = defineStore('game', () => {
   function learnWord(word: string) {
     // 将单词转换为小写
     const lowerCaseWord = word.toLowerCase()
-    
+
     // 检查单词是否已经存在于词典中
     if (!vocabulary.value.learned.has(lowerCaseWord)) {
       // 创建一个简单的单词对象，只包含必要的字段
@@ -357,7 +357,7 @@ export const useGameStore = defineStore('game', () => {
 
       vocabulary.value.learned.set(lowerCaseWord, wordData)
       progress.value.wordsLearnedToday++
-      
+
       // 保存游戏状态以确保词典更新被持久化
       saveGame()
     }
