@@ -368,8 +368,8 @@ export const useGameStore = defineStore('game', () => {
       // 显示AI生成的内容或空模块的文本
       story.value.text = generatedContent.value || modules.value.empty_market.scenes.entrance.text
     } else if (tab === 'DUMMY') {
-      // 显示当前模块的文本
-      story.value.text = modules.value.supermarket_v1.scenes.entrance.text
+      // 对于DUMMY标签页，不设置特定文本，让组件自己处理
+      story.value.text = ''
     }
   }
 

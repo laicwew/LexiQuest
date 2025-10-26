@@ -15,6 +15,7 @@ const emit = defineEmits<{
 }>()
 
 const storyContent = ref('')
+const dummyContent = ref('') // 用于存储从txt文件加载的例文内容
 
 // Vocabulary for the current scene
 const currentVocabulary = ref([
@@ -51,7 +52,10 @@ const selectWord = (word: string) => {
 watch(
   () => props.storyText,
   () => {
-    processStoryText()
+    // 只有当不是DUMMY标签页时才处理故事文本
+    if (gameStore.activeTab !== 'DUMMY') {
+      processStoryText()
+    }
   },
 )
 
@@ -96,10 +100,34 @@ const updateSelectedWordStyling = () => {
 // 切换标签页
 const switchTab = (tab: string) => {
   gameStore.switchTab(tab)
+
+  // 当切换到DUMMY标签页时，加载例文内容
+  if (tab === 'DUMMY') {
+    loadDummyContent()
+  }
+}
+
+// 从txt文件加载例文内容
+const loadDummyContent = async () => {
+  try {
+    const response = await fetch('/src/assets/sample-text.txt')
+    const text = await response.text()
+    dummyContent.value = text
+    storyContent.value = text
+  } catch (error) {
+    console.error('Failed to load dummy content:', error)
+    dummyContent.value = 'Failed to load example text.'
+    storyContent.value = 'Failed to load example text.'
+  }
 }
 
 onMounted(() => {
   processStoryText()
+
+  // 如果初始标签页是DUMMY，则加载例文内容
+  if (gameStore.activeTab === 'DUMMY') {
+    loadDummyContent()
+  }
 })
 </script>
 
@@ -135,15 +163,18 @@ onMounted(() => {
     <div class="story-text-container">
       <!-- 故事内容 -->
       <div class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
-      
+
       <!-- 续写时的加载动画 -->
       <div v-if="isLoading && storyContent" class="loading-container flex items-center py-4">
         <div class="loading-spinner mr-3"></div>
         <p class="text-gray-600">正在续写故事...</p>
       </div>
-      
+
       <!-- 初始加载动画 -->
-      <div v-else-if="isLoading" class="loading-container flex flex-col items-center justify-center py-8">
+      <div
+        v-else-if="isLoading"
+        class="loading-container flex flex-col items-center justify-center py-8"
+      >
         <div class="loading-spinner"></div>
         <p class="mt-4 text-gray-600">正在生成故事...</p>
       </div>
@@ -229,7 +260,11 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
