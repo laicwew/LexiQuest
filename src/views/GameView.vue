@@ -123,6 +123,18 @@ const handleAIResponse = (response: string) => {
   }
 }
 
+// 处理词典通知
+const handleDictionaryNotification = (message: string) => {
+  notificationMessage.value = message
+  notificationType.value = 'success'
+  showNotification.value = true
+  
+  // 3秒后自动隐藏通知
+  setTimeout(() => {
+    showNotification.value = false
+  }, 3000)
+}
+
 // 监听AI控制台的加载状态变化
 const handleAILoading = (loading: boolean) => {
   isLoading.value = loading
@@ -241,7 +253,7 @@ onUnmounted(() => {
           <WordFeeder
             @ai-response="handleAIResponse"
             @loading="handleAILoading"
-            @imitate-word="performAction"
+            @show-notification="handleDictionaryNotification"
           />
 
           <!-- AI Console Tester -->

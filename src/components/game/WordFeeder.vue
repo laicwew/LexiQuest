@@ -8,7 +8,7 @@ const gameStore = useGameStore()
 const emit = defineEmits<{
   (e: 'aiResponse', response: string): void
   (e: 'loading', loading: boolean): void
-  (e: 'imitate-word', action: string): void
+  (e: 'show-notification', message: string): void
 }>()
 
 // 定义响应数据
@@ -76,11 +76,19 @@ async function feedToAI() {
   }
 }
 
-// 模仿功能 - 发出事件让父组件处理
+// 模仿功能 - 直接添加单词到词典
 const imitateWord = () => {
-  // 发出事件让GameView处理模仿操作
-  // 这样可以复用原有的performAction逻辑
-  emit('imitate-word', 'imitate')
+  const selectedWord = gameStore.vocabulary.selectedWord
+  if (!selectedWord) return
+
+  // 调用游戏存储中的learnWord函数将单词添加到词典
+  gameStore.learnWord(selectedWord)
+  
+  // 显示通知
+  emit('show-notification', `You have add ${selectedWord} to the dictionary.`)
+  
+  // 清除选中的单词
+  gameStore.clearSelectedWord()
 }
 </script>
 

@@ -343,21 +343,36 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function learnWord(word: string) {
-    const currentModuleData = modules.value[currentModule.value.id as keyof typeof modules.value]
-    const currentScene =
-      currentModuleData.scenes[story.value.currentScene as keyof typeof currentModuleData.scenes]
-    const vocabularyData = currentScene.vocabulary.find((v: any) => v.word === word)
-
-    if (vocabularyData && !vocabulary.value.learned.has(word)) {
-      vocabulary.value.learned.set(word, {
-        ...vocabularyData,
+    // 将单词转换为小写
+    const lowerCaseWord = word.toLowerCase()
+    
+    // 检查单词是否已经存在于词典中
+    if (!vocabulary.value.learned.has(lowerCaseWord)) {
+      // 创建一个简单的单词对象，只包含必要的字段
+      const wordData = {
+        word: lowerCaseWord,
         learnedAt: Date.now(),
         reviewCount: 0,
-        mastery: 0,
-      })
+      }
 
+      vocabulary.value.learned.set(lowerCaseWord, wordData)
       progress.value.wordsLearnedToday++
+      
+      // 保存游戏状态以确保词典更新被持久化
+      saveGame()
     }
+  }
+
+  // 清空词典
+  function clearDictionary() {
+    vocabulary.value.learned.clear()
+    progress.value.wordsLearnedToday = 0
+    saveGame()
+  }
+
+  // 获取词典数据（用于控制台输出）
+  function getDictionaryData() {
+    return Array.from(vocabulary.value.learned.values())
   }
 
   // 切换标签页
@@ -412,6 +427,8 @@ export const useGameStore = defineStore('game', () => {
     updateCharacterStatsByAction,
     levelUp,
     learnWord,
+    clearDictionary, // 导出清空词典函数
+    getDictionaryData, // 导出获取词典数据函数
     switchTab,
     updateGeneratedContent,
     updateRawGeneratedContent, // 导出更新原始内容的函数
