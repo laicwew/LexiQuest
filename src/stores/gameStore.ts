@@ -344,7 +344,7 @@ export const useGameStore = defineStore('game', () => {
     character.value.hp = character.value.maxHp
     character.value.maxEnergy += 10
     character.value.energy = character.value.maxEnergy
-    
+
     // 保存游戏状态以确保等级更新被持久化
     saveGame()
   }
