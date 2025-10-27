@@ -143,6 +143,7 @@ const handleAILoading = (loading: boolean) => {
 // Initialize game
 onMounted(() => {
   gameStore.loadGame()
+  gameStore.loadLevelRequirements() // 加载等级要求
   gameStore.startProgressTracking()
 
   // Set up progress tracking

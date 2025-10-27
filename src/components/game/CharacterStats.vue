@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useGameStore } from '@/stores/gameStore'
+
+const gameStore = useGameStore()
 
 const props = defineProps<{
   character: {
@@ -9,15 +12,25 @@ const props = defineProps<{
     maxHp: number
     energy: number
     maxEnergy: number
-    experience: number
-    maxExperience: number
   }
   vocabCount: number
 }>()
 
 const hpPercent = computed(() => (props.character.hp / props.character.maxHp) * 100)
 const energyPercent = computed(() => (props.character.energy / props.character.maxEnergy) * 100)
-const xpPercent = computed(() => (props.character.experience / props.character.maxExperience) * 100)
+
+// 计算单词掌握进度
+const vocabProgress = computed(() => {
+  const nextRequirement = gameStore.getNextLevelRequirements()
+  if (!nextRequirement) return 100
+
+  const progress = Math.min(100, (props.vocabCount / nextRequirement.words_required) * 100)
+  return progress
+})
+
+const nextLevelRequirement = computed(() => {
+  return gameStore.getNextLevelRequirements()
+})
 </script>
 
 <template>
@@ -27,7 +40,7 @@ const xpPercent = computed(() => (props.character.experience / props.character.m
       <div
         class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl"
       >
-        🧙‍♂️
+        👽
       </div>
       <h3 class="font-bold text-lg">{{ character.name }}</h3>
       <p class="text-sm text-gray-600">Level {{ character.level }} Scholar</p>
@@ -57,11 +70,14 @@ const xpPercent = computed(() => (props.character.experience / props.character.m
 
       <div>
         <div class="flex justify-between text-sm mb-1">
-          <span>经验值</span>
-          <span>{{ character.experience }}/{{ character.maxExperience }}</span>
+          <span>单词掌握进度</span>
+          <span v-if="nextLevelRequirement"
+            >{{ vocabCount }}/{{ nextLevelRequirement.words_required }}</span
+          >
+          <span v-else>{{ vocabCount }}/∞</span>
         </div>
         <div class="bg-gray-300 rounded-full h-2">
-          <div class="stat-bar h-2 rounded-full" :style="{ width: xpPercent + '%' }"></div>
+          <div class="stat-bar h-2 rounded-full" :style="{ width: vocabProgress + '%' }"></div>
         </div>
       </div>
     </div>

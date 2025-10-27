@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
+// 定义等级要求的接口
+interface LevelRequirement {
+  level: number
+  words_required: number
+}
+
 // 定义游戏历史记录的接口
 interface GameHistoryEntry {
   gm_narrative: string
@@ -17,8 +23,6 @@ export const useGameStore = defineStore('game', () => {
     maxHp: 100,
     energy: 50,
     maxEnergy: 50,
-    experience: 0,
-    maxExperience: 100,
   })
 
   const currentModule = ref({
@@ -135,12 +139,12 @@ export const useGameStore = defineStore('game', () => {
   // 存储原始的AI生成内容（未处理的）
   const rawGeneratedContent = ref('')
 
+  // 等级要求数据
+  const levelRequirements = ref<LevelRequirement[]>([])
+
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
   const energyPercent = computed(() => (character.value.energy / character.value.maxEnergy) * 100)
-  const xpPercent = computed(
-    () => (character.value.experience / character.value.maxExperience) * 100,
-  )
   const vocabCount = computed(() => vocabulary.value.learned.size)
 
   // Actions
@@ -312,34 +316,37 @@ export const useGameStore = defineStore('game', () => {
     switch (action) {
       case 'eat':
         character.value.energy = Math.min(100, character.value.energy + 5)
-        character.value.experience += 2
         break
       case 'attack':
         character.value.energy = Math.max(0, character.value.energy - 2)
-        character.value.experience += 1
         break
       case 'talk':
-        character.value.experience += 3
+        // 不再增加经验值
         break
       case 'imitate':
-        character.value.experience += 5
+        // 不再增加经验值
         break
     }
 
-    // Check for level up
-    if (character.value.experience >= character.value.maxExperience) {
+    // 检查是否可以升级（基于单词数）
+    const learnedWords = vocabulary.value.learned.size
+    const nextRequirement = levelRequirements.value.find(
+      (req) => req.level === character.value.level + 1,
+    )
+    if (nextRequirement && learnedWords >= nextRequirement.words_required) {
       levelUp()
     }
   }
 
   function levelUp() {
     character.value.level++
-    character.value.experience = 0
-    character.value.maxExperience += 50
     character.value.maxHp += 20
     character.value.hp = character.value.maxHp
     character.value.maxEnergy += 10
     character.value.energy = character.value.maxEnergy
+    
+    // 保存游戏状态以确保等级更新被持久化
+    saveGame()
   }
 
   function learnWord(word: string) {
@@ -360,6 +367,16 @@ export const useGameStore = defineStore('game', () => {
 
       // 保存游戏状态以确保词典更新被持久化
       saveGame()
+
+      // 检查是否达到升级要求
+      checkLevelUp()
+    }
+  }
+
+  // 检查是否达到升级要求
+  function checkLevelUp() {
+    if (canLevelUp()) {
+      levelUp()
     }
   }
 
@@ -373,6 +390,80 @@ export const useGameStore = defineStore('game', () => {
   // 获取词典数据（用于控制台输出）
   function getDictionaryData() {
     return Array.from(vocabulary.value.learned.values())
+  }
+
+  // 从CSV文件加载等级要求
+  async function loadLevelRequirements() {
+    try {
+      const response = await fetch('/src/assets/level-requirements.csv')
+      const csvText = await response.text()
+
+      // 解析CSV数据
+      const lines = csvText.split('\n').filter((line) => line.trim() !== '')
+      if (lines.length === 0 || !lines[0]) {
+        throw new Error('CSV file is empty')
+      }
+
+      const headers = lines[0].split(',').map((header) => header.trim())
+
+      const requirements: LevelRequirement[] = []
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i]
+        if (!line) continue
+        const values = line.split(',').map((value) => value.trim())
+        if (values.length === headers.length && values[0]) {
+          const requirement: LevelRequirement = {
+            level: parseInt(values[0] || '0'),
+            words_required: parseInt(values[1] || '0'),
+          }
+          requirements.push(requirement)
+        }
+      }
+
+      levelRequirements.value = requirements
+      console.log('Level requirements loaded:', requirements)
+    } catch (error) {
+      console.error('Failed to load level requirements:', error)
+      // 如果加载失败，使用默认值
+      levelRequirements.value = [
+        { level: 1, words_required: 0 },
+        { level: 2, words_required: 5 },
+        { level: 3, words_required: 10 },
+        { level: 4, words_required: 15 },
+        { level: 5, words_required: 20 },
+      ]
+    }
+  }
+
+  // 检查是否可以升级
+  function canLevelUp() {
+    const currentLevel = character.value.level
+    const learnedWords = vocabulary.value.learned.size
+
+    // 查找当前等级的要求
+    const currentRequirement = levelRequirements.value.find((req) => req.level === currentLevel)
+    if (!currentRequirement) return false
+
+    // 查找下一等级的要求
+    const nextRequirement = levelRequirements.value.find((req) => req.level === currentLevel + 1)
+    if (!nextRequirement) return false
+
+    // 检查是否满足单词数量要求
+    return learnedWords >= nextRequirement.words_required
+  }
+
+  // 获取下一等级的要求
+  function getNextLevelRequirements() {
+    const currentLevel = character.value.level
+    const nextRequirement = levelRequirements.value.find((req) => req.level === currentLevel + 1)
+    return nextRequirement || null
+  }
+
+  // 获取当前等级的要求
+  function getCurrentLevelRequirements() {
+    const currentLevel = character.value.level
+    const currentRequirement = levelRequirements.value.find((req) => req.level === currentLevel)
+    return currentRequirement || null
   }
 
   // 切换标签页
@@ -409,11 +500,11 @@ export const useGameStore = defineStore('game', () => {
     generatedContent,
     rawGeneratedContent,
     gameHistory, // 导出游戏历史
+    levelRequirements, // 导出等级要求数据
 
     // Getters
     hpPercent,
     energyPercent,
-    xpPercent,
     vocabCount,
 
     // Actions
@@ -429,6 +520,11 @@ export const useGameStore = defineStore('game', () => {
     learnWord,
     clearDictionary, // 导出清空词典函数
     getDictionaryData, // 导出获取词典数据函数
+    loadLevelRequirements, // 导出加载等级要求函数
+    canLevelUp, // 导出检查升级函数
+    checkLevelUp, // 导出检查升级函数
+    getNextLevelRequirements, // 导出获取下一等级要求函数
+    getCurrentLevelRequirements, // 导出获取当前等级要求函数
     switchTab,
     updateGeneratedContent,
     updateRawGeneratedContent, // 导出更新原始内容的函数
