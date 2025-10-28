@@ -291,7 +291,10 @@ onMounted(() => {
       </div>
 
       <!-- Loading States -->
-      <div v-if="isLoading && storyContent && gameStore.activeTab !== 'FEEDER'" class="loading-container flex items-center py-4">
+      <div
+        v-if="isLoading && storyContent && gameStore.activeTab !== 'FEEDER'"
+        class="loading-container flex items-center py-4"
+      >
         <div class="loading-spinner mr-3"></div>
         <p class="text-gray-600">正在续写故事...</p>
       </div>
@@ -304,7 +307,7 @@ onMounted(() => {
         <p class="mt-4 text-gray-600">正在生成故事...</p>
       </div>
     </div>
-    
+
     <!-- Buttons - Outside of scrollable area -->
     <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4">
       <button
@@ -315,7 +318,7 @@ onMounted(() => {
         Imitate
       </button>
     </div>
-    
+
     <div v-else-if="gameStore.activeTab === 'FEEDER'" class="mt-4">
       <div class="flex flex-wrap gap-2">
         <button
