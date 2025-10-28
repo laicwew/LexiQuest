@@ -16,7 +16,7 @@ const props = defineProps<{
 
 const hpPercent = computed(() => (props.character.hp / props.character.maxHp) * 100)
 
-// 计算单词掌握进度
+// Calculate vocabulary progress
 const vocabProgress = computed(() => {
   const nextRequirement = gameStore.getNextLevelRequirements()
   if (!nextRequirement) return 100
@@ -32,7 +32,7 @@ const nextLevelRequirement = computed(() => {
 
 <template>
   <div class="parchment-bg rounded-lg p-6 magical-glow">
-    <h2 class="fantasy-title text-xl font-bold mb-4">角色</h2>
+    <h2 class="fantasy-title text-xl font-bold mb-4">Character</h2>
     <div class="text-center mb-6">
       <div
         class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl"
@@ -47,7 +47,7 @@ const nextLevelRequirement = computed(() => {
     <div class="space-y-4">
       <div>
         <div class="flex justify-between text-sm mb-1">
-          <span>生命值</span>
+          <span>HP</span>
           <span>{{ character.hp }}/{{ character.maxHp }}</span>
         </div>
         <div class="bg-gray-300 rounded-full h-2">
@@ -57,7 +57,7 @@ const nextLevelRequirement = computed(() => {
 
       <div>
         <div class="flex justify-between text-sm mb-1">
-          <span>单词掌握进度</span>
+          <span>Vocabulary Progress</span>
           <span v-if="nextLevelRequirement"
             >{{ vocabCount }}/{{ nextLevelRequirement.words_required }}</span
           >
@@ -73,21 +73,21 @@ const nextLevelRequirement = computed(() => {
 
 <style scoped>
 .parchment-bg {
-  background: var(--secondary-parchment); /* 扁平化背景 */
+  background: var(--secondary-parchment); /* Flat background */
   border: 2px solid var(--primary-gold);
-  box-shadow: none; /* 移除阴影 */
+  box-shadow: none; /* Remove shadow */
 }
 
 .fantasy-title {
   font-family: 'Cinzel', serif;
   color: var(--primary-gold);
-  text-shadow: none; /* 移除阴影 */
+  text-shadow: none; /* Remove shadow */
 }
 
 .stat-bar {
-  background: var(--primary-green); /* 扁平化背景 */
+  background: var(--primary-green); /* Flat background */
   height: 8px;
-  border-radius: 0; /* 移除圆角 */
+  border-radius: 0; /* Remove rounded corners */
   transition: width 0.5s ease;
 }
 </style>
