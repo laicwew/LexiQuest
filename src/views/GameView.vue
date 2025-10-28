@@ -3,7 +3,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import CharacterStats from '@/components/game/CharacterStats.vue'
 import StoryDisplay from '@/components/game/StoryDisplay.vue'
-import ActionButtons from '@/components/game/ActionButtons.vue'
 import ProgressPanel from '@/components/game/ProgressPanel.vue'
 import DictionaryModal from '@/components/game/DictionaryModal.vue'
 import Notification from '@/components/game/Notification.vue'
@@ -15,7 +14,6 @@ const gameStore = useGameStore()
 
 // UI state
 const showDictionary = ref(false)
-const actionResponse = ref('')
 const showActionPrompt = ref(false)
 const actionPromptText = ref('')
 const showNotification = ref(false)
@@ -50,7 +48,7 @@ const selectWord = (word: string) => {
 const performAction = (action: string) => {
   const response = gameStore.performAction(action)
   if (response) {
-    actionResponse.value = response
+    console.log("Action performed successfully: ", response)
     // Scroll to response
     setTimeout(() => {
       const responseElement = document.querySelector('.action-response')
@@ -58,29 +56,6 @@ const performAction = (action: string) => {
         responseElement.scrollIntoView({ behavior: 'smooth' })
       }
     }, 100)
-  }
-}
-
-const generateActionPrompt = () => {
-  const prompts = [
-    '你想深入探索市场吗？',
-    '店员似乎还有更多话要说。你要不要再和他谈谈？',
-    '你注意到远处的架子上有闪闪发光的东西。要调查一下吗？',
-    '魔法的氛围让你感到好奇。要多看看周围吗？',
-    '你想练习更多词汇。要试试另一个词吗？',
-  ]
-
-  const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)]
-  actionPromptText.value = randomPrompt || ''
-  showActionPrompt.value = true
-}
-
-const handleActionPrompt = (choice: string) => {
-  showActionPrompt.value = false
-
-  if (choice === 'yes') {
-    const continuationText = '你决定进一步探索。魔法市场似乎隐藏着许多秘密和学习机会...'
-    actionResponse.value = continuationText
   }
 }
 
@@ -176,20 +151,20 @@ onUnmounted(() => {
               @click="toggleDictionary"
               class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 transition-colors border border-yellow-700"
             >
-              📚 词典
+              📚 Dictionary
             </button>
             <button
               @click="saveGame"
               class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 transition-colors border border-green-800"
             >
-              💾 保存
+              💾 Save
             </button>
             <!-- 添加测试按钮 -->
             <button
               @click="testGetContext"
               class="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 transition-colors border border-blue-800"
             >
-              🧪 测试上下文
+              🧪Context
             </button>
           </div>
         </div>
@@ -212,43 +187,7 @@ onUnmounted(() => {
             :is-loading="isLoading"
             @word-selected="selectWord"
           />
-
-          <!-- Action Response -->
-          <div v-if="actionResponse" class="mt-4 p-4 bg-blue-100 border border-blue-300">
-            <p class="italic text-blue-800">{{ actionResponse }}</p>
-          </div>
-
-          <!-- Action Prompt -->
-          <div v-if="showActionPrompt" class="mt-6 p-4 bg-blue-100 border border-blue-300">
-            <p class="font-medium text-blue-800 mb-3">{{ actionPromptText }}</p>
-            <div class="flex space-x-3">
-              <button
-                class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 transition-colors border border-green-800"
-                @click="handleActionPrompt('yes')"
-              >
-                Yes
-              </button>
-              <button
-                class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 transition-colors border border-yellow-700"
-                @click="handleActionPrompt('retry')"
-              >
-                Try Another
-              </button>
-              <button
-                class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 transition-colors border border-red-800"
-                @click="handleActionPrompt('no')"
-              >
-                No
-              </button>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <ActionButtons
-            :selected-word="gameStore.vocabulary.selectedWord"
-            @perform-action="performAction"
-            @generate-prompt="generateActionPrompt"
-          />
+        
 
           <!-- Word Feeder -->
           <WordFeeder
@@ -263,7 +202,7 @@ onUnmounted(() => {
 
         <!-- Progress & Achievements Panel -->
         <div class="lg:col-span-1">
-          <ProgressPanel :module="gameStore.currentModule" :progress="gameStore.progress" />
+          <ProgressPanel :progress="gameStore.progress" />
         </div>
       </div>
     </div>

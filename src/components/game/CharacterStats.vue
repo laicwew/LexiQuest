@@ -10,14 +10,11 @@ const props = defineProps<{
     level: number
     hp: number
     maxHp: number
-    energy: number
-    maxEnergy: number
   }
   vocabCount: number
 }>()
 
 const hpPercent = computed(() => (props.character.hp / props.character.maxHp) * 100)
-const energyPercent = computed(() => (props.character.energy / props.character.maxEnergy) * 100)
 
 // 计算单词掌握进度
 const vocabProgress = computed(() => {
@@ -60,16 +57,6 @@ const nextLevelRequirement = computed(() => {
 
       <div>
         <div class="flex justify-between text-sm mb-1">
-          <span>能量</span>
-          <span>{{ character.energy }}/{{ character.maxEnergy }}</span>
-        </div>
-        <div class="bg-gray-300 rounded-full h-2">
-          <div class="stat-bar h-2 rounded-full" :style="{ width: energyPercent + '%' }"></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between text-sm mb-1">
           <span>单词掌握进度</span>
           <span v-if="nextLevelRequirement"
             >{{ vocabCount }}/{{ nextLevelRequirement.words_required }}</span
@@ -79,14 +66,6 @@ const nextLevelRequirement = computed(() => {
         <div class="bg-gray-300 rounded-full h-2">
           <div class="stat-bar h-2 rounded-full" :style="{ width: vocabProgress + '%' }"></div>
         </div>
-      </div>
-    </div>
-
-    <!-- Vocabulary Count -->
-    <div class="mt-6 p-3 bg-yellow-100 rounded-lg">
-      <div class="text-center">
-        <div class="text-2xl font-bold text-yellow-700">{{ vocabCount }}</div>
-        <div class="text-sm text-yellow-600">已学词汇</div>
       </div>
     </div>
   </div>
