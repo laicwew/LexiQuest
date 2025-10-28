@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
+import OpenAI from 'openai'
 
 const gameStore = useGameStore()
 
@@ -12,10 +13,25 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'wordSelected', word: string): void
+  (e: 'aiResponse', response: string): void
+  (e: 'loading', loading: boolean): void
+  (e: 'showNotification', message: string): void
 }>()
 
 const storyContent = ref('')
 const dummyContent = ref('') // 用于存储从txt文件加载的例文内容
+
+// WordFeeder相关状态
+const feedText = ref<string>('')
+const isFeeding = ref<boolean>(false)
+const error = ref<string>('')
+
+// 初始化OpenAI客户端
+const openai = new OpenAI({
+  baseURL: import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.deepseek.com',
+  apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY,
+  dangerouslyAllowBrowser: true, // 注意：在生产环境中应该通过后端代理API密钥
+})
 
 // Vocabulary for the current scene
 const currentVocabulary = ref([
@@ -53,7 +69,7 @@ watch(
   () => props.storyText,
   () => {
     // 只有当不是DUMMY标签页时才处理故事文本
-    if (gameStore.activeTab !== 'DUMMY') {
+    if (gameStore.activeTab !== 'DUMMY' && gameStore.activeTab !== 'FEEDER') {
       processStoryText()
     }
   },
@@ -121,6 +137,74 @@ const loadDummyContent = async () => {
   }
 }
 
+// 发送文本到AI的函数
+async function feedToAI() {
+  if (!feedText.value.trim()) {
+    error.value = 'Please enter some text to feed to the alien.'
+    return
+  }
+
+  isFeeding.value = true
+  error.value = ''
+
+  // 发射加载状态事件
+  emit('loading', true)
+
+  try {
+    // 从txt文件中读取系统提示内容
+    const responseSystem = await fetch('/src/assets/system-prompt.txt')
+    const systemPrompt = await responseSystem.text()
+
+    // 使用用户输入的文本作为reading prompt
+    const readingPrompt = feedText.value.trim()
+
+    console.log('开始调用DeepSeek API with reading prompt...')
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: readingPrompt },
+      ],
+      model: 'deepseek-chat',
+    })
+
+    console.log('API调用完成:', completion)
+    // 检查completion是否存在以及是否有choices
+    if (completion && completion.choices && completion.choices.length > 0) {
+      const choice = completion.choices[0]
+      if (choice && choice.message && choice.message.content) {
+        // 发射事件，将AI响应传递给父组件
+        emit('aiResponse', choice.message.content)
+      } else {
+        error.value = 'No response content'
+      }
+    } else {
+      error.value = 'No response received'
+    }
+  } catch (err) {
+    console.error('API调用错误:', err)
+    error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+  } finally {
+    isFeeding.value = false
+    // 发射加载完成事件
+    emit('loading', false)
+  }
+}
+
+// 模仿功能 - 直接添加单词到词典
+const imitateWord = () => {
+  const selectedWord = gameStore.vocabulary.selectedWord
+  if (!selectedWord) return
+
+  // 调用游戏存储中的learnWord函数将单词添加到词典
+  gameStore.learnWord(selectedWord)
+
+  // 显示通知
+  emit('showNotification', `You have add ${selectedWord} to the dictionary.`)
+
+  // 清除选中的单词
+  gameStore.clearSelectedWord()
+}
+
 onMounted(() => {
   processStoryText()
 
@@ -149,6 +233,17 @@ onMounted(() => {
       <button
         class="px-4 py-2 font-medium text-sm rounded-t-lg transition-colors"
         :class="[
+          'FEEDER' === gameStore.activeTab
+            ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500'
+            : 'text-gray-600 hover:text-gray-900',
+        ]"
+        @click="switchTab('FEEDER')"
+      >
+        FEEDER
+      </button>
+      <button
+        class="px-4 py-2 font-medium text-sm rounded-t-lg transition-colors"
+        :class="[
           'DUMMY' === gameStore.activeTab
             ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500'
             : 'text-gray-600 hover:text-gray-900',
@@ -161,22 +256,75 @@ onMounted(() => {
 
     <!-- Story Content -->
     <div class="story-text-container">
-      <!-- 故事内容 -->
-      <div class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
+      <!-- GENERATED Tab Content -->
+      <div v-if="gameStore.activeTab === 'GENERATED'">
+        <div class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
+      </div>
 
-      <!-- 续写时的加载动画 -->
-      <div v-if="isLoading && storyContent" class="loading-container flex items-center py-4">
+      <!-- FEEDER Tab Content -->
+      <div v-else-if="gameStore.activeTab === 'FEEDER'">
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Feed Word-Food to Alien</h3>
+        <p class="text-sm text-gray-600 mb-3">
+          Paste English text (under 200 words) for the alien to learn new vocabulary.
+        </p>
+
+        <div class="mb-3">
+          <textarea
+            v-model="feedText"
+            placeholder="Paste English text here (max 200 words)..."
+            class="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded"
+            rows="4"
+            :disabled="isFeeding"
+          ></textarea>
+        </div>
+
+        <div v-if="isFeeding" class="mt-3 text-yellow-600">Alien is learning new words...</div>
+
+        <div v-if="error" class="mt-3 p-3 bg-red-800 text-red-100 border border-red-500">
+          <strong>Error:</strong> {{ error }}
+        </div>
+      </div>
+
+      <!-- DUMMY Tab Content -->
+      <div v-else-if="gameStore.activeTab === 'DUMMY'">
+        <div class="story-text" v-html="storyContent"></div>
+      </div>
+
+      <!-- Loading States -->
+      <div v-if="isLoading && storyContent && gameStore.activeTab !== 'FEEDER'" class="loading-container flex items-center py-4">
         <div class="loading-spinner mr-3"></div>
         <p class="text-gray-600">正在续写故事...</p>
       </div>
 
-      <!-- 初始加载动画 -->
       <div
-        v-else-if="isLoading"
+        v-else-if="isLoading && gameStore.activeTab !== 'FEEDER'"
         class="loading-container flex flex-col items-center justify-center py-8"
       >
         <div class="loading-spinner"></div>
         <p class="mt-4 text-gray-600">正在生成故事...</p>
+      </div>
+    </div>
+    
+    <!-- Buttons - Outside of scrollable area -->
+    <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4">
+      <button
+        @click="imitateWord"
+        :disabled="!gameStore.vocabulary.selectedWord"
+        class="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-blue-300"
+      >
+        Imitate
+      </button>
+    </div>
+    
+    <div v-else-if="gameStore.activeTab === 'FEEDER'" class="mt-4">
+      <div class="flex flex-wrap gap-2">
+        <button
+          @click="feedToAI"
+          :disabled="isFeeding || !feedText.trim()"
+          class="bg-purple-700 hover:bg-purple-600 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-yellow-500"
+        >
+          {{ isFeeding ? 'Feeding...' : 'Feed Alien' }}
+        </button>
       </div>
     </div>
   </div>

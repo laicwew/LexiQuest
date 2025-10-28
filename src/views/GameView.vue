@@ -7,7 +7,6 @@ import ProgressPanel from '@/components/game/ProgressPanel.vue'
 import DictionaryModal from '@/components/game/DictionaryModal.vue'
 import Notification from '@/components/game/Notification.vue'
 import AIConsoleTester from '@/components/game/AIConsoleTester.vue'
-import WordFeeder from '@/components/game/WordFeeder.vue'
 
 // Game store
 const gameStore = useGameStore()
@@ -180,10 +179,6 @@ onUnmounted(() => {
             :selected-word="gameStore.vocabulary.selectedWord"
             :is-loading="isLoading"
             @word-selected="selectWord"
-          />
-
-          <!-- Word Feeder -->
-          <WordFeeder
             @ai-response="handleAIResponse"
             @loading="handleAILoading"
             @show-notification="handleDictionaryNotification"
