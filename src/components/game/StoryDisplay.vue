@@ -190,12 +190,12 @@ onMounted(() => {
 }
 
 .story-text-container {
-  max-height: 400px; /* 设置最大高度 */
+  max-height: 300px; /* 减少最大高度 */
   overflow-y: auto; /* 启用垂直滚动条 */
   padding: 10px; /* 添加内边距 */
   border: 1px solid var(--primary-gold); /* 添加边框 */
   background: var(--secondary-parchment); /* 背景色 */
-  min-height: 200px; /* 确保容器有最小高度 */
+  min-height: 150px; /* 减少最小高度 */
 }
 
 .story-text {

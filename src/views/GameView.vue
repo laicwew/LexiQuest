@@ -45,20 +45,6 @@ const selectWord = (word: string) => {
   gameStore.selectWord(word)
 }
 
-const performAction = (action: string) => {
-  const response = gameStore.performAction(action)
-  if (response) {
-    console.log("Action performed successfully: ", response)
-    // Scroll to response
-    setTimeout(() => {
-      const responseElement = document.querySelector('.action-response')
-      if (responseElement) {
-        responseElement.scrollIntoView({ behavior: 'smooth' })
-      }
-    }, 100)
-  }
-}
-
 const showGameNotification = (
   message: string,
   type: 'success' | 'error' | 'info' | 'achievement' = 'info',
@@ -174,20 +160,27 @@ onUnmounted(() => {
     <!-- Main Game Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <!-- Character Stats Panel -->
-        <div class="lg:col-span-1">
-          <CharacterStats :character="gameStore.character" :vocab-count="gameStore.vocabCount" />
+        <!-- Left Column (Character Stats and Progress Panel) -->
+        <div class="lg:col-span-1 space-y-8">
+          <!-- Character Stats Panel -->
+          <div>
+            <CharacterStats :character="gameStore.character" :vocab-count="gameStore.vocabCount" />
+          </div>
+
+          <!-- Progress & Achievements Panel -->
+          <div>
+            <ProgressPanel :progress="gameStore.progress" />
+          </div>
         </div>
 
         <!-- Story Display Area -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-3">
           <StoryDisplay
             :story-text="gameStore.story.text"
             :selected-word="gameStore.vocabulary.selectedWord"
             :is-loading="isLoading"
             @word-selected="selectWord"
           />
-        
 
           <!-- Word Feeder -->
           <WordFeeder
@@ -198,11 +191,6 @@ onUnmounted(() => {
 
           <!-- AI Console Tester -->
           <AIConsoleTester @ai-response="handleAIResponse" @loading="handleAILoading" />
-        </div>
-
-        <!-- Progress & Achievements Panel -->
-        <div class="lg:col-span-1">
-          <ProgressPanel :progress="gameStore.progress" />
         </div>
       </div>
     </div>
