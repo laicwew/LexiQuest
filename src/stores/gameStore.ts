@@ -367,7 +367,7 @@ export const useGameStore = defineStore('game', () => {
     // 根据标签页更新显示的文本
     if (tab === 'GENERATED') {
       // 显示AI生成的内容或空模块的文本
-      story.value.text = generatedContent.value || ''
+      story.value.text = generatedContent.value || 'Hello Friend {player_name}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
     } else if (tab === 'DUMMY') {
       // 对于DUMMY标签页，不设置特定文本，让组件自己处理
       story.value.text = ''
