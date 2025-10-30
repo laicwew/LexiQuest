@@ -111,7 +111,7 @@ export const useGameStore = defineStore('game', () => {
 
     // Save game state
     saveGame()
-    return gameHistory;
+    return gameHistory
   }
 
   // 添加一个函数来更新原始AI生成内容
@@ -180,6 +180,12 @@ export const useGameStore = defineStore('game', () => {
   // 修改loadGame函数以加载游戏历史
   function loadGame() {
     const savedState = localStorage.getItem('lexiquest-save')
+    // Load username from localStorage regardless of saved state
+    const username = localStorage.getItem('lexiquest-username')
+    if (username) {
+      character.value.name = username
+    }
+
     if (savedState) {
       try {
         const parsed = JSON.parse(savedState)
@@ -197,8 +203,7 @@ export const useGameStore = defineStore('game', () => {
 
         // 根据保存的标签页状态设置正确的文本
         if (activeTab.value === 'GENERATED') {
-          story.value.text =
-            generatedContent.value || ''
+          story.value.text = generatedContent.value || ''
         } else if (activeTab.value === 'DUMMY') {
           story.value.text = ''
         }
@@ -207,16 +212,15 @@ export const useGameStore = defineStore('game', () => {
         if (parsed.vocabulary && parsed.vocabulary.learned) {
           vocabulary.value.learned = new Map(parsed.vocabulary.learned)
         }
+
+        // Ensure the character name is updated from localStorage even with saved state
+        if (username) {
+          character.value.name = username
+        }
       } catch (e) {
         console.error('Failed to load game state', e)
       }
     } else {
-      // Load username from localStorage
-      const username = localStorage.getItem('lexiquest-username')
-      if (username) {
-        character.value.name = username
-      }
-
       // 默认情况下，设置为GENERATED标签页并显示空文本
       activeTab.value = 'GENERATED'
       story.value.text = ''
@@ -224,7 +228,6 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function updateCharacterStatsByAction(action: string) {
-
     // 检查是否可以升级（基于单词数）
     const learnedWords = vocabulary.value.learned.size
     const nextRequirement = levelRequirements.value.find(
@@ -367,7 +370,9 @@ export const useGameStore = defineStore('game', () => {
     // 根据标签页更新显示的文本
     if (tab === 'GENERATED') {
       // 显示AI生成的内容或空模块的文本
-      story.value.text = generatedContent.value || 'Hello Friend {player_name}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+      story.value.text =
+        generatedContent.value ||
+        'Hello Friend {player_name}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
     } else if (tab === 'DUMMY') {
       // 对于DUMMY标签页，不设置特定文本，让组件自己处理
       story.value.text = ''
@@ -392,7 +397,6 @@ export const useGameStore = defineStore('game', () => {
     generatedContent,
     rawGeneratedContent,
     gameHistory, // 导出游戏历史
-    levelRequirements, // 导出等级要求数据
 
     // Getters
     hpPercent,
