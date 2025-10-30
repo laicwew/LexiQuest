@@ -112,6 +112,25 @@ const switchTab = (tab: string) => {
   }
 }
 
+// 文本变量替换函数
+const txtArgumentReplace = (text: string): string => {
+  // 定义变量映射关系
+  const variables: Record<string, string> = {
+    username: gameStore.character.name,
+    alienName: gameStore.alienName,
+    // 可以根据需要添加更多变量
+  }
+
+  // 使用正则表达式替换所有{}中的变量
+  let result = text
+  for (const [key, value] of Object.entries(variables)) {
+    const regex = new RegExp(`\\{${key}\\}`, 'g')
+    result = result.replace(regex, value)
+  }
+
+  return result
+}
+
 // 从txt文件加载例文内容
 const loadDummyContent = async () => {
   try {
@@ -131,7 +150,9 @@ const loadIntroductionContent = async () => {
   try {
     const response = await fetch('/src/assets/introduction.txt')
     const text = await response.text()
-    introductionContent.value = text
+    // 应用变量替换
+    const processedText = txtArgumentReplace(text)
+    introductionContent.value = processedText
   } catch (error) {
     console.error('Failed to load introduction content:', error)
     introductionContent.value =
@@ -165,7 +186,9 @@ async function feedToAI() {
   try {
     // 从txt文件中读取系统提示内容
     const responseSystem = await fetch('/src/assets/system-prompt.txt')
-    const systemPrompt = await responseSystem.text()
+    const systemPromptText = await responseSystem.text()
+    // 应用变量替换
+    const systemPrompt = txtArgumentReplace(systemPromptText)
 
     // 使用用户输入的文本作为reading prompt
     const readingPrompt = feedText.value.trim()
