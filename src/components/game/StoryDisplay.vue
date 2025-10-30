@@ -121,6 +121,7 @@ const txtArgumentReplace = (text: string): string => {
   const variables: Record<string, string> = {
     username: gameStore.userName,
     alienName: gameStore.character.name,
+    languageLevel: gameStore.character.languageLevel,
     // 可以根据需要添加更多变量
   }
 
@@ -264,6 +265,7 @@ const clearGameHistory = () => {
     level: 1,
     hp: 100,
     maxHp: 100,
+    languageLevel: 'CET-6',
   }
 
   // 清空词典，这样vocabCount计算属性会自动更新为0
@@ -272,8 +274,7 @@ const clearGameHistory = () => {
   // 保存到localStorage
   gameStore.saveGame()
 
-  console.log('游戏历史已清除')
-  alert('游戏历史已清除')
+  alert('Game history cleared')
 }
 
 // 复制DUMMY内容的函数

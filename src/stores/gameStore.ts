@@ -20,6 +20,7 @@ export const useGameStore = defineStore('game', () => {
     level: 1,
     hp: 100,
     maxHp: 100,
+    languageLevel: 'CET-6',
   })
 
   const story = ref({
@@ -193,7 +194,11 @@ export const useGameStore = defineStore('game', () => {
     if (savedState) {
       try {
         const parsed = JSON.parse(savedState)
-        character.value = parsed.character
+        // 确保character对象包含languageLevel属性，如果不存在则设置默认值
+        character.value = {
+          ...parsed.character,
+          languageLevel: parsed.character?.languageLevel || 'CET-6',
+        }
         story.value = parsed.story
         vocabulary.value = parsed.vocabulary
         progress.value = parsed.progress
@@ -381,6 +386,13 @@ export const useGameStore = defineStore('game', () => {
     saveGame()
   }
 
+  // 更新语言级别
+  function updateLanguageLevel(level: string) {
+    character.value.languageLevel = level
+    // 保存到localStorage
+    saveGame()
+  }
+
   function startProgressTracking() {
     // Track time spent in game
     setInterval(() => {
@@ -427,6 +439,7 @@ export const useGameStore = defineStore('game', () => {
     updateGeneratedContent,
     updateRawGeneratedContent, // 导出更新原始内容的函数
     updateAlienName, // 导出更新外星人名称的函数
+    updateLanguageLevel, // 导出更新语言级别的函数
     startProgressTracking,
     getContextForContinuation,
   }
