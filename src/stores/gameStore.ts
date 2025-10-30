@@ -63,6 +63,9 @@ export const useGameStore = defineStore('game', () => {
   // 等级要求数据
   const levelRequirements = ref<LevelRequirement[]>([])
 
+  // 外星人名称
+  const alienName = ref('')
+
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
   const vocabCount = computed(() => vocabulary.value.learned.size)
@@ -171,6 +174,7 @@ export const useGameStore = defineStore('game', () => {
       generatedContent: generatedContent.value,
       rawGeneratedContent: rawGeneratedContent.value, // 保存原始内容
       gameHistory: gameHistory.value, // 保存游戏历史
+      alienName: alienName.value, // 保存外星人名称
     }
 
     localStorage.setItem('lexiquest-save', JSON.stringify(gameState))
@@ -197,6 +201,7 @@ export const useGameStore = defineStore('game', () => {
         activeTab.value = parsed.activeTab || 'GENERATED'
         generatedContent.value = parsed.generatedContent || ''
         rawGeneratedContent.value = parsed.rawGeneratedContent || '' // 加载原始内容
+        alienName.value = parsed.alienName || '' // 加载外星人名称
 
         // 加载游戏历史
         gameHistory.value = parsed.gameHistory || []
@@ -369,6 +374,13 @@ export const useGameStore = defineStore('game', () => {
     activeTab.value = tab
   }
 
+  // 更新外星人名称
+  function updateAlienName(name: string) {
+    alienName.value = name
+    // 保存到localStorage
+    saveGame()
+  }
+
   function startProgressTracking() {
     // Track time spent in game
     setInterval(() => {
@@ -387,6 +399,7 @@ export const useGameStore = defineStore('game', () => {
     generatedContent,
     rawGeneratedContent,
     gameHistory, // 导出游戏历史
+    alienName, // 导出外星人名称
 
     // Getters
     hpPercent,
@@ -413,6 +426,7 @@ export const useGameStore = defineStore('game', () => {
     switchTab,
     updateGeneratedContent,
     updateRawGeneratedContent, // 导出更新原始内容的函数
+    updateAlienName, // 导出更新外星人名称的函数
     startProgressTracking,
     getContextForContinuation,
   }

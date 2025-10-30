@@ -103,10 +103,12 @@ const switchTab = (tab: string) => {
   if (tab === 'DUMMY') {
     loadDummyContent()
   }
-
+  
   // 当切换到GENERATED标签页时，加载介绍文本
   if (tab === 'GENERATED') {
     loadIntroductionContent()
+    // 初始化外星人名称输入框的值
+    alienNameInput.value = gameStore.alienName
   }
 }
 
@@ -132,8 +134,17 @@ const loadIntroductionContent = async () => {
     introductionContent.value = text
   } catch (error) {
     console.error('Failed to load introduction content:', error)
-    introductionContent.value =
-      'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+    introductionContent.value = 'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+  }
+}
+
+// 保存外星人名称
+const saveAlienName = () => {
+  if (alienNameInput.value.trim()) {
+    // 保存到store和localStorage
+    gameStore.updateAlienName(alienNameInput.value.trim())
+    // 显示通知
+    emit('showNotification', `Alien name saved as ${alienNameInput.value.trim()}!`)
   }
 }
 
@@ -247,10 +258,12 @@ onMounted(() => {
   if (gameStore.activeTab === 'DUMMY') {
     loadDummyContent()
   }
-
+  
   // 如果初始标签页是GENERATED，则加载介绍内容
   if (gameStore.activeTab === 'GENERATED') {
     loadIntroductionContent()
+    // 初始化外星人名称输入框的值
+    alienNameInput.value = gameStore.alienName
   }
 })
 </script>
@@ -299,12 +312,7 @@ onMounted(() => {
       <!-- GENERATED Tab Content -->
       <div v-if="gameStore.activeTab === 'GENERATED'">
         <!-- 如果有生成内容，显示生成的内容 -->
-        <div
-          v-if="gameStore.generatedContent"
-          class="story-text"
-          v-html="storyContent"
-          @click="handleStoryClick"
-        ></div>
+        <div v-if="gameStore.generatedContent" class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
         <!-- 如果没有生成内容，显示介绍内容和输入框 -->
         <div v-else>
           <div class="story-text">{{ introductionContent }}</div>
@@ -318,11 +326,14 @@ onMounted(() => {
                 type="text"
                 placeholder="Enter alien name..."
                 class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                @keyup.enter="saveAlienName"
               />
               <button
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                @click="saveAlienName"
+                :disabled="!alienNameInput.trim()"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save
+                Confirm
               </button>
             </div>
           </div>
