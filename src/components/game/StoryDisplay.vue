@@ -33,29 +33,9 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true, // 注意：在生产环境中应该通过后端代理API密钥
 })
 
-// Vocabulary for the current scene
-const currentVocabulary = ref([
-  { word: 'apple', translation: '苹果', pos: 'noun', difficulty: 1 },
-  { word: 'shelf', translation: '架子', pos: 'noun', difficulty: 2 },
-  { word: 'clerk', translation: '店员', pos: 'noun', difficulty: 2 },
-  { word: 'cleaning', translation: '打扫', pos: 'verb', difficulty: 2 },
-  { word: 'bright', translation: '明亮的', pos: 'adjective', difficulty: 2 },
-  { word: 'fruits', translation: '水果', pos: 'noun', difficulty: 1 },
-  { word: 'vegetables', translation: '蔬菜', pos: 'noun', difficulty: 1 },
-])
-
 // Process text to highlight vocabulary words
 const processStoryText = () => {
   let processedText = props.storyText
-
-  // Process each vocabulary word
-  currentVocabulary.value.forEach((wordData) => {
-    const regex = new RegExp(`\\b${wordData.word}\\b`, 'gi')
-    processedText = processedText.replace(
-      regex,
-      `<span class="interactive-word" data-word="${wordData.word}">${wordData.word}</span>`,
-    )
-  })
 
   storyContent.value = processedText
 }
@@ -205,6 +185,27 @@ const imitateWord = () => {
   gameStore.clearSelectedWord()
 }
 
+// 清除游戏历史的函数
+const clearGameHistory = () => {
+  // 清除游戏历史
+  gameStore.gameHistory = []
+
+  // 清除原始生成内容
+  gameStore.updateRawGeneratedContent('')
+
+  // 清除生成内容
+  gameStore.updateGeneratedContent('')
+
+  // 重置故事文本
+  gameStore.story.text = ''
+
+  // 保存到localStorage
+  gameStore.saveGame()
+
+  console.log('游戏历史已清除')
+  alert('游戏历史已清除')
+}
+
 onMounted(() => {
   processStoryText()
 
@@ -309,13 +310,19 @@ onMounted(() => {
     </div>
 
     <!-- Buttons - Outside of scrollable area -->
-    <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4">
+    <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4 flex gap-2">
       <button
         @click="imitateWord"
         :disabled="!gameStore.vocabulary.selectedWord"
         class="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-blue-300"
       >
         Imitate
+      </button>
+      <button
+        @click="clearGameHistory"
+        class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 transition-colors border border-red-300"
+      >
+        Clear
       </button>
     </div>
 
@@ -341,12 +348,12 @@ onMounted(() => {
 }
 
 .story-text-container {
-  max-height: 300px; /* 减少最大高度 */
+  flex: 1;
   overflow-y: auto; /* 启用垂直滚动条 */
   padding: 10px; /* 添加内边距 */
   border: 1px solid var(--primary-gold); /* 添加边框 */
   background: var(--secondary-parchment); /* 背景色 */
-  min-height: 150px; /* 减少最小高度 */
+  min-height: 200px; /* 设置最小高度 */
 }
 
 .story-text {

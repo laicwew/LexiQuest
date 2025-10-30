@@ -160,32 +160,35 @@ onUnmounted(() => {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- Left Column (Character Stats and Progress Panel) -->
-        <div class="lg:col-span-1 space-y-8">
+        <div class="lg:col-span-1 flex flex-col">
           <!-- Character Stats Panel -->
-          <div>
+          <div class="flex-shrink-0">
             <CharacterStats :character="gameStore.character" :vocab-count="gameStore.vocabCount" />
           </div>
 
           <!-- Progress & Achievements Panel -->
-          <div>
+          <div class="flex-shrink-0 mt-8">
             <ProgressPanel :progress="gameStore.progress" />
           </div>
+
+          <!-- Spacer to push content to top -->
+          <div class="flex-grow"></div>
         </div>
 
         <!-- Story Display Area -->
-        <div class="lg:col-span-3">
-          <StoryDisplay
-            :story-text="gameStore.story.text"
-            :selected-word="gameStore.vocabulary.selectedWord"
-            :is-loading="isLoading"
-            @word-selected="selectWord"
-            @ai-response="handleAIResponse"
-            @loading="handleAILoading"
-            @show-notification="handleDictionaryNotification"
-          />
-
-          <!-- AI Console Tester -->
-          <AIConsoleTester @ai-response="handleAIResponse" @loading="handleAILoading" />
+        <div class="lg:col-span-3 flex flex-col">
+          <div class="flex-grow flex flex-col">
+            <StoryDisplay
+              class="flex-grow"
+              :story-text="gameStore.story.text"
+              :selected-word="gameStore.vocabulary.selectedWord"
+              :is-loading="isLoading"
+              @word-selected="selectWord"
+              @ai-response="handleAIResponse"
+              @loading="handleAILoading"
+              @show-notification="handleDictionaryNotification"
+            />
+          </div>
         </div>
       </div>
     </div>
