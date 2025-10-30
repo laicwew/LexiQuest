@@ -43,6 +43,6 @@ Example Response Format:
 
 I try use words myself: Family **heritage** important. Ceremony gives **blessing**. People look at **tartan**, feel happy.
 
-''Greetings from America! While I explore, I notice humans display family **tartan** in church for heritage. They get **blessing** for cloth and family. Teach me more words! --Yours, {alien_name}''
+''Greetings from America! While I explore, I notice humans display family **tartan** in church for heritage. They get **blessing** for cloth and family. Teach me more words! --Yours, {alienName}''
 
 I am very very very happy, Friend {username}! Wwhat you think I learn next?"

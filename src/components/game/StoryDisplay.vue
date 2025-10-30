@@ -20,6 +20,7 @@ const emit = defineEmits<{
 
 const storyContent = ref('')
 const dummyContent = ref('') // 用于存储从txt文件加载的例文内容
+const generatedContent = ref('') // 用于存储GENERATED标签页的内容
 
 // WordFeeder相关状态
 const feedText = ref<string>('')
@@ -48,7 +49,7 @@ const selectWord = (word: string) => {
 watch(
   () => props.storyText,
   () => {
-    // 只有当不是DUMMY标签页时才处理故事文本
+    // 只有当不是DUMMY和FEEDER标签页时才处理故事文本
     if (gameStore.activeTab !== 'DUMMY' && gameStore.activeTab !== 'FEEDER') {
       processStoryText()
     }
@@ -101,6 +102,11 @@ const switchTab = (tab: string) => {
   if (tab === 'DUMMY') {
     loadDummyContent()
   }
+
+  // 当切换到GENERATED标签页时，加载介绍文本
+  if (tab === 'GENERATED') {
+    loadGeneratedContent()
+  }
 }
 
 // 从txt文件加载例文内容
@@ -114,6 +120,31 @@ const loadDummyContent = async () => {
     console.error('Failed to load dummy content:', error)
     dummyContent.value = 'Failed to load example text.'
     storyContent.value = 'Failed to load example text.'
+  }
+}
+
+// 从txt文件加载GENERATED标签页的介绍内容
+const loadGeneratedContent = async () => {
+  try {
+    const response = await fetch('/src/assets/introduction.txt')
+    const text = await response.text()
+    generatedContent.value = text
+    // 只有当没有生成内容时才更新显示
+    if (!gameStore.generatedContent) {
+      storyContent.value = text
+    } else {
+      storyContent.value = gameStore.generatedContent
+    }
+  } catch (error) {
+    console.error('Failed to load introduction content:', error)
+    generatedContent.value =
+      'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+    // 只有当没有生成内容时才更新显示
+    if (!gameStore.generatedContent) {
+      storyContent.value = generatedContent.value
+    } else {
+      storyContent.value = gameStore.generatedContent
+    }
   }
 }
 
@@ -226,6 +257,11 @@ onMounted(() => {
   // 如果初始标签页是DUMMY，则加载例文内容
   if (gameStore.activeTab === 'DUMMY') {
     loadDummyContent()
+  }
+
+  // 如果初始标签页是GENERATED，则加载介绍内容
+  if (gameStore.activeTab === 'GENERATED') {
+    loadGeneratedContent()
   }
 })
 </script>
