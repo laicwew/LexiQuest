@@ -32,7 +32,7 @@ const nextLevelRequirement = computed(() => {
 
 <template>
   <div class="parchment-bg rounded-lg p-6 magical-glow">
-    <h2 class="fantasy-title text-xl font-bold mb-4">Character</h2>
+    <h2 class="fantasy-title text-xl font-bold mb-4">Your Alien Friend</h2>
     <div class="text-center mb-6">
       <div
         class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl"
@@ -40,7 +40,7 @@ const nextLevelRequirement = computed(() => {
         👽
       </div>
       <h3 class="font-bold text-lg">{{ character.name }}</h3>
-      <p class="text-sm text-gray-600">Level {{ character.level }} Scholar</p>
+      <p class="text-sm text-gray-600">Level {{ character.level }}</p>
     </div>
 
     <!-- Stats -->

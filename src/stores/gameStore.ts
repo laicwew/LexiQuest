@@ -16,7 +16,7 @@ interface GameHistoryEntry {
 export const useGameStore = defineStore('game', () => {
   // State
   const character = ref({
-    name: 'Adventurer',
+    name: '',
     level: 1,
     hp: 100,
     maxHp: 100,
@@ -63,8 +63,8 @@ export const useGameStore = defineStore('game', () => {
   // 等级要求数据
   const levelRequirements = ref<LevelRequirement[]>([])
 
-  // 外星人名称
-  const alienName = ref('')
+  // 用户名
+  const userName = ref('')
 
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
@@ -174,7 +174,7 @@ export const useGameStore = defineStore('game', () => {
       generatedContent: generatedContent.value,
       rawGeneratedContent: rawGeneratedContent.value, // 保存原始内容
       gameHistory: gameHistory.value, // 保存游戏历史
-      alienName: alienName.value, // 保存外星人名称
+      userName: userName.value, // 保存用户名
     }
 
     localStorage.setItem('lexiquest-save', JSON.stringify(gameState))
@@ -187,7 +187,7 @@ export const useGameStore = defineStore('game', () => {
     // Load username from localStorage regardless of saved state
     const username = localStorage.getItem('lexiquest-username')
     if (username) {
-      character.value.name = username
+      userName.value = username
     }
 
     if (savedState) {
@@ -201,7 +201,7 @@ export const useGameStore = defineStore('game', () => {
         activeTab.value = parsed.activeTab || 'GENERATED'
         generatedContent.value = parsed.generatedContent || ''
         rawGeneratedContent.value = parsed.rawGeneratedContent || '' // 加载原始内容
-        alienName.value = parsed.alienName || '' // 加载外星人名称
+        userName.value = parsed.userName || '' // 加载用户名
 
         // 加载游戏历史
         gameHistory.value = parsed.gameHistory || []
@@ -220,7 +220,7 @@ export const useGameStore = defineStore('game', () => {
 
         // Ensure the character name is updated from localStorage even with saved state
         if (username) {
-          character.value.name = username
+          userName.value = username
         }
       } catch (e) {
         console.error('Failed to load game state', e)
@@ -376,7 +376,7 @@ export const useGameStore = defineStore('game', () => {
 
   // 更新外星人名称
   function updateAlienName(name: string) {
-    alienName.value = name
+    character.value.name = name
     // 保存到localStorage
     saveGame()
   }
@@ -399,7 +399,7 @@ export const useGameStore = defineStore('game', () => {
     generatedContent,
     rawGeneratedContent,
     gameHistory, // 导出游戏历史
-    alienName, // 导出外星人名称
+    userName, // 导出用户名
 
     // Getters
     hpPercent,

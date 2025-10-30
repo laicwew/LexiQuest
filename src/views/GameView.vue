@@ -131,7 +131,7 @@ onUnmounted(() => {
             <h1 class="fantasy-title text-2xl font-bold">LexiQuest</h1>
           </div>
           <div class="flex items-center space-x-4">
-            <span class="text-white font-medium">{{ gameStore.character.name }}</span>
+            <span class="text-white font-medium">{{ gameStore.userName }}</span>
             <button
               @click="toggleDictionary"
               class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 transition-colors border border-yellow-700"

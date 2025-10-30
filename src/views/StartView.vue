@@ -131,7 +131,7 @@ onMounted(() => {
           
           <!-- Welcome Section -->
           <div class="parchment-bg rounded-lg p-8 magical-glow">
-            <h2 class="fantasy-title text-2xl font-bold mb-4">Welcome, Adventurer!</h2>
+            <h2 class="fantasy-title text-2xl font-bold mb-4">Welcome, space friend!</h2>
             <p class="text-gray-700 mb-6 leading-relaxed">
               Embark on an epic journey where learning vocabulary becomes an adventure. 
               Explore magical realms, interact with fascinating characters, and master 
@@ -165,7 +165,7 @@ onMounted(() => {
             <!-- Username Input -->
             <div class="mb-6">
               <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                Choose Your Adventurer Name
+                Your Name
               </label>
               <input 
                 id="username"

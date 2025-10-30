@@ -108,7 +108,7 @@ const switchTab = (tab: string) => {
   if (tab === 'GENERATED') {
     loadIntroductionContent()
     // 初始化外星人名称输入框的值
-    alienNameInput.value = gameStore.alienName
+    alienNameInput.value = gameStore.character.name
   }
 }
 
@@ -116,8 +116,8 @@ const switchTab = (tab: string) => {
 const txtArgumentReplace = (text: string): string => {
   // 定义变量映射关系
   const variables: Record<string, string> = {
-    username: gameStore.character.name,
-    alienName: gameStore.alienName,
+    username: gameStore.userName,
+    alienName: gameStore.character.name,
     // 可以根据需要添加更多变量
   }
 
@@ -254,6 +254,16 @@ const clearGameHistory = () => {
   // 重置故事文本
   gameStore.story.text = ''
 
+  gameStore.character = {
+    name: '',
+    level: 1,
+    hp: 100,
+    maxHp: 100,
+  }
+  
+  // 清空词典，这样vocabCount计算属性会自动更新为0
+  gameStore.clearDictionary()
+
   // 保存到localStorage
   gameStore.saveGame()
 
@@ -287,7 +297,7 @@ onMounted(() => {
   if (gameStore.activeTab === 'GENERATED') {
     loadIntroductionContent()
     // 初始化外星人名称输入框的值
-    alienNameInput.value = gameStore.alienName
+    alienNameInput.value = gameStore.character.name
   }
 })
 </script>
