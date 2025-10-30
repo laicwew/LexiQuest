@@ -206,6 +206,20 @@ const clearGameHistory = () => {
   alert('游戏历史已清除')
 }
 
+// 复制DUMMY内容的函数
+const copyDummyContent = () => {
+  navigator.clipboard
+    .writeText(dummyContent.value)
+    .then(() => {
+      // 显示通知
+      emit('showNotification', 'Content copied to clipboard!')
+    })
+    .catch((err) => {
+      console.error('Failed to copy content: ', err)
+      emit('showNotification', 'Failed to copy content.')
+    })
+}
+
 onMounted(() => {
   processStoryText()
 
@@ -336,6 +350,15 @@ onMounted(() => {
           {{ isFeeding ? 'Feeding...' : 'Feed Alien' }}
         </button>
       </div>
+    </div>
+
+    <div v-else-if="gameStore.activeTab === 'DUMMY'" class="mt-4">
+      <button
+        @click="copyDummyContent"
+        class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 transition-colors border border-green-300"
+      >
+        Copy
+      </button>
     </div>
   </div>
 </template>

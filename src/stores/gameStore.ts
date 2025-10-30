@@ -370,9 +370,22 @@ export const useGameStore = defineStore('game', () => {
     // 根据标签页更新显示的文本
     if (tab === 'GENERATED') {
       // 显示AI生成的内容或空模块的文本
-      story.value.text =
-        generatedContent.value ||
-        'Hello Friend {player_name}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+      if (!generatedContent.value) {
+        // 如果没有生成的内容，从introduction.txt文件中读取介绍文本
+        fetch('/src/assets/introduction.txt')
+          .then((response) => response.text())
+          .then((text) => {
+            story.value.text = text
+          })
+          .catch((error) => {
+            console.error('Failed to load introduction text:', error)
+            // 如果加载失败，使用默认文本
+            story.value.text =
+              'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+          })
+      } else {
+        story.value.text = generatedContent.value
+      }
     } else if (tab === 'DUMMY') {
       // 对于DUMMY标签页，不设置特定文本，让组件自己处理
       story.value.text = ''

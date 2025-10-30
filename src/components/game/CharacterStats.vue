@@ -47,7 +47,7 @@ const nextLevelRequirement = computed(() => {
     <div class="space-y-4">
       <div>
         <div class="flex justify-between text-sm mb-1">
-          <span>HP</span>
+          <span>HAPPY</span>
           <span>{{ character.hp }}/{{ character.maxHp }}</span>
         </div>
         <div class="bg-gray-300 rounded-full h-2">
@@ -57,7 +57,7 @@ const nextLevelRequirement = computed(() => {
 
       <div>
         <div class="flex justify-between text-sm mb-1">
-          <span>Vocabulary Progress</span>
+          <span>VOCAB</span>
           <span v-if="nextLevelRequirement"
             >{{ vocabCount }}/{{ nextLevelRequirement.words_required }}</span
           >
