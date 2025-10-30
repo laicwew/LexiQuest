@@ -20,12 +20,13 @@ const emit = defineEmits<{
 
 const storyContent = ref('')
 const dummyContent = ref('') // 用于存储从txt文件加载的例文内容
-const generatedContent = ref('') // 用于存储GENERATED标签页的内容
+const introductionContent = ref('') // 用于存储从introduction.txt加载的介绍内容
 
 // WordFeeder相关状态
 const feedText = ref<string>('')
 const isFeeding = ref<boolean>(false)
 const error = ref<string>('')
+const alienNameInput = ref('') // 用于存储外星人名称输入
 
 // 初始化OpenAI客户端
 const openai = new OpenAI({
@@ -105,7 +106,7 @@ const switchTab = (tab: string) => {
 
   // 当切换到GENERATED标签页时，加载介绍文本
   if (tab === 'GENERATED') {
-    loadGeneratedContent()
+    loadIntroductionContent()
   }
 }
 
@@ -123,28 +124,16 @@ const loadDummyContent = async () => {
   }
 }
 
-// 从txt文件加载GENERATED标签页的介绍内容
-const loadGeneratedContent = async () => {
+// 从introduction.txt文件加载介绍内容
+const loadIntroductionContent = async () => {
   try {
     const response = await fetch('/src/assets/introduction.txt')
     const text = await response.text()
-    generatedContent.value = text
-    // 只有当没有生成内容时才更新显示
-    if (!gameStore.generatedContent) {
-      storyContent.value = text
-    } else {
-      storyContent.value = gameStore.generatedContent
-    }
+    introductionContent.value = text
   } catch (error) {
     console.error('Failed to load introduction content:', error)
-    generatedContent.value =
+    introductionContent.value =
       'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
-    // 只有当没有生成内容时才更新显示
-    if (!gameStore.generatedContent) {
-      storyContent.value = generatedContent.value
-    } else {
-      storyContent.value = gameStore.generatedContent
-    }
   }
 }
 
@@ -261,7 +250,7 @@ onMounted(() => {
 
   // 如果初始标签页是GENERATED，则加载介绍内容
   if (gameStore.activeTab === 'GENERATED') {
-    loadGeneratedContent()
+    loadIntroductionContent()
   }
 })
 </script>
@@ -309,7 +298,35 @@ onMounted(() => {
     <div class="story-text-container">
       <!-- GENERATED Tab Content -->
       <div v-if="gameStore.activeTab === 'GENERATED'">
-        <div class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
+        <!-- 如果有生成内容，显示生成的内容 -->
+        <div
+          v-if="gameStore.generatedContent"
+          class="story-text"
+          v-html="storyContent"
+          @click="handleStoryClick"
+        ></div>
+        <!-- 如果没有生成内容，显示介绍内容和输入框 -->
+        <div v-else>
+          <div class="story-text">{{ introductionContent }}</div>
+          <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Give the alien a name:
+            </label>
+            <div class="flex gap-2">
+              <input
+                v-model="alienNameInput"
+                type="text"
+                placeholder="Enter alien name..."
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              <button
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- FEEDER Tab Content -->
