@@ -27,6 +27,7 @@ const feedText = ref<string>('')
 const isFeeding = ref<boolean>(false)
 const error = ref<string>('')
 const alienNameInput = ref('') // 用于存储外星人名称输入
+const showNameInput = ref(true) // 控制是否显示输入框
 
 // 初始化OpenAI客户端
 const openai = new OpenAI({
@@ -109,6 +110,8 @@ const switchTab = (tab: string) => {
     loadIntroductionContent()
     // 初始化外星人名称输入框的值
     alienNameInput.value = gameStore.character.name
+    // 重置输入框显示状态
+    showNameInput.value = !gameStore.character.name
   }
 }
 
@@ -165,6 +168,8 @@ const saveAlienName = () => {
   if (alienNameInput.value.trim()) {
     // 保存到store和localStorage
     gameStore.updateAlienName(alienNameInput.value.trim())
+    // 隐藏输入框并显示指定文本
+    showNameInput.value = false
     // 显示通知
     emit('showNotification', `Alien name saved as ${alienNameInput.value.trim()}!`)
   }
@@ -260,7 +265,7 @@ const clearGameHistory = () => {
     hp: 100,
     maxHp: 100,
   }
-  
+
   // 清空词典，这样vocabCount计算属性会自动更新为0
   gameStore.clearDictionary()
 
@@ -298,6 +303,8 @@ onMounted(() => {
     loadIntroductionContent()
     // 初始化外星人名称输入框的值
     alienNameInput.value = gameStore.character.name
+    // 设置输入框显示状态
+    showNameInput.value = !gameStore.character.name
   }
 })
 </script>
@@ -355,7 +362,8 @@ onMounted(() => {
         <!-- 如果没有生成内容，显示介绍内容和输入框 -->
         <div v-else>
           <div class="story-text">{{ introductionContent }}</div>
-          <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+          <!-- 条件渲染：根据showNameInput决定显示输入框还是文本 -->
+          <div v-if="showNameInput && !gameStore.character.name" class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
             <label class="block text-sm font-medium text-gray-700 mb-2">
               Give the alien a name:
             </label>
@@ -375,6 +383,10 @@ onMounted(() => {
                 Confirm
               </button>
             </div>
+          </div>
+          <!-- 确认后显示指定文本 -->
+          <div v-else class=" rounded">
+            <div class="story-text">{{ gameStore.character.name }} my name. You choice, {{ gameStore.character.name}} happy!</div>
           </div>
         </div>
       </div>
@@ -396,7 +408,7 @@ onMounted(() => {
           ></textarea>
         </div>
 
-        <div v-if="isFeeding" class="mt-3 text-yellow-600">Alien is learning new words...</div>
+        <div v-if="isFeeding" class="mt-3 text-yellow-600">{{ gameStore.character.name }} is learning new words...</div>
 
         <div v-if="error" class="mt-3 p-3 bg-red-800 text-red-100 border border-red-500">
           <strong>Error:</strong> {{ error }}
@@ -414,15 +426,7 @@ onMounted(() => {
         class="loading-container flex items-center py-4"
       >
         <div class="loading-spinner mr-3"></div>
-        <p class="text-gray-600">正在续写故事...</p>
-      </div>
-
-      <div
-        v-else-if="isLoading && gameStore.activeTab !== 'FEEDER'"
-        class="loading-container flex flex-col items-center justify-center py-8"
-      >
-        <div class="loading-spinner"></div>
-        <p class="mt-4 text-gray-600">正在生成故事...</p>
+        <p class="text-gray-600">{{ gameStore.character.name }} is reading... </p>
       </div>
     </div>
 
