@@ -103,7 +103,7 @@ const switchTab = (tab: string) => {
   if (tab === 'DUMMY') {
     loadDummyContent()
   }
-  
+
   // 当切换到GENERATED标签页时，加载介绍文本
   if (tab === 'GENERATED') {
     loadIntroductionContent()
@@ -134,7 +134,8 @@ const loadIntroductionContent = async () => {
     introductionContent.value = text
   } catch (error) {
     console.error('Failed to load introduction content:', error)
-    introductionContent.value = 'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+    introductionContent.value =
+      'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
   }
 }
 
@@ -258,7 +259,7 @@ onMounted(() => {
   if (gameStore.activeTab === 'DUMMY') {
     loadDummyContent()
   }
-  
+
   // 如果初始标签页是GENERATED，则加载介绍内容
   if (gameStore.activeTab === 'GENERATED') {
     loadIntroductionContent()
@@ -312,7 +313,12 @@ onMounted(() => {
       <!-- GENERATED Tab Content -->
       <div v-if="gameStore.activeTab === 'GENERATED'">
         <!-- 如果有生成内容，显示生成的内容 -->
-        <div v-if="gameStore.generatedContent" class="story-text" v-html="storyContent" @click="handleStoryClick"></div>
+        <div
+          v-if="gameStore.generatedContent"
+          class="story-text"
+          v-html="storyContent"
+          @click="handleStoryClick"
+        ></div>
         <!-- 如果没有生成内容，显示介绍内容和输入框 -->
         <div v-else>
           <div class="story-text">{{ introductionContent }}</div>
