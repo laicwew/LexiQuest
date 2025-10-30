@@ -7,12 +7,6 @@ interface LevelRequirement {
   words_required: number
 }
 
-// 定义游戏历史记录的接口
-interface GameHistoryEntry {
-  gm_narrative: string
-  player_action: string
-}
-
 export const useGameStore = defineStore('game', () => {
   // State
   const character = ref({
@@ -28,9 +22,6 @@ export const useGameStore = defineStore('game', () => {
     text: '',
     history: [] as string[],
   })
-
-  // 添加游戏历史记录数组
-  const gameHistory = ref<GameHistoryEntry[]>([])
 
   const vocabulary = ref({
     selectedWord: null as string | null,
@@ -57,9 +48,6 @@ export const useGameStore = defineStore('game', () => {
 
   // 存储AI生成的内容
   const generatedContent = ref('')
-
-  // 存储原始的AI生成内容（未处理的）
-  const rawGeneratedContent = ref('')
 
   // 等级要求数据
   const levelRequirements = ref<LevelRequirement[]>([])
@@ -95,13 +83,6 @@ export const useGameStore = defineStore('game', () => {
 
     progress.value.actionsTaken++
 
-    // 保存游戏历史记录
-    const historyEntry: GameHistoryEntry = {
-      gm_narrative: rawGeneratedContent.value || story.value.text, // 使用原始AI生成内容
-      player_action: `${action} ${selectedWord}`,
-    }
-    gameHistory.value.push(historyEntry)
-
     // Handle special cases
     if (action === 'imitate') {
       learnWord(selectedWord)
@@ -115,12 +96,6 @@ export const useGameStore = defineStore('game', () => {
 
     // Save game state
     saveGame()
-    return gameHistory
-  }
-
-  // 添加一个函数来更新原始AI生成内容
-  function updateRawGeneratedContent(content: string) {
-    rawGeneratedContent.value = content
   }
 
   // 修改updateGeneratedContent函数
@@ -130,37 +105,11 @@ export const useGameStore = defineStore('game', () => {
     if (activeTab.value === 'GENERATED') {
       story.value.text = content
     }
+    // 保存到localStorage
+    saveGame()
   }
-
-  // 添加获取续写上下文的函数
-  function getContextForContinuation(): string {
-    if (gameHistory.value.length === 0) {
-      return 'START_JOURNEY\n\nGenerate the opening scene for a new adventurer in Middle-earth.\nBegin the story in a suitable location and provide the first interactive elements.'
-    }
-
-    // 获取最后几条历史记录作为上下文
-    const recentHistory = gameHistory.value.slice(-3) // 获取最近3条记录
-
-    // 构建上下文提示
-    let context = 'Continue the story based on the following history:\n\n'
-
-    recentHistory.forEach((entry, index) => {
-      context += `Turn ${index + 1}:\n`
-      context += `GM Narrative: ${entry.gm_narrative}\n`
-      context += `Player Action: ${entry.player_action}\n`
-    })
-
-    context +=
-      'Based on this history, continue the adventure in Middle-earth. Follow the same format as before:\n'
-    context += '1. Describe the new scene (3-4 sentences)\n'
-    context += '2. Include 2-4 new interactable objects wrapped in **double asterisks**\n'
-    context += "3. Maintain Tolkien's tone and lore\n"
-    context += '4. All output must be in English only'
-
-    return context
-  }
-
-  // 修改saveGame函数以保存游戏历史
+  
+  // 修改saveGame函数以保存游戏
   function saveGame() {
     const gameState = {
       character: character.value,
@@ -173,8 +122,6 @@ export const useGameStore = defineStore('game', () => {
       settings: settings.value,
       activeTab: activeTab.value,
       generatedContent: generatedContent.value,
-      rawGeneratedContent: rawGeneratedContent.value, // 保存原始内容
-      gameHistory: gameHistory.value, // 保存游戏历史
       userName: userName.value, // 保存用户名
     }
 
@@ -205,11 +152,7 @@ export const useGameStore = defineStore('game', () => {
         settings.value = parsed.settings || settings.value
         activeTab.value = parsed.activeTab || 'GENERATED'
         generatedContent.value = parsed.generatedContent || ''
-        rawGeneratedContent.value = parsed.rawGeneratedContent || '' // 加载原始内容
         userName.value = parsed.userName || '' // 加载用户名
-
-        // 加载游戏历史
-        gameHistory.value = parsed.gameHistory || []
 
         // 根据保存的标签页状态设置正确的文本
         if (activeTab.value === 'GENERATED') {
@@ -409,8 +352,6 @@ export const useGameStore = defineStore('game', () => {
     settings,
     activeTab,
     generatedContent,
-    rawGeneratedContent,
-    gameHistory, // 导出游戏历史
     userName, // 导出用户名
 
     // Getters
@@ -437,10 +378,8 @@ export const useGameStore = defineStore('game', () => {
     getCurrentLevelRequirements, // 导出获取当前等级要求函数
     switchTab,
     updateGeneratedContent,
-    updateRawGeneratedContent, // 导出更新原始内容的函数
     updateAlienName, // 导出更新外星人名称的函数
     updateLanguageLevel, // 导出更新语言级别的函数
     startProgressTracking,
-    getContextForContinuation,
   }
 })

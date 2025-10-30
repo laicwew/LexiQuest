@@ -248,12 +248,6 @@ const imitateWord = () => {
 
 // 清除游戏历史的函数
 const clearGameHistory = () => {
-  // 清除游戏历史
-  gameStore.gameHistory = []
-
-  // 清除原始生成内容
-  gameStore.updateRawGeneratedContent('')
-
   // 清除生成内容
   gameStore.updateGeneratedContent('')
 
