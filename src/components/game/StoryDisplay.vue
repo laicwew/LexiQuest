@@ -124,6 +124,7 @@ const txtArgumentReplace = (text: string): string => {
     username: gameStore.userName,
     alienName: gameStore.character.name,
     languageLevel: gameStore.character.languageLevel,
+    country: gameStore.character.country,
     // 可以根据需要添加更多变量
   }
 
@@ -192,8 +193,9 @@ async function feedToAI() {
   emit('loading', true)
 
   try {
-    // 从txt文件中读取系统提示内容
-    const responseSystem = await fetch('/src/assets/system-prompt.txt')
+    // 根据角色等级加载相应的系统提示文件
+    const systemPromptFile = `/src/assets/system-prompt-level-${gameStore.character.level}.txt`
+    const responseSystem = await fetch(systemPromptFile)
     const systemPromptText = await responseSystem.text()
     // 应用变量替换
     const systemPrompt = txtArgumentReplace(systemPromptText)
@@ -262,6 +264,7 @@ const clearGameHistory = () => {
     hp: 100,
     maxHp: 100,
     languageLevel: 'CET-6',
+    country: 'America'
   }
 
   // 清空词典，这样vocabCount计算属性会自动更新为0

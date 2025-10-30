@@ -15,6 +15,7 @@ export const useGameStore = defineStore('game', () => {
     hp: 100,
     maxHp: 100,
     languageLevel: 'CET-6',
+    country: 'America',
   })
 
   const story = ref({
