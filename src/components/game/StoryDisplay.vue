@@ -399,7 +399,7 @@ onMounted(() => {
           <div class="story-text">{{ introductionContent }}</div>
           <!-- 条件渲染：根据showNameInput决定显示输入框还是文本 -->
           <div
-            v-if="showNameInput && !gameStore.character.name"
+            v-if="showNameInput || !gameStore.character.name"
             class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded"
           >
             <label class="block text-sm font-medium text-gray-700 mb-2">
