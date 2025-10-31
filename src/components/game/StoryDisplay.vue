@@ -435,15 +435,15 @@ onMounted(() => {
 
       <!-- FEEDER Tab Content -->
       <div v-else-if="gameStore.activeTab === 'FEEDER'">
-        <h3 class="text-lg font-bold text-gray-800 mb-2">Feed Word-Food to Alien</h3>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Feed Word to {{ gameStore.character.name }}</h3>
         <p class="text-sm text-gray-600 mb-3">
-          Paste English text (under 200 words) for the alien to learn new vocabulary.
+          Give {{ gameStore.character.name }} English text to read so that {{ gameStore.character.name}}can learn new vocabulary.
         </p>
 
         <div class="mb-3">
           <textarea
             v-model="feedText"
-            placeholder="Paste English text here (max 200 words)..."
+            placeholder="Paste English text here..."
             class="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded"
             rows="4"
             :disabled="isFeeding"
@@ -498,7 +498,7 @@ onMounted(() => {
           :disabled="isFeeding || !feedText.trim()"
           class="bg-purple-700 hover:bg-purple-600 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-yellow-500"
         >
-          {{ isFeeding ? 'Feeding...' : 'Feed Alien' }}
+          {{ isFeeding ? 'Feeding...' : "Feed" }}
         </button>
       </div>
     </div>
