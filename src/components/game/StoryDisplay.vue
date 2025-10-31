@@ -360,6 +360,7 @@ onMounted(() => {
         GENERATED
       </button>
       <button
+        v-if="gameStore.character.name"
         class="px-4 py-2 font-medium text-sm rounded-t-lg transition-colors"
         :class="[
           'FEEDER' === gameStore.activeTab
