@@ -38,9 +38,16 @@ const openai = new OpenAI({
 
 // Process text to highlight vocabulary words
 const processStoryText = () => {
-  let processedText = props.storyText
+  // 对于GENERATED标签页，直接使用generatedContent
+  if (gameStore.activeTab === 'GENERATED') {
+    storyContent.value = gameStore.generatedContent
+    return
+  }
 
-  storyContent.value = processedText
+  // 对于其他标签页，使用传入的storyText
+  if (gameStore.activeTab !== 'DUMMY' && gameStore.activeTab !== 'FEEDER') {
+    storyContent.value = props.storyText
+  }
 }
 
 const selectWord = (word: string) => {
@@ -52,8 +59,40 @@ watch(
   () => props.storyText,
   () => {
     // 只有当不是DUMMY和FEEDER标签页时才处理故事文本
-    if (gameStore.activeTab !== 'DUMMY' && gameStore.activeTab !== 'FEEDER') {
+    if (
+      gameStore.activeTab !== 'DUMMY' &&
+      gameStore.activeTab !== 'FEEDER' &&
+      gameStore.activeTab !== 'GENERATED'
+    ) {
       processStoryText()
+    }
+  },
+)
+
+// 监听generatedContent变化，确保GENERATED标签页能及时更新
+watch(
+  () => gameStore.generatedContent,
+  () => {
+    if (gameStore.activeTab === 'GENERATED') {
+      storyContent.value = gameStore.generatedContent
+    }
+  },
+)
+
+// 监听activeTab变化，确保切换标签页时正确显示内容
+watch(
+  () => gameStore.activeTab,
+  (newTab) => {
+    if (newTab === 'GENERATED') {
+      storyContent.value = gameStore.generatedContent
+      // 初始化外星人名称输入框的值
+      alienNameInput.value = gameStore.character.name
+      // 设置输入框显示状态
+      showNameInput.value = !gameStore.character.name
+    } else if (newTab === 'DUMMY') {
+      storyContent.value = dummyContent.value
+    } else if (newTab === 'FEEDER') {
+      // FEEDER标签页不需要特殊处理
     }
   },
 )
@@ -108,12 +147,6 @@ const switchTab = (tab: string) => {
   // 当切换到GENERATED标签页时，加载介绍文本
   if (tab === 'GENERATED') {
     loadIntroductionContent()
-    // 初始化外星人名称输入框的值
-    alienNameInput.value = gameStore.character.name
-    // 重置输入框显示状态
-    showNameInput.value = !gameStore.character.name
-    // 更新storyContent为generatedContent
-    processStoryText()
   }
 }
 
@@ -144,11 +177,15 @@ const loadDummyContent = async () => {
     const response = await fetch('/src/assets/sample-text.txt')
     const text = await response.text()
     dummyContent.value = text
-    storyContent.value = text
+    if (gameStore.activeTab === 'DUMMY') {
+      storyContent.value = text
+    }
   } catch (error) {
     console.error('Failed to load dummy content:', error)
     dummyContent.value = 'Failed to load example text.'
-    storyContent.value = 'Failed to load example text.'
+    if (gameStore.activeTab === 'DUMMY') {
+      storyContent.value = 'Failed to load example text.'
+    }
   }
 }
 
@@ -264,7 +301,7 @@ const clearGameHistory = () => {
     hp: 100,
     maxHp: 100,
     languageLevel: 'CET-6',
-    country: 'America'
+    country: 'America',
   }
 
   // 清空词典，这样vocabCount计算属性会自动更新为0
@@ -291,20 +328,18 @@ const copyDummyContent = () => {
 }
 
 onMounted(() => {
-  processStoryText()
-
-  // 如果初始标签页是DUMMY，则加载例文内容
+  // 初始化各标签页的内容
   if (gameStore.activeTab === 'DUMMY') {
     loadDummyContent()
-  }
-
-  // 如果初始标签页是GENERATED，则加载介绍内容
-  if (gameStore.activeTab === 'GENERATED') {
+  } else if (gameStore.activeTab === 'GENERATED') {
     loadIntroductionContent()
+    storyContent.value = gameStore.generatedContent
     // 初始化外星人名称输入框的值
     alienNameInput.value = gameStore.character.name
     // 设置输入框显示状态
     showNameInput.value = !gameStore.character.name
+  } else {
+    processStoryText()
   }
 })
 </script>
@@ -430,7 +465,7 @@ onMounted(() => {
 
       <!-- Loading States -->
       <div
-        v-if="isLoading && storyContent && gameStore.activeTab !== 'FEEDER'"
+        v-if="isLoading && gameStore.activeTab !== 'FEEDER'"
         class="loading-container flex items-center py-4"
       >
         <div class="loading-spinner mr-3"></div>
