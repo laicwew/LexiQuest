@@ -109,7 +109,7 @@ export const useGameStore = defineStore('game', () => {
     // 保存到localStorage
     saveGame()
   }
-  
+
   // 修改saveGame函数以保存游戏
   function saveGame() {
     const gameState = {
@@ -337,6 +337,35 @@ export const useGameStore = defineStore('game', () => {
     saveGame()
   }
 
+  // Review功能：获取需要复习的单词
+  function getReviewWords() {
+    // 将Map转换为数组并按reviewCount排序（从低到高）
+    const sortedWords = Array.from(vocabulary.value.learned.entries())
+      .map(([word, data]) => ({
+        word,
+        reviewCount: data.reviewCount || 0,
+      }))
+      .sort((a, b) => a.reviewCount - b.reviewCount)
+      .slice(0, 10) // 取前10个
+
+    return sortedWords
+  }
+
+  // Review功能：增加单词的复习计数
+  function incrementReviewCount(words: string[]) {
+    words.forEach((word) => {
+      const lowerCaseWord = word.toLowerCase()
+      if (vocabulary.value.learned.has(lowerCaseWord)) {
+        const wordData = vocabulary.value.learned.get(lowerCaseWord)
+        if (wordData) {
+          wordData.reviewCount = (wordData.reviewCount || 0) + 1
+          vocabulary.value.learned.set(lowerCaseWord, wordData)
+        }
+      }
+    })
+    saveGame()
+  }
+
   function startProgressTracking() {
     // Track time spent in game
     setInterval(() => {
@@ -381,6 +410,8 @@ export const useGameStore = defineStore('game', () => {
     updateGeneratedContent,
     updateAlienName, // 导出更新外星人名称的函数
     updateLanguageLevel, // 导出更新语言级别的函数
+    getReviewWords, // 导出获取复习单词的函数
+    incrementReviewCount, // 导出增加复习计数的函数
     startProgressTracking,
   }
 })

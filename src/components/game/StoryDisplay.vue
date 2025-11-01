@@ -29,6 +29,9 @@ const error = ref<string>('')
 const alienNameInput = ref('') // 用于存储外星人名称输入
 const showNameInput = ref(true) // 控制是否显示输入框
 
+// Review相关状态
+const isReviewing = ref(false)
+
 // 初始化OpenAI客户端
 const openai = new OpenAI({
   baseURL: import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.deepseek.com',
@@ -327,6 +330,70 @@ const copyDummyContent = () => {
     })
 }
 
+// Review功能 - 发送复习请求到AI
+const reviewWords = async () => {
+  // 检查词典中是否有单词
+  if (gameStore.vocabCount === 0) {
+    emit('showNotification', 'No words in dictionary to review!')
+    return
+  }
+
+  isReviewing.value = true
+  emit('loading', true)
+
+  try {
+    // 获取需要复习的单词
+    const reviewWords = gameStore.getReviewWords()
+    const wordsList = reviewWords.map(item => item.word).join(', ')
+    
+    // 加载review系统提示文件
+    const systemPromptFile = '/src/assets/system-prompt-review.txt'
+    const responseSystem = await fetch(systemPromptFile)
+    const systemPromptTemplate = await responseSystem.text()
+    
+    // 替换模板中的单词占位符
+    const systemPrompt = systemPromptTemplate.replace('{words}', wordsList)
+    
+    console.log('开始调用DeepSeek API for review...')
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Review these words: ${wordsList}` },
+      ],
+      model: 'deepseek-chat',
+    })
+
+    console.log('Review API调用完成:', completion)
+    if (completion && completion.choices && completion.choices.length > 0) {
+      const choice = completion.choices[0]
+      if (choice && choice.message && choice.message.content) {
+        // 更新生成内容，将复习结果添加到现有内容后面
+        const newContent = gameStore.generatedContent 
+          ? `${gameStore.generatedContent}\n\n--- Review Session ---\n${choice.message.content}`
+          : `--- Review Session ---\n${choice.message.content}`
+          
+        gameStore.updateGeneratedContent(newContent)
+        
+        // 增加这些单词的复习计数
+        gameStore.incrementReviewCount(reviewWords.map(item => item.word))
+        
+        // 显示通知
+        emit('showNotification', `Reviewed ${reviewWords.length} words successfully!`)
+      } else {
+        emit('showNotification', 'No response content from review')
+      }
+    } else {
+      emit('showNotification', 'No response received from review')
+    }
+  } catch (err) {
+    console.error('Review API调用错误:', err)
+    emit('showNotification', err instanceof Error ? err.message : 'Unknown error occurred during review')
+  } finally {
+    isReviewing.value = false
+    emit('loading', false)
+  }
+}
+
 onMounted(() => {
   // 初始化各标签页的内容
   if (gameStore.activeTab === 'DUMMY') {
@@ -485,6 +552,13 @@ onMounted(() => {
         class="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-blue-300"
       >
         Imitate
+      </button>
+      <button
+        @click="reviewWords"
+        :disabled="isReviewing || gameStore.vocabCount === 0"
+        class="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-purple-300"
+      >
+        {{ isReviewing ? 'Reviewing...' : 'Review' }}
       </button>
       <button
         @click="clearGameHistory"
