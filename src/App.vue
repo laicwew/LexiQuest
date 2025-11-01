@@ -8,18 +8,19 @@ import { RouterView } from 'vue-router'
 
 <style>
 :root {
-  --primary-green: #2d5016; /* 森林绿 */
-  --primary-gold: #d4af37; /* 鹅黄色 */
+  --primary-green: #c19c4d;
+  --primary-gold: #b6b6b6;
   --primary-burgundy: #800020;
-  --secondary-parchment: #f5f5dc;
+  --secondary-parchment: #2b4695;
   --secondary-purple: #663399;
   --accent-cyan: #00ffff;
-  --text-charcoal: #36454f;
+  --text-charcoal: #dbdbdb;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--primary-green); /* 扁平化背景 */
+  background: url('@/assets/Sprite-0003.png') no-repeat center center fixed;
+  background-size: cover;
   min-height: 100vh;
   color: var(--text-charcoal);
   margin: 0;

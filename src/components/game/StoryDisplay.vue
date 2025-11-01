@@ -345,7 +345,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="parchment-bg rounded-lg p-8 magical-glow min-h-96">
+  <div class="parchment-bg p-8 magical-glow min-h-96">
     <!-- Tabs -->
     <div class="flex mb-4 border-b border-gray-300">
       <button
@@ -517,7 +517,7 @@ onMounted(() => {
 <style scoped>
 .parchment-bg {
   background: var(--secondary-parchment); /* 扁平化背景 */
-  border: 2px solid var(--primary-gold);
+  border: 4px solid var(--primary-gold) !important;
   box-shadow: none; /* 移除阴影 */
 }
 
@@ -525,8 +525,8 @@ onMounted(() => {
   flex: 1;
   overflow-y: auto; /* 启用垂直滚动条 */
   padding: 10px; /* 添加内边距 */
-  border: 1px solid var(--primary-gold); /* 添加边框 */
-  background: var(--secondary-parchment); /* 背景色 */
+  border: 3px solid var(--primary-gold); /* 添加边框 */
+  background: #14101e; /* 背景色 */
   min-height: 200px; /* 设置最小高度 */
 }
 
