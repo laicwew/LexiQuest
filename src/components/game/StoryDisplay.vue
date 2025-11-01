@@ -435,9 +435,12 @@ onMounted(() => {
 
       <!-- FEEDER Tab Content -->
       <div v-else-if="gameStore.activeTab === 'FEEDER'">
-        <h3 class="text-lg font-bold text-gray-800 mb-2">Feed Word to {{ gameStore.character.name }}</h3>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">
+          Feed Word to {{ gameStore.character.name }}
+        </h3>
         <p class="text-sm text-gray-600 mb-3">
-          Give {{ gameStore.character.name }} English text to read so that {{ gameStore.character.name}}can learn new vocabulary.
+          Give {{ gameStore.character.name }} English text to read so that
+          {{ gameStore.character.name }}can learn new vocabulary.
         </p>
 
         <div class="mb-3">
@@ -498,7 +501,7 @@ onMounted(() => {
           :disabled="isFeeding || !feedText.trim()"
           class="bg-purple-700 hover:bg-purple-600 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-yellow-500"
         >
-          {{ isFeeding ? 'Feeding...' : "Feed" }}
+          {{ isFeeding ? 'Feeding...' : 'Feed' }}
         </button>
       </div>
     </div>
