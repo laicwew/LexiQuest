@@ -534,6 +534,7 @@ onMounted(() => {
   font-size: 1.1rem;
   line-height: 1.8;
   color: var(--text-charcoal);
+  white-space: pre-wrap; /* 添加这行来保持换行符 */
 }
 
 /* 滚动条样式 */
