@@ -37,7 +37,6 @@ const isReviewing = ref(false)
 const showPostcardModal = ref(false)
 const selectedPostcard = ref<{
   id: string
-  title: string
   content: string
   createdAt: number
 } | null>(null)
@@ -430,12 +429,7 @@ const reviewWords = async () => {
 }
 
 // Postcard功能
-const openPostcard = (postcard: {
-  id: string
-  title: string
-  content: string
-  createdAt: number
-}) => {
+const openPostcard = (postcard: { id: string; content: string; createdAt: number }) => {
   selectedPostcard.value = postcard
   showPostcardModal.value = true
 }
@@ -599,7 +593,7 @@ onMounted(() => {
         <div
           v-for="postcard in gameStore.postcards"
           :key="postcard.id"
-          class="postcard-item parchment-bg border-2 border-[var(--primary-gold)] p-4 mb-4 cursor-pointer hover:bg-[var(--yale-blue)] flex justify-between items-center"
+          class="postcard-item parchment-bg border border-[var(--primary-gold)] p-4 cursor-pointer flex justify-between items-center transition-colors duration-200"
           @click="openPostcard(postcard)"
         >
           <div class="postcard-date text-2xl text-yellow-400">
@@ -806,11 +800,8 @@ onMounted(() => {
   }
 }
 
-.postcard-item {
-  transition: background-color 0.2s ease;
-}
-
-.postcard-title {
-  color: var(--text-charcoal);
+/* Postcard item hover effect */
+.postcard-item:hover {
+  background-color: var(--yale-blue);
 }
 </style>

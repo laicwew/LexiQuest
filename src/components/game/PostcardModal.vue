@@ -75,11 +75,10 @@ const close = () => {
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--primary-gold);
 }
 
 .modal-title {

@@ -4,7 +4,6 @@ import { ref, computed } from 'vue'
 // 定义明信片接口
 interface Postcard {
   id: string
-  title: string
   content: string
   createdAt: number
 }
@@ -123,15 +122,11 @@ export const useGameStore = defineStore('game', () => {
     while ((match = postcardRegex.exec(content)) !== null) {
       const postcardContent = match[1]
       if (postcardContent && postcardContent.trim()) {
-        // 获取第一行作为标题
-        const lines = postcardContent.split('\n')
-        const firstLine = lines.length > 0 && lines[0] ? lines[0].trim() : 'Postcard'
         postcardCounter++ // 递增计数器
         const id = String(postcardCounter).padStart(3, '0') // 生成001, 002格式的ID
 
         newPostcards.push({
           id,
-          title: firstLine,
           content: postcardContent,
           createdAt: Date.now(),
         })
@@ -143,13 +138,12 @@ export const useGameStore = defineStore('game', () => {
       postcards.value = [...postcards.value, ...newPostcards]
     }
 
-    // 移除content中的明信片内容（被[]包裹的部分）
-    const contentWithoutPostcards = content.replace(postcardRegex, '').trim()
+    const contentWithEmptyLines = content.replace(postcardRegex, '').trim()
 
-    generatedContent.value = contentWithoutPostcards
+    generatedContent.value = contentWithEmptyLines
     // 如果当前是GENERATED标签，则更新显示文本
     if (activeTab.value === 'GENERATED') {
-      story.value.text = contentWithoutPostcards
+      story.value.text = contentWithEmptyLines
     }
     // 保存到localStorage
     saveGame()
