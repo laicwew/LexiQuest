@@ -81,7 +81,7 @@ const sortOptions = [
 <template>
   <div v-if="show" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
     <div
-      class="bg-[var(--secondary-parchment)] rounded-lg border-[var(--primary-gold)] border-2 max-w-2xl w-full max-h-96 overflow-y-auto"
+      class="bg-[var(--secondary-parchment)] rounded-lg border-[var(--primary-gold)] border-2 max-w-3xl w-full max-h-96 overflow-y-auto"
     >
       <div class="p-6 border-b border-gray-200">
         <div class="flex justify-between items-center">
@@ -123,7 +123,7 @@ const sortOptions = [
         </div>
         <div v-else>
           <!-- 以小砖块形式显示单词，每行3个 -->
-          <div class="grid grid-cols-4 gap-3">
+          <div class="grid grid-cols-4 gap-2">
             <div
               v-for="entry in filteredDictionary"
               :key="entry.word"

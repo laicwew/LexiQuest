@@ -62,8 +62,8 @@ const close = () => {
 }
 
 .modal-content {
-  background: var(--secondary-parchment);
-  border: 4px solid var(--primary-gold);
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid var(--primary-gold);
   border-radius: 0;
   padding: 1.5rem;
   max-width: 800px;

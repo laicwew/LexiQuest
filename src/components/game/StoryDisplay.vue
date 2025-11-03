@@ -473,7 +473,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="parchment-bg p-8 magical-glow min-h-96">
+  <div class="parchment-bg p-8 magical-glow min-h-96" :class="$attrs.class">
     <!-- Tabs -->
     <div class="flex mb-0">
       <button
@@ -481,7 +481,7 @@ onMounted(() => {
         :class="getTabClass('GENERATED')"
         @click="switchTab('GENERATED')"
       >
-        GENERATED
+        STUDY
       </button>
       <button
         v-if="gameStore.character.name"
