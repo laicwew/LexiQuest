@@ -34,13 +34,15 @@ const nextLevelRequirement = computed(() => {
   <div class="parchment-bg rounded-lg p-6 magical-glow">
     <h2 class="fantasy-title text-xl font-bold mb-4">Your Alien Friend</h2>
     <div class="text-center mb-6">
-      <div
-        class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl"
-      >
-        👽
+      <div class="mx-auto mb-3 flex items-center justify-center">
+        <img
+          :src="`/src/assets/Crisp Pencil-${character.level}.png`"
+          :alt="`Crisp Pencil Level ${character.level}`"
+          class="w-40 h-40 object-contain"
+        />
       </div>
       <h3 class="font-bold text-lg">{{ character.name }}</h3>
-      <p class="text-sm text-gray-600">Level {{ character.level }}</p>
+      <p class="text-sm text-yellow-600">Level {{ character.level }}</p>
     </div>
 
     <!-- Stats -->

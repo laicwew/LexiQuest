@@ -344,16 +344,16 @@ const reviewWords = async () => {
   try {
     // 获取需要复习的单词
     const reviewWords = gameStore.getReviewWords()
-    const wordsList = reviewWords.map(item => item.word).join(', ')
-    
+    const wordsList = reviewWords.map((item) => item.word).join(', ')
+
     // 加载review系统提示文件
     const systemPromptFile = '/src/assets/system-prompt-review.txt'
     const responseSystem = await fetch(systemPromptFile)
     const systemPromptTemplate = await responseSystem.text()
-    
+
     // 替换模板中的单词占位符
     const systemPrompt = systemPromptTemplate.replace('{words}', wordsList)
-    
+
     console.log('开始调用DeepSeek API for review...')
     const completion = await openai.chat.completions.create({
       messages: [
@@ -367,16 +367,21 @@ const reviewWords = async () => {
     if (completion && completion.choices && completion.choices.length > 0) {
       const choice = completion.choices[0]
       if (choice && choice.message && choice.message.content) {
-        // 更新生成内容，将复习结果添加到现有内容后面
-        const newContent = gameStore.generatedContent 
-          ? `${gameStore.generatedContent}\n\n--- Review Session ---\n${choice.message.content}`
-          : `--- Review Session ---\n${choice.message.content}`
-          
-        gameStore.updateGeneratedContent(newContent)
-        
+        // 对AI生成的内容进行变量替换处理
+        let processedContent = txtArgumentReplace(choice.message.content)
+
+        // 解析processedContent中被**包裹的词汇，将其转换为可点击的交互式词汇
+        processedContent = processedContent.replace(
+          /\*\*(.*?)\*\*/g,
+          '<span class="interactive-word" data-word="$1">$1</span>',
+        )
+
+        // 直接更新生成内容，而不是追加
+        gameStore.updateGeneratedContent(processedContent)
+
         // 增加这些单词的复习计数
-        gameStore.incrementReviewCount(reviewWords.map(item => item.word))
-        
+        gameStore.incrementReviewCount(reviewWords.map((item) => item.word))
+
         // 显示通知
         emit('showNotification', `Reviewed ${reviewWords.length} words successfully!`)
       } else {
@@ -387,7 +392,10 @@ const reviewWords = async () => {
     }
   } catch (err) {
     console.error('Review API调用错误:', err)
-    emit('showNotification', err instanceof Error ? err.message : 'Unknown error occurred during review')
+    emit(
+      'showNotification',
+      err instanceof Error ? err.message : 'Unknown error occurred during review',
+    )
   } finally {
     isReviewing.value = false
     emit('loading', false)
@@ -416,7 +424,7 @@ onMounted(() => {
     <!-- Tabs -->
     <div class="flex mb-4 border-b border-gray-300">
       <button
-        class="px-4 py-2 font-medium text-sm rounded-t-lg transition-colors"
+        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors"
         :class="[
           'GENERATED' === gameStore.activeTab
             ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500'
@@ -428,7 +436,7 @@ onMounted(() => {
       </button>
       <button
         v-if="gameStore.character.name"
-        class="px-4 py-2 font-medium text-sm rounded-t-lg transition-colors"
+        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors"
         :class="[
           'FEEDER' === gameStore.activeTab
             ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500'
@@ -439,7 +447,7 @@ onMounted(() => {
         FEEDER
       </button>
       <button
-        class="px-4 py-2 font-medium text-sm rounded-t-lg transition-colors"
+        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors"
         :class="[
           'DUMMY' === gameStore.activeTab
             ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500'
