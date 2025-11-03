@@ -28,6 +28,11 @@ const vocabProgress = computed(() => {
 const nextLevelRequirement = computed(() => {
   return gameStore.getNextLevelRequirements()
 })
+
+// 为头像URL添加时间戳以避免缓存
+const avatarUrl = computed(() => {
+  return `/src/assets/avatar-${props.character.level}.gif?t=${Date.now()}`
+})
 </script>
 
 <template>
@@ -35,11 +40,7 @@ const nextLevelRequirement = computed(() => {
     <h2 class="fantasy-title text-xl font-bold mb-4">Your Alien Friend</h2>
     <div class="text-center mb-6">
       <div class="mx-auto mb-3 flex items-center justify-center">
-        <img
-          :src="`/src/assets/Crisp Pencil-${character.level}.png`"
-          :alt="`Crisp Pencil Level ${character.level}`"
-          class="w-40 h-40 object-contain"
-        />
+        <img :src="avatarUrl" :alt="`avatar ${character.level}`" class="w-40 h-40 object-contain" />
       </div>
       <h3 class="font-bold text-lg">{{ character.name }}</h3>
       <p class="text-sm text-yellow-600">Level {{ character.level }}</p>
