@@ -33,9 +33,9 @@ const nextLevelRequirement = computed(() => {
 // 根据加载状态选择头像
 const avatarUrl = computed(() => {
   if (props.isLoading) {
-    return `/src/assets/avatar-happy.gif`
+    return `/assets/avatar-happy.gif`
   }
-  return `/src/assets/avatar-${props.character.level}.gif?t=${Date.now()}`
+  return `/assets/avatar-${props.character.level}.gif?t=${Date.now()}`
 })
 </script>
 

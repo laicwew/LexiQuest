@@ -316,7 +316,7 @@ export const useGameStore = defineStore('game', () => {
   // 从CSV文件加载等级要求
   async function loadLevelRequirements() {
     try {
-      const response = await fetch('/src/assets/level-requirements.csv')
+      const response = await fetch('/assets/level-requirements.csv')
       const csvText = await response.text()
 
       // 解析CSV数据

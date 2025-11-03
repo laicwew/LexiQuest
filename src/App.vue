@@ -43,7 +43,7 @@ import { RouterView } from 'vue-router'
 
 body {
   font-family: 'ByteBounce', sans-serif;
-  background: url('@/assets/Sprite-0003.png') no-repeat center center fixed;
+  background: url('/assets/Sprite-0003.png') no-repeat center center fixed;
   background-size: cover;
   min-height: 100vh;
   color: var(--text-charcoal);

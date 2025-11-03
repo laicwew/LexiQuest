@@ -200,7 +200,7 @@ const txtArgumentReplace = (text: string): string => {
 // 从txt文件加载例文内容
 const loadDummyContent = async () => {
   try {
-    const response = await fetch('/src/assets/sample-text.txt')
+    const response = await fetch('/assets/sample-text.txt')
     const text = await response.text()
     dummyContent.value = text
     if (gameStore.activeTab === 'DUMMY') {
@@ -218,7 +218,7 @@ const loadDummyContent = async () => {
 // 从introduction.txt文件加载介绍内容
 const loadIntroductionContent = async () => {
   try {
-    const response = await fetch('/src/assets/introduction.txt')
+    const response = await fetch('/assets/introduction.txt')
     const text = await response.text()
     // 应用变量替换
     const processedText = txtArgumentReplace(text)
@@ -257,7 +257,7 @@ async function feedToAI() {
 
   try {
     // 根据角色等级加载相应的系统提示文件
-    const systemPromptFile = `/src/assets/system-prompt-level-${gameStore.character.level}.txt`
+    const systemPromptFile = `/assets/system-prompt-level-${gameStore.character.level}.txt`
     const responseSystem = await fetch(systemPromptFile)
     const systemPromptText = await responseSystem.text()
     // 应用变量替换
@@ -373,7 +373,7 @@ const reviewWords = async () => {
     const wordsList = reviewWords.map((item) => item.word).join(', ')
 
     // 加载review系统提示文件
-    const systemPromptFile = '/src/assets/system-prompt-review.txt'
+    const systemPromptFile = '/assets/system-prompt-review.txt'
     const responseSystem = await fetch(systemPromptFile)
     const systemPromptTemplate = await responseSystem.text()
 
