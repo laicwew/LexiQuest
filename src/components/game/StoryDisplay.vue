@@ -524,7 +524,7 @@ onMounted(() => {
           <textarea
             v-model="feedText"
             placeholder=""
-            class="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded text-2xl"
+            class="w-full p-2 border border-gray-600 bg-[#5c2c20] text-white rounded text-2xl"
             rows="4"
             :disabled="isFeeding"
           ></textarea>
@@ -557,8 +557,8 @@ onMounted(() => {
 
     <!-- Buttons - Outside of scrollable area -->
     <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4 flex gap-2 relative">
-      <button v-if="gameStore.vocabulary.selectedWord" @click="imitateWord" class="action-button">
-        Imitate
+      <button v-if="gameStore.vocabulary.selectedWord" @click="imitateWord" class="action-button bg-[#669bbc] hover:bg-[#2b6589] active:bg-[#0f3d5a] action-button">
+        Memorize
       </button>
       <button
         @click="clearGameHistory"

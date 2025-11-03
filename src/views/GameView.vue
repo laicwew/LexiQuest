@@ -104,23 +104,13 @@ onUnmounted(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center space-x-4">
-            <img src="@/assets/logo.svg" alt="LexiQuest" class="h-10 w-auto" />
-            <h1 class="fantasy-title text-2xl font-bold">LexiQuest</h1>
+            <!-- <img src="@/assets/logo.svg" alt="LexiQuest" class="h-10 w-auto" /> -->
+            <h1 class="fantasy-title text-5xl font-bold">LexiQuest</h1>
+            <h1 class="text-white text-2xl font-bold ">PLAYER: {{ gameStore.userName }}</h1 >
           </div>
           <div class="flex items-center space-x-4">
-            <span class="text-white font-medium">{{ gameStore.userName }}</span>
-            <button
-              @click="toggleDictionary"
-              class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 transition-colors border border-yellow-700"
-            >
-              📚 Dictionary
-            </button>
-            <button
-              @click="saveGame"
-              class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 transition-colors border border-green-800"
-            >
-              💾 Save
-            </button>
+            <button @click="toggleDictionary" class="action-button">📚 Dictionary</button>
+            <button @click="saveGame" class="action-button">💾 Save</button>
           </div>
         </div>
       </div>
@@ -216,20 +206,20 @@ body {
 }
 
 .action-button {
-  background: var(--primary-burgundy); /* 扁平化背景 */
-  border: 2px solid var(--primary-gold);
   color: white;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: none; /* 移除阴影 */
+  padding: 0.1rem 1rem;
+  /* border: 2px solid var(--orange-web); */
+  border-radius: 0.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.5rem; /* 2xl */
+  transition: colors 0.2s ease;
 }
 
 .action-button:hover {
   transform: none; /* 移除变换效果 */
   box-shadow: none; /* 移除阴影 */
-  background: #a00028; /* 稍微亮一点的 burgundy */
+  background: var(--secondary-parchment); /* 稍微亮一点的 burgundy */
 }
 
 .action-button:active {
