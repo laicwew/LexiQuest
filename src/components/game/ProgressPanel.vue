@@ -12,21 +12,21 @@ const props = defineProps<{
   <div class="space-y-6">
     <!-- Quick Stats -->
     <div class="parchment-bg p-6 magical-glow">
-      <h3 class="fantasy-title text-lg font-bold mb-3">Today's Progress</h3>
-      <div class="space-y-3">
+      <h3 class="fantasy-title text-2xl font-bold mb-3">Today's Progress</h3>
+      <div>
         <div class="flex justify-between">
-          <span class="text-sm">Words Learned</span>
-          <span class="font-bold text-yellow-600">{{ progress.wordsLearnedToday }}</span>
+          <span class="text-xl">Words Learned</span>
+          <span class="text-xl font-bold text-yellow-600">{{ progress.wordsLearnedToday }}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-sm">Play Time</span>
-          <span class="font-bold text-blue-600"
+          <span class="text-xl">Play Time</span>
+          <span class="text-xl font-bold text-yellow-600"
             >{{ Math.floor(progress.timeSpent / 60) }} minutes</span
           >
         </div>
         <div class="flex justify-between">
-          <span class="text-sm">Actions Taken</span>
-          <span class="font-bold text-green-600">{{ progress.actionsTaken }}</span>
+          <span class="text-xl">Actions Taken</span>
+          <span class="text-xl font-bold text-green-600">{{ progress.actionsTaken }}</span>
         </div>
       </div>
     </div>

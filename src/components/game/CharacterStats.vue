@@ -40,39 +40,27 @@ const avatarUrl = computed(() => {
 </script>
 
 <template>
-  <div class="parchment-bg p-6 magical-glow">
-    <h2 class="fantasy-title text-xl font-bold mb-4">Your Alien Friend</h2>
+  <div class="parchment-bg p-4 magical-glow">
+    <h2 class="fantasy-title text-4xl font-bold mb-4">YOUR FRIEND</h2>
     <div class="text-center mb-6">
       <div class="mx-auto mb-3 flex items-center justify-center">
         <img :src="avatarUrl" :alt="`avatar ${character.level}`" class="w-40 h-40 object-contain" />
       </div>
-      <h3 class="font-bold text-lg">{{ character.name }}</h3>
-      <p class="text-sm text-yellow-600">Level {{ character.level }}</p>
+      <h3 class="font-bold text-3xl">{{ character.name }}</h3>
+      <p class="text-xl text-yellow-600">Level {{ character.level }}</p>
     </div>
 
     <!-- Stats -->
-    <div class="space-y-4">
-      <div>
-        <div class="flex justify-between text-sm mb-1">
-          <span>HAPPY</span>
-          <span>{{ character.hp }}/{{ character.maxHp }}</span>
-        </div>
-        <div class="bg-gray-300 h-2">
-          <div class="stat-bar h-2" :style="{ width: hpPercent + '%' }"></div>
-        </div>
+    <div class="space-y-1">
+      <div class="flex justify-between text-2xl mb-1">
+        <span>VOCAB</span>
+        <span v-if="nextLevelRequirement"
+          >{{ vocabCount }}/{{ nextLevelRequirement.words_required }}</span
+        >
+        <span v-else>{{ vocabCount }}/∞</span>
       </div>
-
-      <div>
-        <div class="flex justify-between text-sm mb-1">
-          <span>VOCAB</span>
-          <span v-if="nextLevelRequirement"
-            >{{ vocabCount }}/{{ nextLevelRequirement.words_required }}</span
-          >
-          <span v-else>{{ vocabCount }}/∞</span>
-        </div>
-        <div class="bg-gray-300 h-2">
-          <div class="stat-bar h-2" :style="{ width: vocabProgress + '%' }"></div>
-        </div>
+      <div class="bg-gray-300 h-2">
+        <div class="stat-bar h-2" :style="{ width: vocabProgress + '%' }"></div>
       </div>
     </div>
   </div>

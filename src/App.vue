@@ -7,6 +7,13 @@ import { RouterView } from 'vue-router'
 </template>
 
 <style>
+@font-face {
+  font-family: 'ByteBounce';
+  src: url('/fonts/ByteBounce.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   --primary-green: #c19c4d;
   --primary-gold: #ffc300;
@@ -35,16 +42,21 @@ import { RouterView } from 'vue-router'
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'ByteBounce', sans-serif;
   background: url('@/assets/Sprite-0003.png') no-repeat center center fixed;
   background-size: cover;
   min-height: 100vh;
   color: var(--text-charcoal);
   margin: 0;
   padding: 0;
+  /* font-size: 20px !important; */
 }
 
 #app {
   height: 100vh;
+}
+
+* {
+  font-family: 'ByteBounce', sans-serif !important;
 }
 </style>

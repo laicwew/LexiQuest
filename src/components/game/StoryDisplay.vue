@@ -441,7 +441,7 @@ onMounted(() => {
     <!-- Tabs -->
     <div class="flex mb-0">
       <button
-        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
+        class="px-4 py-2 font-medium text-3xl rounded-t-lg transition-colors tab-button"
         :class="getTabClass('GENERATED')"
         @click="switchTab('GENERATED')"
       >
@@ -488,15 +488,15 @@ onMounted(() => {
                 v-model="alienNameInput"
                 type="text"
                 placeholder=""
-                class="w-30 px-3 py-2 border border-gray-300 focus:outline-none text-[#14101e]"
+                class="w-30 px-3 border border-gray-300 focus:outline-none text-[#14101e] text-2xl"
                 @keyup.enter="saveAlienName"
               />
               <button
                 v-if="alienNameInput.trim()"
                 @click="saveAlienName"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-[#000814] bg-[var(--primary-gold)] hover:bg-[#e6b000] active:bg-[#cc9e00] focus:outline-none"
+                class="inline-flex items-center px-4 border border-transparent text-2xl font-medium rounded-md text-[#000814] bg-[var(--primary-gold)] hover:bg-[#b48a00] active:bg-[#715700]"
               >
-                Confirm
+                CONFIRM
               </button>
             </div>
           </div>
@@ -512,26 +512,27 @@ onMounted(() => {
 
       <!-- FEEDER Tab Content -->
       <div v-else-if="gameStore.activeTab === 'FEEDER'">
-        <h3 class="text-lg font-bold text-[var(--text-charcoal)] mb-2">
+        <h3 class="text-3xl font-bold text-[var(--text-charcoal)] mb-2">
           Feed Word to {{ gameStore.character.name }}
         </h3>
-        <p class="text-sm text-[var(--text-charcoal)] mb-3">
-          Give {{ gameStore.character.name }} English text to read so that
-          {{ gameStore.character.name }}can learn new vocabulary.
+        <p class="text-2xl text-[var(--text-charcoal)] mb-3">
+          Give {{ gameStore.character.name }} text to read so that
+          {{ gameStore.character.name }} can learn new vocabulary.
         </p>
 
         <div class="mb-3">
           <textarea
             v-model="feedText"
             placeholder=""
-            class="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded"
+            class="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded text-2xl"
             rows="4"
             :disabled="isFeeding"
           ></textarea>
         </div>
 
-        <div v-if="isFeeding" class="mt-3 text-yellow-600">
-          {{ gameStore.character.name }} is learning new words...
+        <div v-if="isFeeding" class="mt-3 text-yellow-600 text-2xl flex items-center">
+          <div class="loading-spinner mr-3"></div>
+          {{ gameStore.character.name }} is reading...
         </div>
 
         <div v-if="error" class="mt-3 p-3 bg-red-800 text-red-100 border border-red-500">
@@ -550,22 +551,18 @@ onMounted(() => {
         class="loading-container flex items-center py-4"
       >
         <div class="loading-spinner mr-3"></div>
-        <p class="text-yellow-600">{{ gameStore.character.name }} is reading...</p>
+        <p class="text-yellow-600 text-2xl">{{ gameStore.character.name }} is learning...</p>
       </div>
     </div>
 
     <!-- Buttons - Outside of scrollable area -->
     <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4 flex gap-2 relative">
-      <button
-        v-if="gameStore.vocabulary.selectedWord"
-        @click="imitateWord"
-        class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase"
-      >
+      <button v-if="gameStore.vocabulary.selectedWord" @click="imitateWord" class="action-button">
         Imitate
       </button>
       <button
         @click="clearGameHistory"
-        class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase"
+        class="bg-[#a54244] hover:bg-[#761b1c] active:bg-[#4b0e0e] action-button"
       >
         Clear
       </button>
@@ -573,7 +570,7 @@ onMounted(() => {
         v-if="gameStore.vocabCount > 0"
         @click="reviewWords"
         :disabled="isReviewing"
-        class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase absolute bottom-0 right-0"
+        class="action-button absolute bottom-0 right-0 bg-[#8446a9] hover:bg-[#501373] active:bg-[#2f0646]"
       >
         {{ isReviewing ? 'Reviewing...' : 'Review' }}
       </button>
@@ -585,7 +582,7 @@ onMounted(() => {
           v-if="feedText.trim()"
           @click="feedToAI"
           :disabled="isFeeding"
-          class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase"
+          class="action-button bg-[#0e7b4a] hover:bg-[#026538] active:bg-[#004224]"
         >
           {{ isFeeding ? 'Feeding...' : 'Feed' }}
         </button>
@@ -595,7 +592,7 @@ onMounted(() => {
     <div v-else-if="gameStore.activeTab === 'DUMMY'" class="mt-4">
       <button
         @click="copyDummyContent"
-        class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase"
+        class="action-button bg-[#b28000] hover:bg-[#8c6400] active:bg-[#4a3500]"
       >
         Copy
       </button>
@@ -604,15 +601,32 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* 统一的操作按钮样式 */
+.action-button {
+  color: white;
+  padding: 0.1rem 1rem;
+  /* border: 2px solid var(--orange-web); */
+  border-radius: 0.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.5rem; /* 2xl */
+  transition: colors 0.2s ease;
+}
+
+.action-button:disabled {
+  background-color: #6b7280; /* gray-500 */
+}
+
 /* 添加统一的 tab 按钮样式 */
 .tab-button {
-  border-bottom: 2px solid transparent;
+  font-size: 1.25rem; /* xl */
 }
 
 .tab-button.active {
   background-color: var(--primary-gold);
   color: var(--secondary-parchment);
   border-bottom-color: var(--primary-gold);
+  font-size: 1.875rem; /* 3xl */
 }
 
 .tab-button:not(.active) {
@@ -641,8 +655,8 @@ onMounted(() => {
 }
 
 .story-text {
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: 1.8rem;
+  line-height: 1;
   color: var(--text-charcoal);
   white-space: pre-wrap; /* 添加这行来保持换行符 */
 }
