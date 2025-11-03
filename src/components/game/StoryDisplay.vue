@@ -39,6 +39,14 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true, // 注意：在生产环境中应该通过后端代理API密钥
 })
 
+// 获取tab按钮的类名
+const getTabClass = (tabName: string) => {
+  return {
+    active: gameStore.activeTab === tabName,
+    inactive: gameStore.activeTab !== tabName,
+  }
+}
+
 // Process text to highlight vocabulary words
 const processStoryText = () => {
   // 对于GENERATED标签页，直接使用generatedContent
@@ -114,7 +122,13 @@ const handleStoryClick = (event: Event) => {
   if (target.classList.contains('interactive-word')) {
     const word = target.getAttribute('data-word')
     if (word) {
-      selectWord(word)
+      // 如果点击的是已经选中的单词，则取消选中
+      if (props.selectedWord === word) {
+        gameStore.clearSelectedWord()
+      } else {
+        // 否则选择新的单词
+        selectWord(word)
+      }
     }
   }
 }
@@ -310,6 +324,9 @@ const clearGameHistory = () => {
   // 清空词典，这样vocabCount计算属性会自动更新为0
   gameStore.clearDictionary()
 
+  // 清除选中的单词
+  gameStore.clearSelectedWord()
+
   // 保存到localStorage
   gameStore.saveGame()
 
@@ -422,37 +439,25 @@ onMounted(() => {
 <template>
   <div class="parchment-bg p-8 magical-glow min-h-96">
     <!-- Tabs -->
-    <div class="flex mb-4 border-b border-gray-300">
+    <div class="flex mb-0">
       <button
-        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors"
-        :class="[
-          'GENERATED' === gameStore.activeTab
-            ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500'
-            : 'text-gray-600 hover:text-gray-900',
-        ]"
+        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
+        :class="getTabClass('GENERATED')"
         @click="switchTab('GENERATED')"
       >
         GENERATED
       </button>
       <button
         v-if="gameStore.character.name"
-        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors"
-        :class="[
-          'FEEDER' === gameStore.activeTab
-            ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500'
-            : 'text-gray-600 hover:text-gray-900',
-        ]"
+        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
+        :class="getTabClass('FEEDER')"
         @click="switchTab('FEEDER')"
       >
         FEEDER
       </button>
       <button
-        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors"
-        :class="[
-          'DUMMY' === gameStore.activeTab
-            ? 'bg-yellow-100 text-yellow-700 border-b-2 border-yellow-500'
-            : 'text-gray-600 hover:text-gray-900',
-        ]"
+        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
+        :class="getTabClass('DUMMY')"
         @click="switchTab('DUMMY')"
       >
         DUMMY
@@ -460,7 +465,7 @@ onMounted(() => {
     </div>
 
     <!-- Story Content -->
-    <div class="story-text-container">
+    <div class="story-text-container mt-0">
       <!-- GENERATED Tab Content -->
       <div v-if="gameStore.activeTab === 'GENERATED'">
         <!-- 如果有生成内容，显示生成的内容 -->
@@ -474,25 +479,22 @@ onMounted(() => {
         <div v-else>
           <div class="story-text">{{ introductionContent }}</div>
           <!-- 条件渲染：根据showNameInput决定显示输入框还是文本 -->
-          <div
-            v-if="showNameInput || !gameStore.character.name"
-            class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded"
-          >
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+          <div v-if="showNameInput || !gameStore.character.name" class="p-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2 story-text">
               Give the alien a name:
             </label>
             <div class="flex gap-2">
               <input
                 v-model="alienNameInput"
                 type="text"
-                placeholder="Enter alien name..."
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder=""
+                class="w-30 px-3 py-2 border border-gray-300 focus:outline-none text-[#14101e]"
                 @keyup.enter="saveAlienName"
               />
               <button
+                v-if="alienNameInput.trim()"
                 @click="saveAlienName"
-                :disabled="!alienNameInput.trim()"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-[#000814] bg-[var(--primary-gold)] hover:bg-[#e6b000] active:bg-[#cc9e00] focus:outline-none"
               >
                 Confirm
               </button>
@@ -510,10 +512,10 @@ onMounted(() => {
 
       <!-- FEEDER Tab Content -->
       <div v-else-if="gameStore.activeTab === 'FEEDER'">
-        <h3 class="text-lg font-bold text-gray-800 mb-2">
+        <h3 class="text-lg font-bold text-[var(--text-charcoal)] mb-2">
           Feed Word to {{ gameStore.character.name }}
         </h3>
-        <p class="text-sm text-gray-600 mb-3">
+        <p class="text-sm text-[var(--text-charcoal)] mb-3">
           Give {{ gameStore.character.name }} English text to read so that
           {{ gameStore.character.name }}can learn new vocabulary.
         </p>
@@ -521,7 +523,7 @@ onMounted(() => {
         <div class="mb-3">
           <textarea
             v-model="feedText"
-            placeholder="Paste English text here..."
+            placeholder=""
             class="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded"
             rows="4"
             :disabled="isFeeding"
@@ -548,40 +550,42 @@ onMounted(() => {
         class="loading-container flex items-center py-4"
       >
         <div class="loading-spinner mr-3"></div>
-        <p class="text-gray-600">{{ gameStore.character.name }} is reading...</p>
+        <p class="text-yellow-600">{{ gameStore.character.name }} is reading...</p>
       </div>
     </div>
 
     <!-- Buttons - Outside of scrollable area -->
-    <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4 flex gap-2">
+    <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4 flex gap-2 relative">
       <button
+        v-if="gameStore.vocabulary.selectedWord"
         @click="imitateWord"
-        :disabled="!gameStore.vocabulary.selectedWord"
-        class="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-blue-300"
+        class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase"
       >
         Imitate
       </button>
       <button
-        @click="reviewWords"
-        :disabled="isReviewing || gameStore.vocabCount === 0"
-        class="bg-purple-600 hover:bg-purple-500 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-purple-300"
-      >
-        {{ isReviewing ? 'Reviewing...' : 'Review' }}
-      </button>
-      <button
         @click="clearGameHistory"
-        class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 transition-colors border border-red-300"
+        class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase"
       >
         Clear
+      </button>
+      <button
+        v-if="gameStore.vocabCount > 0"
+        @click="reviewWords"
+        :disabled="isReviewing"
+        class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase absolute bottom-0 right-0"
+      >
+        {{ isReviewing ? 'Reviewing...' : 'Review' }}
       </button>
     </div>
 
     <div v-else-if="gameStore.activeTab === 'FEEDER'" class="mt-4">
       <div class="flex flex-wrap gap-2">
         <button
+          v-if="feedText.trim()"
           @click="feedToAI"
-          :disabled="isFeeding || !feedText.trim()"
-          class="bg-purple-700 hover:bg-purple-600 disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-yellow-500"
+          :disabled="isFeeding"
+          class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] disabled:bg-gray-500 text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase"
         >
           {{ isFeeding ? 'Feeding...' : 'Feed' }}
         </button>
@@ -591,7 +595,7 @@ onMounted(() => {
     <div v-else-if="gameStore.activeTab === 'DUMMY'" class="mt-4">
       <button
         @click="copyDummyContent"
-        class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 transition-colors border border-green-300"
+        class="bg-[var(--secondary-parchment)] hover:bg-[#3a5bb0] active:bg-[#1c357a] text-white px-4 py-2 transition-colors border border-[var(--orange-web)] rounded-lg font-bold uppercase"
       >
         Copy
       </button>
@@ -600,6 +604,26 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* 添加统一的 tab 按钮样式 */
+.tab-button {
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+  background-color: var(--primary-gold);
+  color: var(--secondary-parchment);
+  border-bottom-color: var(--primary-gold);
+}
+
+.tab-button:not(.active) {
+  color: var(--primary-gold); /* gray-600 */
+}
+
+.tab-button:not(.active):hover {
+  color: var(--primary-green); /* gray-900 */
+  background-color: var(--yale-blue); /* amber-100 */
+}
+
 .parchment-bg {
   background: var(--secondary-parchment); /* 扁平化背景 */
   border: 4px solid var(--primary-gold) !important;

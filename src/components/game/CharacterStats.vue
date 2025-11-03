@@ -31,7 +31,7 @@ const nextLevelRequirement = computed(() => {
 </script>
 
 <template>
-  <div class="parchment-bg rounded-lg p-6 magical-glow">
+  <div class="parchment-bg p-6 magical-glow">
     <h2 class="fantasy-title text-xl font-bold mb-4">Your Alien Friend</h2>
     <div class="text-center mb-6">
       <div class="mx-auto mb-3 flex items-center justify-center">
@@ -52,8 +52,8 @@ const nextLevelRequirement = computed(() => {
           <span>HAPPY</span>
           <span>{{ character.hp }}/{{ character.maxHp }}</span>
         </div>
-        <div class="bg-gray-300 rounded-full h-2">
-          <div class="stat-bar h-2 rounded-full" :style="{ width: hpPercent + '%' }"></div>
+        <div class="bg-gray-300 h-2">
+          <div class="stat-bar h-2" :style="{ width: hpPercent + '%' }"></div>
         </div>
       </div>
 
@@ -65,8 +65,8 @@ const nextLevelRequirement = computed(() => {
           >
           <span v-else>{{ vocabCount }}/∞</span>
         </div>
-        <div class="bg-gray-300 rounded-full h-2">
-          <div class="stat-bar h-2 rounded-full" :style="{ width: vocabProgress + '%' }"></div>
+        <div class="bg-gray-300 h-2">
+          <div class="stat-bar h-2" :style="{ width: vocabProgress + '%' }"></div>
         </div>
       </div>
     </div>
@@ -76,7 +76,7 @@ const nextLevelRequirement = computed(() => {
 <style scoped>
 .parchment-bg {
   background: var(--secondary-parchment); /* Flat background */
-  border: 2px solid var(--primary-gold);
+  border: 4px solid var(--primary-gold) !important; /* Changed from 2px to 4px to match StoryDisplay */
   box-shadow: none; /* Remove shadow */
 }
 

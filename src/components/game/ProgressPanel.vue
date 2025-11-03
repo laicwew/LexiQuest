@@ -11,7 +11,7 @@ const props = defineProps<{
 <template>
   <div class="space-y-6">
     <!-- Quick Stats -->
-    <div class="parchment-bg rounded-lg p-6 magical-glow">
+    <div class="parchment-bg p-6 magical-glow">
       <h3 class="fantasy-title text-lg font-bold mb-3">Today's Progress</h3>
       <div class="space-y-3">
         <div class="flex justify-between">
@@ -20,7 +20,9 @@ const props = defineProps<{
         </div>
         <div class="flex justify-between">
           <span class="text-sm">Play Time</span>
-          <span class="font-bold text-blue-600">{{ Math.floor(progress.timeSpent / 60) }} minutes</span>
+          <span class="font-bold text-blue-600"
+            >{{ Math.floor(progress.timeSpent / 60) }} minutes</span
+          >
         </div>
         <div class="flex justify-between">
           <span class="text-sm">Actions Taken</span>
@@ -34,7 +36,7 @@ const props = defineProps<{
 <style scoped>
 .parchment-bg {
   background: var(--secondary-parchment); /* Flat background */
-  border: 2px solid var(--primary-gold);
+  border: 4px solid var(--primary-gold) !important; /* Changed from 2px to 4px to match StoryDisplay */
   box-shadow: none; /* Remove shadow */
 }
 
