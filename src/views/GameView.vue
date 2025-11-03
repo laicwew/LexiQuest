@@ -6,9 +6,11 @@ import StoryDisplay from '@/components/game/StoryDisplay.vue'
 import ProgressPanel from '@/components/game/ProgressPanel.vue'
 import DictionaryModal from '@/components/game/DictionaryModal.vue'
 import Notification from '@/components/game/Notification.vue'
+import { useRouter } from 'vue-router'
 
 // Game store
 const gameStore = useGameStore()
+const router = useRouter()
 
 // UI state
 const showDictionary = ref(false)
@@ -77,6 +79,11 @@ const handleAILoading = (loading: boolean) => {
   isLoading.value = loading
 }
 
+// 返回首页
+const goToHome = () => {
+  router.push('/')
+}
+
 // Initialize game
 onMounted(() => {
   gameStore.loadGame()
@@ -105,8 +112,10 @@ onUnmounted(() => {
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center space-x-4">
             <!-- <img src="@/assets/logo.svg" alt="LexiQuest" class="h-10 w-auto" /> -->
-            <h1 class="fantasy-title text-5xl font-bold">LexiQuest</h1>
-            <h1 class="text-white text-2xl font-bold ">PLAYER: {{ gameStore.userName }}</h1 >
+            <h1 class="fantasy-title text-5xl font-bold cursor-pointer" @click="goToHome">
+              LexiQuest
+            </h1>
+            <h1 class="text-white text-2xl font-bold">PLAYER: {{ gameStore.userName }}</h1>
           </div>
           <div class="flex items-center space-x-4">
             <button @click="toggleDictionary" class="action-button">📚 Dictionary</button>
@@ -192,6 +201,7 @@ body {
   font-family: 'Cinzel', serif;
   color: var(--primary-gold);
   text-shadow: none; /* 移除渐变和阴影 */
+  cursor: pointer;
 }
 
 .parchment-bg {

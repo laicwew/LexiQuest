@@ -135,6 +135,18 @@ export const useGameStore = defineStore('game', () => {
     const savedState = localStorage.getItem('lexiquest-save')
     // Load username from localStorage regardless of saved state
     const username = localStorage.getItem('lexiquest-username')
+    
+    // Load preferences to get country and languageLevel
+    const preferences = localStorage.getItem('lexiquest-preferences')
+    let parsedPreferences: any = null
+    if (preferences) {
+      try {
+        parsedPreferences = JSON.parse(preferences)
+      } catch (e) {
+        console.error('Failed to parse preferences', e)
+      }
+    }
+    
     if (username) {
       userName.value = username
     }
@@ -145,7 +157,8 @@ export const useGameStore = defineStore('game', () => {
         // 确保character对象包含languageLevel属性，如果不存在则设置默认值
         character.value = {
           ...parsed.character,
-          languageLevel: parsed.character?.languageLevel || 'CET-6',
+          languageLevel: parsedPreferences?.languageLevel || parsed.character?.languageLevel || 'CET-6',
+          country: parsedPreferences?.country || parsed.character?.country || 'America',
         }
         story.value = parsed.story
         vocabulary.value = parsed.vocabulary
@@ -178,6 +191,12 @@ export const useGameStore = defineStore('game', () => {
       // 默认情况下，设置为GENERATED标签页并显示空文本
       activeTab.value = 'GENERATED'
       story.value.text = ''
+      
+      // 从preferences中加载languageLevel和country
+      if (parsedPreferences) {
+        character.value.languageLevel = parsedPreferences.languageLevel || 'CET-6'
+        character.value.country = parsedPreferences.country || 'America'
+      }
     }
   }
 
