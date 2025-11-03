@@ -1,1165 +1,1278 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LexiQuest - Character Creation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.0/echarts.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        :root {
-            --primary-green: #2D5016;
-            --primary-gold: #D4AF37;
-            --primary-burgundy: #800020;
-            --secondary-parchment: #F5F5DC;
-            --secondary-purple: #663399;
-            --accent-cyan: #00FFFF;
-            --text-charcoal: #36454F;
+      :root {
+        --primary-green: #2d5016;
+        --primary-gold: #d4af37;
+        --primary-burgundy: #800020;
+        --secondary-parchment: #f5f5dc;
+        --secondary-purple: #663399;
+        --accent-cyan: #00ffff;
+        --text-charcoal: #36454f;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background:
+          linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-purple) 100%),
+          url('resources/character-bg.png') center/cover;
+        background-blend-mode: overlay;
+        min-height: 100vh;
+        color: var(--text-charcoal);
+      }
+
+      .fantasy-title {
+        font-family: 'Cinzel', serif;
+        background: linear-gradient(45deg, var(--primary-gold), #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .parchment-bg {
+        background: linear-gradient(135deg, var(--secondary-parchment) 0%, #f0e68c 100%);
+        border: 2px solid var(--primary-gold);
+        box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+      }
+
+      .magical-glow {
+        box-shadow:
+          0 0 20px rgba(212, 175, 55, 0.4),
+          inset 0 0 20px rgba(212, 175, 55, 0.1);
+        border: 1px solid var(--primary-gold);
+      }
+
+      .character-avatar {
+        background: linear-gradient(135deg, var(--primary-gold), #ffd700);
+        border: 3px solid var(--primary-burgundy);
+        transition: all 0.3s ease;
+      }
+
+      .character-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+      }
+
+      .stat-input {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid var(--primary-gold);
+        transition: all 0.3s ease;
+      }
+
+      .stat-input:focus {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+      }
+
+      .create-button {
+        background: linear-gradient(135deg, var(--primary-burgundy), #b22222);
+        border: 2px solid var(--primary-gold);
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .create-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(128, 0, 32, 0.4);
+      }
+
+      .create-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .back-button {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+        border: 2px solid #9ca3af;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .back-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(107, 114, 128, 0.4);
+      }
+
+      .stat-bar-container {
+        background: #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .stat-bar {
+        height: 100%;
+        border-radius: 8px;
+        transition: width 0.5s ease;
+        position: relative;
+      }
+
+      .stat-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 2s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
         }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-purple) 100%),
-                        url('resources/character-bg.png') center/cover;
-            background-blend-mode: overlay;
-            min-height: 100vh;
-            color: var(--text-charcoal);
+        100% {
+          transform: translateX(100%);
         }
-        
-        .fantasy-title {
-            font-family: 'Cinzel', serif;
-            background: linear-gradient(45deg, var(--primary-gold), #FFD700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .avatar-option {
+        width: 80px;
+        height: 80px;
+        border: 3px solid transparent;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+      }
+
+      .avatar-option:hover {
+        transform: scale(1.1);
+        border-color: var(--primary-gold);
+      }
+
+      .avatar-option.selected {
+        border-color: var(--accent-cyan);
+        background: linear-gradient(135deg, var(--accent-cyan), #00ced1);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+      }
+
+      .step-indicator {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .step-indicator.active {
+        background: var(--primary-gold);
+        color: white;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+      }
+
+      .step-indicator.completed {
+        background: var(--accent-cyan);
+        color: white;
+      }
+
+      .step-indicator.inactive {
+        background: #e5e7eb;
+        color: #9ca3af;
+      }
+
+      .step-connector {
+        height: 2px;
+        background: #e5e7eb;
+        flex: 1;
+        margin: 0 1rem;
+        position: relative;
+      }
+
+      .step-connector.completed::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: var(--accent-cyan);
+        animation: fillLine 0.5s ease;
+      }
+
+      @keyframes fillLine {
+        from {
+          width: 0;
         }
-        
-        .parchment-bg {
-            background: linear-gradient(135deg, var(--secondary-parchment) 0%, #F0E68C 100%);
-            border: 2px solid var(--primary-gold);
-            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.1);
+        to {
+          width: 100%;
         }
-        
-        .magical-glow {
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.1);
-            border: 1px solid var(--primary-gold);
+      }
+
+      .form-section {
+        display: none;
+      }
+
+      .form-section.active {
+        display: block;
+        animation: fadeInUp 0.5s ease;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
-        
-        .character-avatar {
-            background: linear-gradient(135deg, var(--primary-gold), #FFD700);
-            border: 3px solid var(--primary-burgundy);
-            transition: all 0.3s ease;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        
-        .character-avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-        }
-        
-        .stat-input {
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid var(--primary-gold);
-            transition: all 0.3s ease;
-        }
-        
-        .stat-input:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-        }
-        
-        .create-button {
-            background: linear-gradient(135deg, var(--primary-burgundy), #B22222);
-            border: 2px solid var(--primary-gold);
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .create-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(128, 0, 32, 0.4);
-        }
-        
-        .create-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .back-button {
-            background: linear-gradient(135deg, #6B7280, #4B5563);
-            border: 2px solid #9CA3AF;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .back-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(107, 114, 128, 0.4);
-        }
-        
-        .stat-bar-container {
-            background: #E5E7EB;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .stat-bar {
-            height: 100%;
-            border-radius: 8px;
-            transition: width 0.5s ease;
-            position: relative;
-        }
-        
-        .stat-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .avatar-option {
-            width: 80px;
-            height: 80px;
-            border: 3px solid transparent;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            background: linear-gradient(135deg, #E5E7EB, #D1D5DB);
-        }
-        
-        .avatar-option:hover {
-            transform: scale(1.1);
-            border-color: var(--primary-gold);
-        }
-        
-        .avatar-option.selected {
-            border-color: var(--accent-cyan);
-            background: linear-gradient(135deg, var(--accent-cyan), #00CED1);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-        }
-        
-        .step-indicator {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        .step-indicator.active {
-            background: var(--primary-gold);
-            color: white;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-        }
-        
-        .step-indicator.completed {
-            background: var(--accent-cyan);
-            color: white;
-        }
-        
-        .step-indicator.inactive {
-            background: #E5E7EB;
-            color: #9CA3AF;
-        }
-        
-        .step-connector {
-            height: 2px;
-            background: #E5E7EB;
-            flex: 1;
-            margin: 0 1rem;
-            position: relative;
-        }
-        
-        .step-connector.completed::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background: var(--accent-cyan);
-            animation: fillLine 0.5s ease;
-        }
-        
-        @keyframes fillLine {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        
-        .form-section {
-            display: none;
-        }
-        
-        .form-section.active {
-            display: block;
-            animation: fadeInUp 0.5s ease;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation -->
-    <nav class="bg-black bg-opacity-30 backdrop-blur-md border-b border-yellow-600 border-opacity-30 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
-                    <img src="resources/logo.png" alt="LexiQuest" class="h-10 w-auto">
-                    <h1 class="fantasy-title text-2xl font-bold">LexiQuest</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-white font-medium">Character Creation</span>
-                </div>
-            </div>
+    <nav
+      class="bg-black bg-opacity-30 backdrop-blur-md border-b border-yellow-600 border-opacity-30 sticky top-0 z-50"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center space-x-4">
+            <img src="resources/logo.png" alt="LexiQuest" class="h-10 w-auto" />
+            <h1 class="fantasy-title text-2xl font-bold">LexiQuest</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-white font-medium">Character Creation</span>
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- Main Container -->
     <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="max-w-4xl w-full">
-            
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <h1 class="fantasy-title text-4xl font-bold mb-2">Create Your Character</h1>
-                <p class="text-white text-lg">Customize your adventurer and begin your learning quest</p>
-            </div>
-
-            <!-- Step Indicator -->
-            <div class="mb-8">
-                <div class="flex items-center justify-center">
-                    <div class="step-indicator active" id="step-1">1</div>
-                    <div class="step-connector" id="connector-1"></div>
-                    <div class="step-indicator inactive" id="step-2">2</div>
-                    <div class="step-connector" id="connector-2"></div>
-                    <div class="step-indicator inactive" id="step-3">3</div>
-                    <div class="step-connector" id="connector-3"></div>
-                    <div class="step-indicator inactive" id="step-4">4</div>
-                </div>
-                <div class="flex justify-center mt-2">
-                    <span class="text-white text-sm" id="step-description">Basic Information</span>
-                </div>
-            </div>
-
-            <!-- Character Creation Form -->
-            <div class="parchment-bg rounded-lg p-8 magical-glow">
-                
-                <!-- Step 1: Basic Information -->
-                <div class="form-section active" id="section-1">
-                    <h2 class="fantasy-title text-2xl font-bold mb-6">Basic Information</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="character-name" class="block text-sm font-medium text-gray-700 mb-2">
-                                Character Name
-                            </label>
-                            <input 
-                                type="text" 
-                                id="character-name" 
-                                placeholder="Enter your character's name..."
-                                class="stat-input w-full px-4 py-3 rounded-lg text-lg"
-                                maxlength="20"
-                                autocomplete="off"
-                            >
-                            <div id="name-error" class="text-red-500 text-sm mt-1 hidden"></div>
-                        </div>
-                        
-                        <div>
-                            <label for="character-title" class="block text-sm font-medium text-gray-700 mb-2">
-                                Character Title
-                            </label>
-                            <select id="character-title" class="stat-input w-full px-4 py-3 rounded-lg text-lg">
-                                <option value="Adventurer">Adventurer</option>
-                                <option value="Scholar">Scholar</option>
-                                <option value="Explorer">Explorer</option>
-                                <option value="Linguist">Linguist</option>
-                                <option value="Wizard">Wizard</option>
-                                <option value="Hero">Hero</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-3">
-                            Choose Your Avatar
-                        </label>
-                        <div class="grid grid-cols-4 gap-4" id="avatar-options">
-                            <div class="avatar-option" data-avatar="🧙‍♂️">🧙‍♂️</div>
-                            <div class="avatar-option" data-avatar="👸">👸</div>
-                            <div class="avatar-option" data-avatar="🦸‍♂️">🦸‍♂️</div>
-                            <div class="avatar-option" data-avatar="🦸‍♀️">🦸‍♀️</div>
-                            <div class="avatar-option" data-avatar="🧝‍♂️">🧝‍♂️</div>
-                            <div class="avatar-option" data-avatar="🧝‍♀️">🧝‍♀️</div>
-                            <div class="avatar-option" data-avatar="🧛‍♂️">🧛‍♂️</div>
-                            <div class="avatar-option" data-avatar="🧟‍♀️">🧟‍♀️</div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6">
-                        <button onclick="nextStep()" class="create-button w-full py-4 px-6 rounded-lg text-lg font-bold">
-                            Next: Character Stats →
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Step 2: Character Stats -->
-                <div class="form-section" id="section-2">
-                    <h2 class="fantasy-title text-2xl font-bold mb-6">Character Stats</h2>
-                    <p class="text-gray-600 mb-6">Distribute your character's starting attributes. These will affect your learning experience.</p>
-                    
-                    <div class="space-y-6">
-                        <!-- Intelligence -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="font-medium">Intelligence</label>
-                                <span class="font-bold text-purple-600" id="intelligence-value">10</span>
-                            </div>
-                            <input 
-                                type="range" 
-                                id="intelligence" 
-                                min="5" 
-                                max="15" 
-                                value="10"
-                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                oninput="updateStat('intelligence', this.value)"
-                            >
-                            <div class="text-sm text-gray-500 mt-1">Affects vocabulary learning speed</div>
-                        </div>
-                        
-                        <!-- Charisma -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="font-medium">Charisma</label>
-                                <span class="font-bold text-blue-600" id="charisma-value">10</span>
-                            </div>
-                            <input 
-                                type="range" 
-                                id="charisma" 
-                                min="5" 
-                                max="15" 
-                                value="10"
-                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                oninput="updateStat('charisma', this.value)"
-                            >
-                            <div class="text-sm text-gray-500 mt-1">Affects interaction success</div>
-                        </div>
-                        
-                        <!-- Endurance -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="font-medium">Endurance</label>
-                                <span class="font-bold text-green-600" id="endurance-value">10</span>
-                            </div>
-                            <input 
-                                type="range" 
-                                id="endurance" 
-                                min="5" 
-                                max="15" 
-                                value="10"
-                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                oninput="updateStat('endurance', this.value)"
-                            >
-                            <div class="text-sm text-gray-500 mt-1">Affects energy and health</div>
-                        </div>
-                        
-                        <!-- Luck -->
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="font-medium">Luck</label>
-                                <span class="font-bold text-yellow-600" id="luck-value">10</span>
-                            </div>
-                            <input 
-                                type="range" 
-                                id="luck" 
-                                min="5" 
-                                max="15" 
-                                value="10"
-                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                oninput="updateStat('luck', this.value)"
-                            >
-                            <div class="text-sm text-gray-500 mt-1">Affects random events and bonuses</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Stat Preview -->
-                    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
-                        <h3 class="font-bold mb-3">Character Preview</h3>
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div>Health: <span class="font-bold text-red-600" id="preview-health">100</span></div>
-                            <div>Energy: <span class="font-bold text-blue-600" id="preview-energy">50</span></div>
-                            <div>Learning Speed: <span class="font-bold text-purple-600" id="preview-learning">Normal</span></div>
-                            <div>Bonus Chance: <span class="font-bold text-yellow-600" id="preview-bonus">10%</span></div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 flex space-x-4">
-                        <button onclick="previousStep()" class="back-button flex-1 py-3 px-6 rounded-lg font-bold">
-                            ← Back
-                        </button>
-                        <button onclick="nextStep()" class="create-button flex-1 py-3 px-6 rounded-lg font-bold">
-                            Next: Preferences →
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Step 3: Learning Preferences -->
-                <div class="form-section" id="section-3">
-                    <h2 class="fantasy-title text-2xl font-bold mb-6">Learning Preferences</h2>
-                    <p class="text-gray-600 mb-6">Customize your learning experience to match your style.</p>
-                    
-                    <div class="space-y-6">
-                        <!-- Learning Pace -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                Learning Pace
-                            </label>
-                            <div class="grid grid-cols-3 gap-3">
-                                <button class="pace-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600" data-pace="casual">
-                                    <div class="font-bold text-green-600">Casual</div>
-                                    <div class="text-xs text-gray-500">Relaxed learning</div>
-                                </button>
-                                <button class="pace-btn p-3 border-2 border-yellow-600 rounded-lg text-center transition-all bg-yellow-50" data-pace="normal">
-                                    <div class="font-bold text-yellow-600">Normal</div>
-                                    <div class="text-xs text-gray-500">Steady progress</div>
-                                </button>
-                                <button class="pace-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600" data-pace="intensive">
-                                    <div class="font-bold text-red-600">Intensive</div>
-                                    <div class="text-xs text-gray-500">Fast-paced learning</div>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Vocabulary Focus -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                Vocabulary Focus
-                            </label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button class="focus-btn p-3 border-2 border-yellow-600 rounded-lg text-center transition-all bg-yellow-50" data-focus="balanced">
-                                    <div class="font-bold text-yellow-600">Balanced</div>
-                                    <div class="text-xs text-gray-500">All word types</div>
-                                </button>
-                                <button class="focus-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600" data-focus="practical">
-                                    <div class="font-bold text-blue-600">Practical</div>
-                                    <div class="text-xs text-gray-500">Everyday words</div>
-                                </button>
-                                <button class="focus-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600" data-focus="academic">
-                                    <div class="font-bold text-purple-600">Academic</div>
-                                    <div class="text-xs text-gray-500">Formal language</div>
-                                </button>
-                                <button class="focus-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600" data-focus="creative">
-                                    <div class="font-bold text-green-600">Creative</div>
-                                    <div class="text-xs text-gray-500">Expressive words</div>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Accessibility Options -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                Accessibility Options
-                            </label>
-                            <div class="space-y-3">
-                                <label class="flex items-center space-x-3">
-                                    <input type="checkbox" id="sound-effects" class="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500" checked>
-                                    <span>Enable sound effects and audio feedback</span>
-                                </label>
-                                <label class="flex items-center space-x-3">
-                                    <input type="checkbox" id="animations" class="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500" checked>
-                                    <span>Enable animations and visual effects</span>
-                                </label>
-                                <label class="flex items-center space-x-3">
-                                    <input type="checkbox" id="high-contrast" class="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500">
-                                    <span>High contrast mode for better visibility</span>
-                                </label>
-                                <label class="flex items-center space-x-3">
-                                    <input type="checkbox" id="large-text" class="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500">
-                                    <span>Large text mode for easier reading</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 flex space-x-4">
-                        <button onclick="previousStep()" class="back-button flex-1 py-3 px-6 rounded-lg font-bold">
-                            ← Back
-                        </button>
-                        <button onclick="nextStep()" class="create-button flex-1 py-3 px-6 rounded-lg font-bold">
-                            Next: Review →
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Step 4: Review and Create -->
-                <div class="form-section" id="section-4">
-                    <h2 class="fantasy-title text-2xl font-bold mb-6">Review Your Character</h2>
-                    <p class="text-gray-600 mb-6">Review your character details before starting your adventure.</p>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Character Summary -->
-                        <div class="space-y-6">
-                            <div class="p-4 bg-blue-50 rounded-lg">
-                                <h3 class="font-bold mb-3">Character Summary</h3>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between">
-                                        <span>Name:</span>
-                                        <span class="font-bold" id="review-name">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Title:</span>
-                                        <span class="font-bold" id="review-title">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Avatar:</span>
-                                        <span class="font-bold text-2xl" id="review-avatar">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Difficulty:</span>
-                                        <span class="font-bold" id="review-difficulty">-</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="p-4 bg-green-50 rounded-lg">
-                                <h3 class="font-bold mb-3">Character Stats</h3>
-                                <div class="grid grid-cols-2 gap-2 text-sm">
-                                    <div class="flex justify-between">
-                                        <span>Intelligence:</span>
-                                        <span class="font-bold text-purple-600" id="review-intelligence">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Charisma:</span>
-                                        <span class="font-bold text-blue-600" id="review-charisma">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Endurance:</span>
-                                        <span class="font-bold text-green-600" id="review-endurance">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Luck:</span>
-                                        <span class="font-bold text-yellow-600" id="review-luck">-</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="p-4 bg-yellow-50 rounded-lg">
-                                <h3 class="font-bold mb-3">Learning Preferences</h3>
-                                <div class="space-y-1 text-sm">
-                                    <div class="flex justify-between">
-                                        <span>Pace:</span>
-                                        <span class="font-bold" id="review-pace">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Focus:</span>
-                                        <span class="font-bold" id="review-focus">-</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Character Preview -->
-                        <div class="text-center">
-                            <div class="character-avatar w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center text-6xl" id="preview-avatar">
-                                🧙‍♂️
-                            </div>
-                            <h3 class="fantasy-title text-xl font-bold mb-2" id="preview-name">Your Character</h3>
-                            <p class="text-gray-600 mb-6" id="preview-title">The Adventurer</p>
-                            
-                            <!-- Stats Visualization -->
-                            <div class="space-y-3">
-                                <div class="text-left">
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span>Health</span>
-                                        <span id="preview-hp">100</span>
-                                    </div>
-                                    <div class="stat-bar-container h-3">
-                                        <div class="stat-bar bg-gradient-to-r from-red-500 to-red-400" id="preview-hp-bar" style="width: 100%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="text-left">
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span>Energy</span>
-                                        <span id="preview-energy">50</span>
-                                    </div>
-                                    <div class="stat-bar-container h-3">
-                                        <div class="stat-bar bg-gradient-to-r from-blue-500 to-blue-400" id="preview-energy-bar" style="width: 100%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="text-left">
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span>Learning Speed</span>
-                                        <span id="preview-learning-speed">Normal</span>
-                                    </div>
-                                    <div class="stat-bar-container h-3">
-                                        <div class="stat-bar bg-gradient-to-r from-purple-500 to-purple-400" id="preview-learning-bar" style="width: 50%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8 flex space-x-4">
-                        <button onclick="previousStep()" class="back-button flex-1 py-4 px-6 rounded-lg font-bold">
-                            ← Back to Edit
-                        </button>
-                        <button onclick="createCharacter()" class="create-button flex-1 py-4 px-6 rounded-lg font-bold">
-                            🚀 Create Character & Start Adventure
-                        </button>
-                    </div>
-                </div>
-            </div>
+      <div class="max-w-4xl w-full">
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <h1 class="fantasy-title text-4xl font-bold mb-2">Create Your Character</h1>
+          <p class="text-white text-lg">Customize your adventurer and begin your learning quest</p>
         </div>
+
+        <!-- Step Indicator -->
+        <div class="mb-8">
+          <div class="flex items-center justify-center">
+            <div class="step-indicator active" id="step-1">1</div>
+            <div class="step-connector" id="connector-1"></div>
+            <div class="step-indicator inactive" id="step-2">2</div>
+            <div class="step-connector" id="connector-2"></div>
+            <div class="step-indicator inactive" id="step-3">3</div>
+            <div class="step-connector" id="connector-3"></div>
+            <div class="step-indicator inactive" id="step-4">4</div>
+          </div>
+          <div class="flex justify-center mt-2">
+            <span class="text-white text-sm" id="step-description">Basic Information</span>
+          </div>
+        </div>
+
+        <!-- Character Creation Form -->
+        <div class="parchment-bg rounded-lg p-8 magical-glow">
+          <!-- Step 1: Basic Information -->
+          <div class="form-section active" id="section-1">
+            <h2 class="fantasy-title text-2xl font-bold mb-6">Basic Information</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="character-name" class="block text-sm font-medium text-gray-700 mb-2">
+                  Character Name
+                </label>
+                <input
+                  type="text"
+                  id="character-name"
+                  placeholder="Enter your character's name..."
+                  class="stat-input w-full px-4 py-3 rounded-lg text-lg"
+                  maxlength="20"
+                  autocomplete="off"
+                />
+                <div id="name-error" class="text-red-500 text-sm mt-1 hidden"></div>
+              </div>
+
+              <div>
+                <label for="character-title" class="block text-sm font-medium text-gray-700 mb-2">
+                  Character Title
+                </label>
+                <select id="character-title" class="stat-input w-full px-4 py-3 rounded-lg text-lg">
+                  <option value="Adventurer">Adventurer</option>
+                  <option value="Scholar">Scholar</option>
+                  <option value="Explorer">Explorer</option>
+                  <option value="Linguist">Linguist</option>
+                  <option value="Wizard">Wizard</option>
+                  <option value="Hero">Hero</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label class="block text-sm font-medium text-gray-700 mb-3">
+                Choose Your Avatar
+              </label>
+              <div class="grid grid-cols-4 gap-4" id="avatar-options">
+                <div class="avatar-option" data-avatar="👽">👽</div>
+                <div class="avatar-option" data-avatar="👸">👸</div>
+                <div class="avatar-option" data-avatar="🦸‍♂️">🦸‍♂️</div>
+                <div class="avatar-option" data-avatar="🦸‍♀️">🦸‍♀️</div>
+                <div class="avatar-option" data-avatar="🧝‍♂️">🧝‍♂️</div>
+                <div class="avatar-option" data-avatar="🧝‍♀️">🧝‍♀️</div>
+                <div class="avatar-option" data-avatar="🧛‍♂️">🧛‍♂️</div>
+                <div class="avatar-option" data-avatar="🧟‍♀️">🧟‍♀️</div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <button
+                onclick="nextStep()"
+                class="create-button w-full py-4 px-6 rounded-lg text-lg font-bold"
+              >
+                Next: Character Stats →
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Character Stats -->
+          <div class="form-section" id="section-2">
+            <h2 class="fantasy-title text-2xl font-bold mb-6">Character Stats</h2>
+            <p class="text-gray-600 mb-6">
+              Distribute your character's starting attributes. These will affect your learning
+              experience.
+            </p>
+
+            <div class="space-y-6">
+              <!-- Intelligence -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="font-medium">Intelligence</label>
+                  <span class="font-bold text-purple-600" id="intelligence-value">10</span>
+                </div>
+                <input
+                  type="range"
+                  id="intelligence"
+                  min="5"
+                  max="15"
+                  value="10"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  oninput="updateStat('intelligence', this.value)"
+                />
+                <div class="text-sm text-gray-500 mt-1">Affects vocabulary learning speed</div>
+              </div>
+
+              <!-- Charisma -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="font-medium">Charisma</label>
+                  <span class="font-bold text-blue-600" id="charisma-value">10</span>
+                </div>
+                <input
+                  type="range"
+                  id="charisma"
+                  min="5"
+                  max="15"
+                  value="10"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  oninput="updateStat('charisma', this.value)"
+                />
+                <div class="text-sm text-gray-500 mt-1">Affects interaction success</div>
+              </div>
+
+              <!-- Endurance -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="font-medium">Endurance</label>
+                  <span class="font-bold text-green-600" id="endurance-value">10</span>
+                </div>
+                <input
+                  type="range"
+                  id="endurance"
+                  min="5"
+                  max="15"
+                  value="10"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  oninput="updateStat('endurance', this.value)"
+                />
+                <div class="text-sm text-gray-500 mt-1">Affects energy and health</div>
+              </div>
+
+              <!-- Luck -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="font-medium">Luck</label>
+                  <span class="font-bold text-yellow-600" id="luck-value">10</span>
+                </div>
+                <input
+                  type="range"
+                  id="luck"
+                  min="5"
+                  max="15"
+                  value="10"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  oninput="updateStat('luck', this.value)"
+                />
+                <div class="text-sm text-gray-500 mt-1">Affects random events and bonuses</div>
+              </div>
+            </div>
+
+            <!-- Stat Preview -->
+            <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+              <h3 class="font-bold mb-3">Character Preview</h3>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  Health: <span class="font-bold text-red-600" id="preview-health">100</span>
+                </div>
+                <div>
+                  Energy: <span class="font-bold text-blue-600" id="preview-energy">50</span>
+                </div>
+                <div>
+                  Learning Speed:
+                  <span class="font-bold text-purple-600" id="preview-learning">Normal</span>
+                </div>
+                <div>
+                  Bonus Chance:
+                  <span class="font-bold text-yellow-600" id="preview-bonus">10%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 flex space-x-4">
+              <button
+                onclick="previousStep()"
+                class="back-button flex-1 py-3 px-6 rounded-lg font-bold"
+              >
+                ← Back
+              </button>
+              <button
+                onclick="nextStep()"
+                class="create-button flex-1 py-3 px-6 rounded-lg font-bold"
+              >
+                Next: Preferences →
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Learning Preferences -->
+          <div class="form-section" id="section-3">
+            <h2 class="fantasy-title text-2xl font-bold mb-6">Learning Preferences</h2>
+            <p class="text-gray-600 mb-6">
+              Customize your learning experience to match your style.
+            </p>
+
+            <div class="space-y-6">
+              <!-- Learning Pace -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3"> Learning Pace </label>
+                <div class="grid grid-cols-3 gap-3">
+                  <button
+                    class="pace-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600"
+                    data-pace="casual"
+                  >
+                    <div class="font-bold text-green-600">Casual</div>
+                    <div class="text-xs text-gray-500">Relaxed learning</div>
+                  </button>
+                  <button
+                    class="pace-btn p-3 border-2 border-yellow-600 rounded-lg text-center transition-all bg-yellow-50"
+                    data-pace="normal"
+                  >
+                    <div class="font-bold text-yellow-600">Normal</div>
+                    <div class="text-xs text-gray-500">Steady progress</div>
+                  </button>
+                  <button
+                    class="pace-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600"
+                    data-pace="intensive"
+                  >
+                    <div class="font-bold text-red-600">Intensive</div>
+                    <div class="text-xs text-gray-500">Fast-paced learning</div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Vocabulary Focus -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  Vocabulary Focus
+                </label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button
+                    class="focus-btn p-3 border-2 border-yellow-600 rounded-lg text-center transition-all bg-yellow-50"
+                    data-focus="balanced"
+                  >
+                    <div class="font-bold text-yellow-600">Balanced</div>
+                    <div class="text-xs text-gray-500">All word types</div>
+                  </button>
+                  <button
+                    class="focus-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600"
+                    data-focus="practical"
+                  >
+                    <div class="font-bold text-blue-600">Practical</div>
+                    <div class="text-xs text-gray-500">Everyday words</div>
+                  </button>
+                  <button
+                    class="focus-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600"
+                    data-focus="academic"
+                  >
+                    <div class="font-bold text-purple-600">Academic</div>
+                    <div class="text-xs text-gray-500">Formal language</div>
+                  </button>
+                  <button
+                    class="focus-btn p-3 border-2 border-gray-300 rounded-lg text-center transition-all hover:border-yellow-600"
+                    data-focus="creative"
+                  >
+                    <div class="font-bold text-green-600">Creative</div>
+                    <div class="text-xs text-gray-500">Expressive words</div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Accessibility Options -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  Accessibility Options
+                </label>
+                <div class="space-y-3">
+                  <label class="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="sound-effects"
+                      class="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500"
+                      checked
+                    />
+                    <span>Enable sound effects and audio feedback</span>
+                  </label>
+                  <label class="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="animations"
+                      class="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500"
+                      checked
+                    />
+                    <span>Enable animations and visual effects</span>
+                  </label>
+                  <label class="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="high-contrast"
+                      class="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500"
+                    />
+                    <span>High contrast mode for better visibility</span>
+                  </label>
+                  <label class="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="large-text"
+                      class="w-5 h-5 text-yellow-600 rounded focus:ring-yellow-500"
+                    />
+                    <span>Large text mode for easier reading</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 flex space-x-4">
+              <button
+                onclick="previousStep()"
+                class="back-button flex-1 py-3 px-6 rounded-lg font-bold"
+              >
+                ← Back
+              </button>
+              <button
+                onclick="nextStep()"
+                class="create-button flex-1 py-3 px-6 rounded-lg font-bold"
+              >
+                Next: Review →
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 4: Review and Create -->
+          <div class="form-section" id="section-4">
+            <h2 class="fantasy-title text-2xl font-bold mb-6">Review Your Character</h2>
+            <p class="text-gray-600 mb-6">
+              Review your character details before starting your adventure.
+            </p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <!-- Character Summary -->
+              <div class="space-y-6">
+                <div class="p-4 bg-blue-50 rounded-lg">
+                  <h3 class="font-bold mb-3">Character Summary</h3>
+                  <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                      <span>Name:</span>
+                      <span class="font-bold" id="review-name">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Title:</span>
+                      <span class="font-bold" id="review-title">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Avatar:</span>
+                      <span class="font-bold text-2xl" id="review-avatar">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Difficulty:</span>
+                      <span class="font-bold" id="review-difficulty">-</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-4 bg-green-50 rounded-lg">
+                  <h3 class="font-bold mb-3">Character Stats</h3>
+                  <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="flex justify-between">
+                      <span>Intelligence:</span>
+                      <span class="font-bold text-purple-600" id="review-intelligence">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Charisma:</span>
+                      <span class="font-bold text-blue-600" id="review-charisma">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Endurance:</span>
+                      <span class="font-bold text-green-600" id="review-endurance">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Luck:</span>
+                      <span class="font-bold text-yellow-600" id="review-luck">-</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-4 bg-yellow-50 rounded-lg">
+                  <h3 class="font-bold mb-3">Learning Preferences</h3>
+                  <div class="space-y-1 text-sm">
+                    <div class="flex justify-between">
+                      <span>Pace:</span>
+                      <span class="font-bold" id="review-pace">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Focus:</span>
+                      <span class="font-bold" id="review-focus">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Character Preview -->
+              <div class="text-center">
+                <div
+                  class="character-avatar w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center text-6xl"
+                  id="preview-avatar"
+                >
+                  👽
+                </div>
+                <h3 class="fantasy-title text-xl font-bold mb-2" id="preview-name">
+                  Your Character
+                </h3>
+                <p class="text-gray-600 mb-6" id="preview-title">The Adventurer</p>
+
+                <!-- Stats Visualization -->
+                <div class="space-y-3">
+                  <div class="text-left">
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>Health</span>
+                      <span id="preview-hp">100</span>
+                    </div>
+                    <div class="stat-bar-container h-3">
+                      <div
+                        class="stat-bar bg-gradient-to-r from-red-500 to-red-400"
+                        id="preview-hp-bar"
+                        style="width: 100%"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div class="text-left">
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>Energy</span>
+                      <span id="preview-energy">50</span>
+                    </div>
+                    <div class="stat-bar-container h-3">
+                      <div
+                        class="stat-bar bg-gradient-to-r from-blue-500 to-blue-400"
+                        id="preview-energy-bar"
+                        style="width: 100%"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div class="text-left">
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>Learning Speed</span>
+                      <span id="preview-learning-speed">Normal</span>
+                    </div>
+                    <div class="stat-bar-container h-3">
+                      <div
+                        class="stat-bar bg-gradient-to-r from-purple-500 to-purple-400"
+                        id="preview-learning-bar"
+                        style="width: 50%"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 flex space-x-4">
+              <button
+                onclick="previousStep()"
+                class="back-button flex-1 py-4 px-6 rounded-lg font-bold"
+              >
+                ← Back to Edit
+              </button>
+              <button
+                onclick="createCharacter()"
+                class="create-button flex-1 py-4 px-6 rounded-lg font-bold"
+              >
+                🚀 Create Character & Start Adventure
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
-        class CharacterCreation {
-            constructor() {
-                this.currentStep = 1;
-                this.totalSteps = 4;
-                this.characterData = {
-                    name: '',
-                    title: 'Adventurer',
-                    avatar: '🧙‍♂️',
-                    stats: {
-                        intelligence: 10,
-                        charisma: 10,
-                        endurance: 10,
-                        luck: 10
-                    },
-                    preferences: {
-                        pace: 'normal',
-                        focus: 'balanced',
-                        soundEffects: true,
-                        animations: true,
-                        highContrast: false,
-                        largeText: false
-                    }
-                };
-                
-                this.init();
+      class CharacterCreation {
+        constructor() {
+          this.currentStep = 1
+          this.totalSteps = 4
+          this.characterData = {
+            name: '',
+            title: 'Adventurer',
+            avatar: '👽',
+            stats: {
+              intelligence: 10,
+              charisma: 10,
+              endurance: 10,
+              luck: 10,
+            },
+            preferences: {
+              pace: 'normal',
+              focus: 'balanced',
+              soundEffects: true,
+              animations: true,
+              highContrast: false,
+              largeText: false,
+            },
+          }
+
+          this.init()
+        }
+
+        init() {
+          this.loadPreferences()
+          this.setupEventListeners()
+          this.updatePreview()
+          this.animateElements()
+        }
+
+        loadPreferences() {
+          const preferences = localStorage.getItem('lexiquest-preferences')
+          if (preferences) {
+            const prefs = JSON.parse(preferences)
+
+            if (prefs.username) {
+              document.getElementById('character-name').value = prefs.username
+              this.characterData.name = prefs.username
             }
-            
-            init() {
-                this.loadPreferences();
-                this.setupEventListeners();
-                this.updatePreview();
-                this.animateElements();
+
+            // Load other preferences if available
+          }
+        }
+
+        setupEventListeners() {
+          // Character name input
+          document.getElementById('character-name').addEventListener('input', (e) => {
+            this.characterData.name = e.target.value
+            this.updatePreview()
+            this.validateName()
+          })
+
+          // Character title selection
+          document.getElementById('character-title').addEventListener('change', (e) => {
+            this.characterData.title = e.target.value
+            this.updatePreview()
+          })
+
+          // Avatar selection
+          document.querySelectorAll('.avatar-option').forEach((option) => {
+            option.addEventListener('click', (e) => {
+              this.selectAvatar(e.target.dataset.avatar)
+            })
+          })
+
+          // Stat sliders
+          ;['intelligence', 'charisma', 'endurance', 'luck'].forEach((stat) => {
+            const slider = document.getElementById(stat)
+            if (slider) {
+              slider.addEventListener('input', (e) => {
+                this.updateStat(stat, parseInt(e.target.value))
+              })
             }
-            
-            loadPreferences() {
-                const preferences = localStorage.getItem('lexiquest-preferences');
-                if (preferences) {
-                    const prefs = JSON.parse(preferences);
-                    
-                    if (prefs.username) {
-                        document.getElementById('character-name').value = prefs.username;
-                        this.characterData.name = prefs.username;
-                    }
-                    
-                    // Load other preferences if available
-                }
+          })
+
+          // Difficulty buttons
+          document.querySelectorAll('.difficulty-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+              this.selectDifficulty(e.target.dataset.difficulty)
+            })
+          })
+
+          // Pace buttons
+          document.querySelectorAll('.pace-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+              this.selectPace(e.target.dataset.pace)
+            })
+          })
+
+          // Focus buttons
+          document.querySelectorAll('.focus-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+              this.selectFocus(e.target.dataset.focus)
+            })
+          })
+
+          // Accessibility options
+          ;['sound-effects', 'animations', 'high-contrast', 'large-text'].forEach((option) => {
+            const checkbox = document.getElementById(option)
+            if (checkbox) {
+              checkbox.addEventListener('change', (e) => {
+                this.updatePreference(option.replace('-', ''), e.target.checked)
+              })
             }
-            
-            setupEventListeners() {
-                // Character name input
-                document.getElementById('character-name').addEventListener('input', (e) => {
-                    this.characterData.name = e.target.value;
-                    this.updatePreview();
-                    this.validateName();
-                });
-                
-                // Character title selection
-                document.getElementById('character-title').addEventListener('change', (e) => {
-                    this.characterData.title = e.target.value;
-                    this.updatePreview();
-                });
-                
-                // Avatar selection
-                document.querySelectorAll('.avatar-option').forEach(option => {
-                    option.addEventListener('click', (e) => {
-                        this.selectAvatar(e.target.dataset.avatar);
-                    });
-                });
-                
-                // Stat sliders
-                ['intelligence', 'charisma', 'endurance', 'luck'].forEach(stat => {
-                    const slider = document.getElementById(stat);
-                    if (slider) {
-                        slider.addEventListener('input', (e) => {
-                            this.updateStat(stat, parseInt(e.target.value));
-                        });
-                    }
-                });
-                
-                // Difficulty buttons
-                document.querySelectorAll('.difficulty-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.selectDifficulty(e.target.dataset.difficulty);
-                    });
-                });
-                
-                // Pace buttons
-                document.querySelectorAll('.pace-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.selectPace(e.target.dataset.pace);
-                    });
-                });
-                
-                // Focus buttons
-                document.querySelectorAll('.focus-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.selectFocus(e.target.dataset.focus);
-                    });
-                });
-                
-                // Accessibility options
-                ['sound-effects', 'animations', 'high-contrast', 'large-text'].forEach(option => {
-                    const checkbox = document.getElementById(option);
-                    if (checkbox) {
-                        checkbox.addEventListener('change', (e) => {
-                            this.updatePreference(option.replace('-', ''), e.target.checked);
-                        });
-                    }
-                });
+          })
+        }
+
+        selectAvatar(avatar) {
+          // Remove selection from all avatars
+          document.querySelectorAll('.avatar-option').forEach((option) => {
+            option.classList.remove('selected')
+          })
+
+          // Select new avatar
+          const avatarElement = document.querySelector(`[data-avatar="${avatar}"]`)
+          avatarElement.classList.add('selected')
+
+          this.characterData.avatar = avatar
+          this.updatePreview()
+
+          // Animate selection
+          anime({
+            targets: avatarElement,
+            scale: [1, 1.2, 1],
+            duration: 300,
+            easing: 'easeOutElastic(1, .8)',
+          })
+        }
+
+        updateStat(stat, value) {
+          this.characterData.stats[stat] = value
+          document.getElementById(`${stat}-value`).textContent = value
+          this.updatePreview()
+
+          // Animate stat bar
+          const percentage = ((value - 5) / 10) * 100
+          anime({
+            targets: `#${stat}-value`,
+            scale: [1, 1.1, 1],
+            color: [
+              { value: '#FFD700', duration: 200 },
+              { value: getStatColor(stat), duration: 200 },
+            ],
+            duration: 400,
+            easing: 'easeOutQuad',
+          })
+        }
+
+        selectDifficulty(difficulty) {
+          // Remove selection from all difficulty buttons
+          document.querySelectorAll('.difficulty-btn').forEach((btn) => {
+            btn.classList.remove('border-yellow-600', 'bg-yellow-50')
+            btn.classList.add('border-gray-300')
+          })
+
+          // Select new difficulty
+          const selectedBtn = document.querySelector(`[data-difficulty="${difficulty}"]`)
+          selectedBtn.classList.remove('border-gray-300')
+          selectedBtn.classList.add('border-yellow-600', 'bg-yellow-50')
+
+          this.characterData.difficulty = difficulty
+          this.updatePreview()
+
+          // Animate selection
+          anime({
+            targets: selectedBtn,
+            scale: [1, 1.05, 1],
+            duration: 300,
+            easing: 'easeOutElastic(1, .8)',
+          })
+        }
+
+        selectPace(pace) {
+          // Remove selection from all pace buttons
+          document.querySelectorAll('.pace-btn').forEach((btn) => {
+            btn.classList.remove('border-yellow-600', 'bg-yellow-50')
+            btn.classList.add('border-gray-300')
+          })
+
+          // Select new pace
+          const selectedBtn = document.querySelector(`[data-pace="${pace}"]`)
+          selectedBtn.classList.remove('border-gray-300')
+          selectedBtn.classList.add('border-yellow-600', 'bg-yellow-50')
+
+          this.characterData.preferences.pace = pace
+          this.updatePreview()
+
+          // Animate selection
+          anime({
+            targets: selectedBtn,
+            scale: [1, 1.05, 1],
+            duration: 300,
+            easing: 'easeOutElastic(1, .8)',
+          })
+        }
+
+        selectFocus(focus) {
+          // Remove selection from all focus buttons
+          document.querySelectorAll('.focus-btn').forEach((btn) => {
+            btn.classList.remove('border-yellow-600', 'bg-yellow-50')
+            btn.classList.add('border-gray-300')
+          })
+
+          // Select new focus
+          const selectedBtn = document.querySelector(`[data-focus="${focus}"]`)
+          selectedBtn.classList.remove('border-gray-300')
+          selectedBtn.classList.add('border-yellow-600', 'bg-yellow-50')
+
+          this.characterData.preferences.focus = focus
+          this.updatePreview()
+
+          // Animate selection
+          anime({
+            targets: selectedBtn,
+            scale: [1, 1.05, 1],
+            duration: 300,
+            easing: 'easeOutElastic(1, .8)',
+          })
+        }
+
+        updatePreference(key, value) {
+          this.characterData.preferences[key] = value
+          this.updatePreview()
+        }
+
+        validateName() {
+          const name = this.characterData.name.trim()
+          const errorElement = document.getElementById('name-error')
+
+          if (!name) {
+            errorElement.textContent = 'Character name is required'
+            errorElement.classList.remove('hidden')
+            return false
+          }
+
+          if (name.length < 3) {
+            errorElement.textContent = 'Name must be at least 3 characters long'
+            errorElement.classList.remove('hidden')
+            return false
+          }
+
+          if (!/^[a-zA-Z0-9_\s]+$/.test(name)) {
+            errorElement.textContent =
+              'Name can only contain letters, numbers, spaces, and underscores'
+            errorElement.classList.remove('hidden')
+            return false
+          }
+
+          errorElement.classList.add('hidden')
+          return true
+        }
+
+        updatePreview() {
+          // Update review section
+          document.getElementById('review-name').textContent = this.characterData.name || '-'
+          document.getElementById('review-title').textContent = this.characterData.title
+          document.getElementById('review-avatar').textContent = this.characterData.avatar
+          document.getElementById('review-difficulty').textContent =
+            this.getDifficultyText(this.characterData.difficulty) || '普通'
+
+          document.getElementById('review-intelligence').textContent =
+            this.characterData.stats.intelligence
+          document.getElementById('review-charisma').textContent = this.characterData.stats.charisma
+          document.getElementById('review-endurance').textContent =
+            this.characterData.stats.endurance
+          document.getElementById('review-luck').textContent = this.characterData.stats.luck
+
+          document.getElementById('review-pace').textContent = this.characterData.preferences.pace
+          document.getElementById('review-focus').textContent = this.characterData.preferences.focus
+
+          // Update preview avatar
+          document.getElementById('preview-avatar').textContent = this.characterData.avatar
+          document.getElementById('preview-name').textContent =
+            this.characterData.name || 'Your Character'
+          document.getElementById('preview-title').textContent = `The ${this.characterData.title}`
+
+          // Calculate derived stats
+          const health = 80 + this.characterData.stats.endurance * 2
+          const energy = 30 + this.characterData.stats.endurance * 2
+          const learningSpeed = this.getLearningSpeedText()
+          const bonusChance = Math.min(25, this.characterData.stats.luck * 2)
+
+          document.getElementById('preview-hp').textContent = health
+          document.getElementById('preview-energy').textContent = energy
+          document.getElementById('preview-learning-speed').textContent = learningSpeed
+          document.getElementById('preview-bonus').textContent = `${bonusChance}%`
+
+          // Update stat bars
+          document.getElementById('preview-hp-bar').style.width = '100%'
+          document.getElementById('preview-energy-bar').style.width = '100%'
+
+          const learningPercentage = (this.characterData.stats.intelligence / 15) * 100
+          document.getElementById('preview-learning-bar').style.width = `${learningPercentage}%`
+        }
+
+        getLearningSpeedText() {
+          const intelligence = this.characterData.stats.intelligence
+          if (intelligence <= 7) return '较慢'
+          if (intelligence <= 12) return '正常'
+          if (intelligence <= 14) return '较快'
+          return '非常快'
+        }
+
+        getDifficultyText(difficulty) {
+          const difficultyMap = {
+            easy: '简单',
+            normal: '普通',
+            hard: '困难',
+          }
+          return difficultyMap[difficulty] || difficulty
+        }
+
+        nextStep() {
+          if (this.currentStep === 1 && !this.validateName()) {
+            return
+          }
+
+          if (this.currentStep < this.totalSteps) {
+            this.currentStep++
+            this.updateStepDisplay()
+            this.animateStepTransition()
+          }
+        }
+
+        previousStep() {
+          if (this.currentStep > 1) {
+            this.currentStep--
+            this.updateStepDisplay()
+            this.animateStepTransition()
+          }
+        }
+
+        updateStepDisplay() {
+          // Hide all sections
+          document.querySelectorAll('.form-section').forEach((section) => {
+            section.classList.remove('active')
+          })
+
+          // Show current section
+          document.getElementById(`section-${this.currentStep}`).classList.add('active')
+
+          // Update step indicators
+          for (let i = 1; i <= this.totalSteps; i++) {
+            const indicator = document.getElementById(`step-${i}`)
+            const connector = document.getElementById(`connector-${i}`)
+
+            if (i < this.currentStep) {
+              indicator.className = 'step-indicator completed'
+              if (connector) connector.className = 'step-connector completed'
+            } else if (i === this.currentStep) {
+              indicator.className = 'step-indicator active'
+              if (connector) connector.className = 'step-connector'
+            } else {
+              indicator.className = 'step-indicator inactive'
+              if (connector) connector.className = 'step-connector'
             }
-            
-            selectAvatar(avatar) {
-                // Remove selection from all avatars
-                document.querySelectorAll('.avatar-option').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                
-                // Select new avatar
-                const avatarElement = document.querySelector(`[data-avatar="${avatar}"]`);
-                avatarElement.classList.add('selected');
-                
-                this.characterData.avatar = avatar;
-                this.updatePreview();
-                
-                // Animate selection
-                anime({
-                    targets: avatarElement,
-                    scale: [1, 1.2, 1],
-                    duration: 300,
-                    easing: 'easeOutElastic(1, .8)'
-                });
-            }
-            
-            updateStat(stat, value) {
-                this.characterData.stats[stat] = value;
-                document.getElementById(`${stat}-value`).textContent = value;
-                this.updatePreview();
-                
-                // Animate stat bar
-                const percentage = ((value - 5) / 10) * 100;
-                anime({
-                    targets: `#${stat}-value`,
-                    scale: [1, 1.1, 1],
-                    color: [
-                        { value: '#FFD700', duration: 200 },
-                        { value: getStatColor(stat), duration: 200 }
-                    ],
-                    duration: 400,
-                    easing: 'easeOutQuad'
-                });
-            }
-            
-            selectDifficulty(difficulty) {
-                // Remove selection from all difficulty buttons
-                document.querySelectorAll('.difficulty-btn').forEach(btn => {
-                    btn.classList.remove('border-yellow-600', 'bg-yellow-50');
-                    btn.classList.add('border-gray-300');
-                });
-                
-                // Select new difficulty
-                const selectedBtn = document.querySelector(`[data-difficulty="${difficulty}"]`);
-                selectedBtn.classList.remove('border-gray-300');
-                selectedBtn.classList.add('border-yellow-600', 'bg-yellow-50');
-                
-                this.characterData.difficulty = difficulty;
-                this.updatePreview();
-                
-                // Animate selection
-                anime({
-                    targets: selectedBtn,
-                    scale: [1, 1.05, 1],
-                    duration: 300,
-                    easing: 'easeOutElastic(1, .8)'
-                });
-            }
-            
-            selectPace(pace) {
-                // Remove selection from all pace buttons
-                document.querySelectorAll('.pace-btn').forEach(btn => {
-                    btn.classList.remove('border-yellow-600', 'bg-yellow-50');
-                    btn.classList.add('border-gray-300');
-                });
-                
-                // Select new pace
-                const selectedBtn = document.querySelector(`[data-pace="${pace}"]`);
-                selectedBtn.classList.remove('border-gray-300');
-                selectedBtn.classList.add('border-yellow-600', 'bg-yellow-50');
-                
-                this.characterData.preferences.pace = pace;
-                this.updatePreview();
-                
-                // Animate selection
-                anime({
-                    targets: selectedBtn,
-                    scale: [1, 1.05, 1],
-                    duration: 300,
-                    easing: 'easeOutElastic(1, .8)'
-                });
-            }
-            
-            selectFocus(focus) {
-                // Remove selection from all focus buttons
-                document.querySelectorAll('.focus-btn').forEach(btn => {
-                    btn.classList.remove('border-yellow-600', 'bg-yellow-50');
-                    btn.classList.add('border-gray-300');
-                });
-                
-                // Select new focus
-                const selectedBtn = document.querySelector(`[data-focus="${focus}"]`);
-                selectedBtn.classList.remove('border-gray-300');
-                selectedBtn.classList.add('border-yellow-600', 'bg-yellow-50');
-                
-                this.characterData.preferences.focus = focus;
-                this.updatePreview();
-                
-                // Animate selection
-                anime({
-                    targets: selectedBtn,
-                    scale: [1, 1.05, 1],
-                    duration: 300,
-                    easing: 'easeOutElastic(1, .8)'
-                });
-            }
-            
-            updatePreference(key, value) {
-                this.characterData.preferences[key] = value;
-                this.updatePreview();
-            }
-            
-            validateName() {
-                const name = this.characterData.name.trim();
-                const errorElement = document.getElementById('name-error');
-                
-                if (!name) {
-                    errorElement.textContent = 'Character name is required';
-                    errorElement.classList.remove('hidden');
-                    return false;
-                }
-                
-                if (name.length < 3) {
-                    errorElement.textContent = 'Name must be at least 3 characters long';
-                    errorElement.classList.remove('hidden');
-                    return false;
-                }
-                
-                if (!/^[a-zA-Z0-9_\s]+$/.test(name)) {
-                    errorElement.textContent = 'Name can only contain letters, numbers, spaces, and underscores';
-                    errorElement.classList.remove('hidden');
-                    return false;
-                }
-                
-                errorElement.classList.add('hidden');
-                return true;
-            }
-            
-            updatePreview() {
-                // Update review section
-                document.getElementById('review-name').textContent = this.characterData.name || '-';
-                document.getElementById('review-title').textContent = this.characterData.title;
-                document.getElementById('review-avatar').textContent = this.characterData.avatar;
-                document.getElementById('review-difficulty').textContent = this.getDifficultyText(this.characterData.difficulty) || '普通';
-                
-                document.getElementById('review-intelligence').textContent = this.characterData.stats.intelligence;
-                document.getElementById('review-charisma').textContent = this.characterData.stats.charisma;
-                document.getElementById('review-endurance').textContent = this.characterData.stats.endurance;
-                document.getElementById('review-luck').textContent = this.characterData.stats.luck;
-                
-                document.getElementById('review-pace').textContent = this.characterData.preferences.pace;
-                document.getElementById('review-focus').textContent = this.characterData.preferences.focus;
-                
-                // Update preview avatar
-                document.getElementById('preview-avatar').textContent = this.characterData.avatar;
-                document.getElementById('preview-name').textContent = this.characterData.name || 'Your Character';
-                document.getElementById('preview-title').textContent = `The ${this.characterData.title}`;
-                
-                // Calculate derived stats
-                const health = 80 + (this.characterData.stats.endurance * 2);
-                const energy = 30 + (this.characterData.stats.endurance * 2);
-                const learningSpeed = this.getLearningSpeedText();
-                const bonusChance = Math.min(25, this.characterData.stats.luck * 2);
-                
-                document.getElementById('preview-hp').textContent = health;
-                document.getElementById('preview-energy').textContent = energy;
-                document.getElementById('preview-learning-speed').textContent = learningSpeed;
-                document.getElementById('preview-bonus').textContent = `${bonusChance}%`;
-                
-                // Update stat bars
-                document.getElementById('preview-hp-bar').style.width = '100%';
-                document.getElementById('preview-energy-bar').style.width = '100%';
-                
-                const learningPercentage = (this.characterData.stats.intelligence / 15) * 100;
-                document.getElementById('preview-learning-bar').style.width = `${learningPercentage}%`;
-            }
-            
-            getLearningSpeedText() {
-                const intelligence = this.characterData.stats.intelligence;
-                if (intelligence <= 7) return '较慢';
-                if (intelligence <= 12) return '正常';
-                if (intelligence <= 14) return '较快';
-                return '非常快';
-            }
-            
-            getDifficultyText(difficulty) {
-                const difficultyMap = {
-                    'easy': '简单',
-                    'normal': '普通',
-                    'hard': '困难'
-                };
-                return difficultyMap[difficulty] || difficulty;
-            }
-            
-            nextStep() {
-                if (this.currentStep === 1 && !this.validateName()) {
-                    return;
-                }
-                
-                if (this.currentStep < this.totalSteps) {
-                    this.currentStep++;
-                    this.updateStepDisplay();
-                    this.animateStepTransition();
-                }
-            }
-            
-            previousStep() {
-                if (this.currentStep > 1) {
-                    this.currentStep--;
-                    this.updateStepDisplay();
-                    this.animateStepTransition();
-                }
-            }
-            
-            updateStepDisplay() {
-                // Hide all sections
-                document.querySelectorAll('.form-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                
-                // Show current section
-                document.getElementById(`section-${this.currentStep}`).classList.add('active');
-                
-                // Update step indicators
-                for (let i = 1; i <= this.totalSteps; i++) {
-                    const indicator = document.getElementById(`step-${i}`);
-                    const connector = document.getElementById(`connector-${i}`);
-                    
-                    if (i < this.currentStep) {
-                        indicator.className = 'step-indicator completed';
-                        if (connector) connector.className = 'step-connector completed';
-                    } else if (i === this.currentStep) {
-                        indicator.className = 'step-indicator active';
-                        if (connector) connector.className = 'step-connector';
-                    } else {
-                        indicator.className = 'step-indicator inactive';
-                        if (connector) connector.className = 'step-connector';
-                    }
-                }
-                
-                // Update step description
-                const descriptions = [
-                    'Basic Information',
-                    'Character Stats',
-                    'Learning Preferences',
-                    'Review & Create'
-                ];
-                document.getElementById('step-description').textContent = descriptions[this.currentStep - 1];
-            }
-            
-            animateStepTransition() {
-                anime({
-                    targets: '.form-section.active',
-                    opacity: [0, 1],
-                    translateY: [20, 0],
-                    duration: 500,
-                    easing: 'easeOutQuad'
-                });
-                
-                anime({
-                    targets: `.step-indicator:nth-child(${this.currentStep * 2 - 1})`,
-                    scale: [1, 1.2, 1],
-                    duration: 500,
-                    easing: 'easeOutElastic(1, .8)'
-                });
-            }
-            
-            createCharacter() {
-                if (!this.validateName()) {
-                    return;
-                }
-                
-                // Create character data object
-                const characterData = {
-                    ...this.characterData,
-                    createdAt: Date.now(),
-                    stats: {
-                        ...this.characterData.stats,
-                        health: 80 + (this.characterData.stats.endurance * 2),
-                        maxHealth: 80 + (this.characterData.stats.endurance * 2),
-                        energy: 30 + (this.characterData.stats.endurance * 2),
-                        maxEnergy: 30 + (this.characterData.stats.endurance * 2),
-                        level: 1,
-                        experience: 0,
-                        maxExperience: 100
-                    }
-                };
-                
-                // Save character data
-                localStorage.setItem('lexiquest-character', JSON.stringify(characterData));
-                localStorage.setItem('lexiquest-username', this.characterData.name);
-                
-                // Show success message and redirect
-                this.showSuccessMessage();
-                
-                // Animate button and redirect
-                const button = document.querySelector('.create-button');
-                anime({
-                    targets: button,
-                    scale: [1, 1.1, 1],
-                    duration: 1000,
-                    easing: 'easeOutElastic(1, .8)',
-                    complete: () => {
-                        setTimeout(() => {
-                            window.location.href = 'modules.html';
-                        }, 1500);
-                    }
-                });
-            }
-            
-            showSuccessMessage() {
-                const message = document.createElement('div');
-                message.className = 'fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50';
-                message.innerHTML = `
+          }
+
+          // Update step description
+          const descriptions = [
+            'Basic Information',
+            'Character Stats',
+            'Learning Preferences',
+            'Review & Create',
+          ]
+          document.getElementById('step-description').textContent =
+            descriptions[this.currentStep - 1]
+        }
+
+        animateStepTransition() {
+          anime({
+            targets: '.form-section.active',
+            opacity: [0, 1],
+            translateY: [20, 0],
+            duration: 500,
+            easing: 'easeOutQuad',
+          })
+
+          anime({
+            targets: `.step-indicator:nth-child(${this.currentStep * 2 - 1})`,
+            scale: [1, 1.2, 1],
+            duration: 500,
+            easing: 'easeOutElastic(1, .8)',
+          })
+        }
+
+        createCharacter() {
+          if (!this.validateName()) {
+            return
+          }
+
+          // Create character data object
+          const characterData = {
+            ...this.characterData,
+            createdAt: Date.now(),
+            stats: {
+              ...this.characterData.stats,
+              health: 80 + this.characterData.stats.endurance * 2,
+              maxHealth: 80 + this.characterData.stats.endurance * 2,
+              energy: 30 + this.characterData.stats.endurance * 2,
+              maxEnergy: 30 + this.characterData.stats.endurance * 2,
+              level: 1,
+              experience: 0,
+              maxExperience: 100,
+            },
+          }
+
+          // Save character data
+          localStorage.setItem('lexiquest-character', JSON.stringify(characterData))
+          localStorage.setItem('lexiquest-username', this.characterData.name)
+
+          // Show success message and redirect
+          this.showSuccessMessage()
+
+          // Animate button and redirect
+          const button = document.querySelector('.create-button')
+          anime({
+            targets: button,
+            scale: [1, 1.1, 1],
+            duration: 1000,
+            easing: 'easeOutElastic(1, .8)',
+            complete: () => {
+              setTimeout(() => {
+                window.location.href = 'modules.html'
+              }, 1500)
+            },
+          })
+        }
+
+        showSuccessMessage() {
+          const message = document.createElement('div')
+          message.className =
+            'fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'
+          message.innerHTML = `
                     <div class="bg-white rounded-lg p-8 text-center max-w-md">
                         <div class="text-6xl mb-4">🎉</div>
                         <h2 class="fantasy-title text-2xl font-bold mb-2">Character Created!</h2>
                         <p class="text-gray-600 mb-4">Welcome to LexiQuest, ${this.characterData.name}!</p>
                         <p class="text-sm text-gray-500">Redirecting to adventure selection...</p>
                     </div>
-                `;
-                
-                document.body.appendChild(message);
-                
-                anime({
-                    targets: message.querySelector('div'),
-                    scale: [0, 1],
-                    opacity: [0, 1],
-                    duration: 500,
-                    easing: 'easeOutElastic(1, .8)'
-                });
-            }
-            
-            animateElements() {
-                // Animate elements on load
-                anime({
-                    targets: '.parchment-bg',
-                    opacity: [0, 1],
-                    translateY: [30, 0],
-                    duration: 800,
-                    easing: 'easeOutQuad'
-                });
-                
-                anime({
-                    targets: '.fantasy-title',
-                    opacity: [0, 1],
-                    scale: [0.8, 1],
-                    duration: 1000,
-                    delay: 500,
-                    easing: 'easeOutElastic(1, .8)'
-                });
-                
-                anime({
-                    targets: '.step-indicator',
-                    opacity: [0, 1],
-                    scale: [0, 1],
-                    duration: 600,
-                    delay: anime.stagger(100, {start: 800}),
-                    easing: 'easeOutElastic(1, .8)'
-                });
-            }
+                `
+
+          document.body.appendChild(message)
+
+          anime({
+            targets: message.querySelector('div'),
+            scale: [0, 1],
+            opacity: [0, 1],
+            duration: 500,
+            easing: 'easeOutElastic(1, .8)',
+          })
         }
-        
-        // Global functions for HTML event handlers
-        let characterCreation;
-        
-        function nextStep() {
-            characterCreation.nextStep();
+
+        animateElements() {
+          // Animate elements on load
+          anime({
+            targets: '.parchment-bg',
+            opacity: [0, 1],
+            translateY: [30, 0],
+            duration: 800,
+            easing: 'easeOutQuad',
+          })
+
+          anime({
+            targets: '.fantasy-title',
+            opacity: [0, 1],
+            scale: [0.8, 1],
+            duration: 1000,
+            delay: 500,
+            easing: 'easeOutElastic(1, .8)',
+          })
+
+          anime({
+            targets: '.step-indicator',
+            opacity: [0, 1],
+            scale: [0, 1],
+            duration: 600,
+            delay: anime.stagger(100, { start: 800 }),
+            easing: 'easeOutElastic(1, .8)',
+          })
         }
-        
-        function previousStep() {
-            characterCreation.previousStep();
+      }
+
+      // Global functions for HTML event handlers
+      let characterCreation
+
+      function nextStep() {
+        characterCreation.nextStep()
+      }
+
+      function previousStep() {
+        characterCreation.previousStep()
+      }
+
+      function updateStat(stat, value) {
+        characterCreation.updateStat(stat, value)
+      }
+
+      function createCharacter() {
+        characterCreation.createCharacter()
+      }
+
+      // Initialize character creation when page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        characterCreation = new CharacterCreation()
+      })
+
+      // Helper function to get stat color
+      function getStatColor(stat) {
+        const colors = {
+          intelligence: '#663399',
+          charisma: '#3B82F6',
+          endurance: '#10B981',
+          luck: '#F59E0B',
         }
-        
-        function updateStat(stat, value) {
-            characterCreation.updateStat(stat, value);
-        }
-        
-        function createCharacter() {
-            characterCreation.createCharacter();
-        }
-        
-        // Initialize character creation when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            characterCreation = new CharacterCreation();
-        });
-        
-        // Helper function to get stat color
-        function getStatColor(stat) {
-            const colors = {
-                intelligence: '#663399',
-                charisma: '#3B82F6',
-                endurance: '#10B981',
-                luck: '#F59E0B'
-            };
-            return colors[stat] || '#6B7280';
-        }
+        return colors[stat] || '#6B7280'
+      }
     </script>
-</body>
+  </body>
 </html>

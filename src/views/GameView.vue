@@ -3,18 +3,17 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import CharacterStats from '@/components/game/CharacterStats.vue'
 import StoryDisplay from '@/components/game/StoryDisplay.vue'
-import ActionButtons from '@/components/game/ActionButtons.vue'
 import ProgressPanel from '@/components/game/ProgressPanel.vue'
 import DictionaryModal from '@/components/game/DictionaryModal.vue'
 import Notification from '@/components/game/Notification.vue'
-import AIConsoleTester from '@/components/game/AIConsoleTester.vue'
+import { useRouter } from 'vue-router'
 
 // Game store
 const gameStore = useGameStore()
+const router = useRouter()
 
 // UI state
 const showDictionary = ref(false)
-const actionResponse = ref('')
 const showActionPrompt = ref(false)
 const actionPromptText = ref('')
 const showNotification = ref(false)
@@ -35,52 +34,8 @@ const saveGame = () => {
   showGameNotification('Game saved successfully!', 'success')
 }
 
-// 添加测试getContextForContinuation的函数
-const testGetContext = () => {
-  const context = gameStore.getContextForContinuation()
-  console.log('Generated context for continuation:', context)
-  alert('Context has been logged to console. Check the browser console for details.')
-}
-
 const selectWord = (word: string) => {
   gameStore.selectWord(word)
-}
-
-const performAction = (action: string) => {
-  const response = gameStore.performAction(action)
-  if (response) {
-    actionResponse.value = response
-    // Scroll to response
-    setTimeout(() => {
-      const responseElement = document.querySelector('.action-response')
-      if (responseElement) {
-        responseElement.scrollIntoView({ behavior: 'smooth' })
-      }
-    }, 100)
-  }
-}
-
-const generateActionPrompt = () => {
-  const prompts = [
-    '你想深入探索市场吗？',
-    '店员似乎还有更多话要说。你要不要再和他谈谈？',
-    '你注意到远处的架子上有闪闪发光的东西。要调查一下吗？',
-    '魔法的氛围让你感到好奇。要多看看周围吗？',
-    '你想练习更多词汇。要试试另一个词吗？',
-  ]
-
-  const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)]
-  actionPromptText.value = randomPrompt || ''
-  showActionPrompt.value = true
-}
-
-const handleActionPrompt = (choice: string) => {
-  showActionPrompt.value = false
-
-  if (choice === 'yes') {
-    const continuationText = '你决定进一步探索。魔法市场似乎隐藏着许多秘密和学习机会...'
-    actionResponse.value = continuationText
-  }
 }
 
 const showGameNotification = (
@@ -98,28 +53,25 @@ const closeNotification = () => {
 
 // 处理AI响应
 const handleAIResponse = (response: string) => {
-  // 保存原始的AI生成内容
-  gameStore.updateRawGeneratedContent(response)
-
   // 解析response中被**包裹的词汇，将其转换为可点击的交互式词汇
   const processedResponse = response.replace(
     /\*\*(.*?)\*\*/g,
     '<span class="interactive-word" data-word="$1">$1</span>',
   )
 
-  // 检查是否有游戏历史来决定如何更新内容
-  if (gameStore.gameHistory.length > 0) {
-    // 有游戏历史，在原有文本下面补充新生成的段落
-    const separator = '<br><br>---<br><br>' // 添加分隔符
-    const currentContent = gameStore.generatedContent || ''
-    const newContent = currentContent
-      ? currentContent + separator + processedResponse
-      : processedResponse
-    gameStore.updateGeneratedContent(newContent)
-  } else {
-    // 没有游戏历史，直接更新内容
-    gameStore.updateGeneratedContent(processedResponse)
-  }
+  gameStore.updateGeneratedContent(processedResponse)
+}
+
+// 处理词典通知
+const handleDictionaryNotification = (message: string) => {
+  notificationMessage.value = message
+  notificationType.value = 'success'
+  showNotification.value = true
+
+  // 3秒后自动隐藏通知
+  setTimeout(() => {
+    showNotification.value = false
+  }, 3000)
 }
 
 // 监听AI控制台的加载状态变化
@@ -127,9 +79,15 @@ const handleAILoading = (loading: boolean) => {
   isLoading.value = loading
 }
 
+// 返回首页
+const goToHome = () => {
+  router.push('/')
+}
+
 // Initialize game
 onMounted(() => {
   gameStore.loadGame()
+  gameStore.loadLevelRequirements() // 加载等级要求
   gameStore.startProgressTracking()
 
   // Set up progress tracking
@@ -153,30 +111,15 @@ onUnmounted(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center space-x-4">
-            <img src="@/assets/logo.svg" alt="LexiQuest" class="h-10 w-auto" />
-            <h1 class="fantasy-title text-2xl font-bold">LexiQuest</h1>
+            <!-- <img src="@/assets/logo.svg" alt="LexiQuest" class="h-10 w-auto" /> -->
+            <h1 class="fantasy-title text-5xl font-bold cursor-pointer" @click="goToHome">
+              LexiQuest
+            </h1>
+            <h1 class="text-white text-2xl font-bold">PLAYER: {{ gameStore.userName }}</h1>
           </div>
           <div class="flex items-center space-x-4">
-            <span class="text-white font-medium">{{ gameStore.character.name }}</span>
-            <button
-              @click="toggleDictionary"
-              class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 transition-colors border border-yellow-700"
-            >
-              📚 词典
-            </button>
-            <button
-              @click="saveGame"
-              class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 transition-colors border border-green-800"
-            >
-              💾 保存
-            </button>
-            <!-- 添加测试按钮 -->
-            <button
-              @click="testGetContext"
-              class="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 transition-colors border border-blue-800"
-            >
-              🧪 测试上下文
-            </button>
+            <button @click="toggleDictionary" class="action-button">📚 Dictionary</button>
+            <button @click="saveGame" class="action-button">💾 Save</button>
           </div>
         </div>
       </div>
@@ -185,64 +128,40 @@ onUnmounted(() => {
     <!-- Main Game Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <!-- Character Stats Panel -->
-        <div class="lg:col-span-1">
-          <CharacterStats :character="gameStore.character" :vocab-count="gameStore.vocabCount" />
+        <!-- Left Column (Character Stats and Progress Panel) -->
+        <div class="lg:col-span-1 flex flex-col">
+          <!-- Character Stats Panel -->
+          <div class="flex-shrink-0">
+            <CharacterStats
+              :character="gameStore.character"
+              :vocab-count="gameStore.vocabCount"
+              :is-loading="isLoading"
+            />
+          </div>
+
+          <!-- Progress & Achievements Panel -->
+          <div class="flex-shrink-0 mt-8">
+            <ProgressPanel :progress="gameStore.progress" />
+          </div>
+
+          <!-- Spacer to push content to top -->
+          <div class="flex-grow"></div>
         </div>
 
         <!-- Story Display Area -->
-        <div class="lg:col-span-2">
-          <StoryDisplay
-            :story-text="gameStore.story.text"
-            :selected-word="gameStore.vocabulary.selectedWord"
-            :is-loading="isLoading"
-            @word-selected="selectWord"
-          />
-
-          <!-- Action Response -->
-          <div v-if="actionResponse" class="mt-4 p-4 bg-blue-100 border border-blue-300">
-            <p class="italic text-blue-800">{{ actionResponse }}</p>
+        <div class="lg:col-span-3 flex flex-col">
+          <div class="flex-grow flex flex-col">
+            <StoryDisplay
+              class="flex-grow"
+              :story-text="gameStore.story.text"
+              :selected-word="gameStore.vocabulary.selectedWord"
+              :is-loading="isLoading"
+              @word-selected="selectWord"
+              @ai-response="handleAIResponse"
+              @loading="handleAILoading"
+              @show-notification="handleDictionaryNotification"
+            />
           </div>
-
-          <!-- Action Prompt -->
-          <div v-if="showActionPrompt" class="mt-6 p-4 bg-blue-100 border border-blue-300">
-            <p class="font-medium text-blue-800 mb-3">{{ actionPromptText }}</p>
-            <div class="flex space-x-3">
-              <button
-                class="bg-green-700 hover:bg-green-600 text-white px-4 py-2 transition-colors border border-green-800"
-                @click="handleActionPrompt('yes')"
-              >
-                Yes
-              </button>
-              <button
-                class="bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 transition-colors border border-yellow-700"
-                @click="handleActionPrompt('retry')"
-              >
-                Try Another
-              </button>
-              <button
-                class="bg-red-700 hover:bg-red-600 text-white px-4 py-2 transition-colors border border-red-800"
-                @click="handleActionPrompt('no')"
-              >
-                No
-              </button>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <ActionButtons
-            :selected-word="gameStore.vocabulary.selectedWord"
-            @perform-action="performAction"
-            @generate-prompt="generateActionPrompt"
-          />
-
-          <!-- AI Console Tester -->
-          <AIConsoleTester @ai-response="handleAIResponse" @loading="handleAILoading" />
-        </div>
-
-        <!-- Progress & Achievements Panel -->
-        <div class="lg:col-span-1">
-          <ProgressPanel :module="gameStore.currentModule" :progress="gameStore.progress" />
         </div>
       </div>
     </div>
@@ -282,6 +201,7 @@ body {
   font-family: 'Cinzel', serif;
   color: var(--primary-gold);
   text-shadow: none; /* 移除渐变和阴影 */
+  cursor: pointer;
 }
 
 .parchment-bg {
@@ -296,20 +216,20 @@ body {
 }
 
 .action-button {
-  background: var(--primary-burgundy); /* 扁平化背景 */
-  border: 2px solid var(--primary-gold);
   color: white;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: none; /* 移除阴影 */
+  padding: 0.1rem 1rem;
+  /* border: 2px solid var(--orange-web); */
+  border-radius: 0.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.5rem; /* 2xl */
+  transition: colors 0.2s ease;
 }
 
 .action-button:hover {
   transform: none; /* 移除变换效果 */
   box-shadow: none; /* 移除阴影 */
-  background: #a00028; /* 稍微亮一点的 burgundy */
+  background: var(--secondary-parchment); /* 稍微亮一点的 burgundy */
 }
 
 .action-button:active {

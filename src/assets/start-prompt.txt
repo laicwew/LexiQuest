@@ -1,4 +1,0 @@
-START_JOURNEY
-
-Generate the opening scene for a new adventurer in Middle-earth. 
-Begin the story in a suitable location and provide the first interactive elements.

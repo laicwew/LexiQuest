@@ -1,31 +1,28 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-// 定义游戏历史记录的接口
-interface GameHistoryEntry {
-  gm_narrative: string
-  player_action: string
-  action_result: string
+// 定义明信片接口
+interface Postcard {
+  id: string
+  content: string
+  createdAt: number
+}
+
+// 定义等级要求的接口
+interface LevelRequirement {
+  level: number
+  words_required: number
 }
 
 export const useGameStore = defineStore('game', () => {
   // State
   const character = ref({
-    name: 'Adventurer',
+    name: '',
     level: 1,
     hp: 100,
     maxHp: 100,
-    energy: 50,
-    maxEnergy: 50,
-    experience: 0,
-    maxExperience: 100,
-  })
-
-  const currentModule = ref({
-    id: 'supermarket_v1',
-    title: 'Magical Market',
-    description: 'Learn shopping vocabulary',
-    progress: 25,
+    languageLevel: 'CET-6',
+    country: 'America',
   })
 
   const story = ref({
@@ -33,9 +30,6 @@ export const useGameStore = defineStore('game', () => {
     text: '',
     history: [] as string[],
   })
-
-  // 添加游戏历史记录数组
-  const gameHistory = ref<GameHistoryEntry[]>([])
 
   const vocabulary = ref({
     selectedWord: null as string | null,
@@ -57,74 +51,9 @@ export const useGameStore = defineStore('game', () => {
     animationsEnabled: true,
   })
 
-  // Modules data
-  const modules = ref({
-    supermarket_v1: {
-      title: 'Magical Market',
-      description: 'Learn shopping vocabulary in a mystical supermarket',
-      scenes: {
-        entrance: {
-          text: '你走进魔法超市，看到一个红色的apple放在shelf上。一个友好的clerk正在cleaning地面。明亮的灯光照亮了各种fruits和vegetables，它们被整齐地排列在架子上。',
-          vocabulary: [
-            { word: 'apple', translation: '苹果', pos: 'noun', difficulty: 1 },
-            { word: 'shelf', translation: '架子', pos: 'noun', difficulty: 2 },
-            { word: 'clerk', translation: '店员', pos: 'noun', difficulty: 2 },
-            { word: 'cleaning', translation: '打扫', pos: 'verb', difficulty: 2 },
-            { word: 'bright', translation: '明亮的', pos: 'adjective', difficulty: 2 },
-            { word: 'fruits', translation: '水果', pos: 'noun', difficulty: 1 },
-            { word: 'vegetables', translation: '蔬菜', pos: 'noun', difficulty: 1 },
-          ],
-          interactions: ['talk_to_clerk', 'examine_shelf', 'explore_aisle'],
-        },
-      },
-      npcs: {
-        clerk: {
-          name: 'Shopkeeper',
-          dialogue: [
-            '欢迎来到魔法集市!',
-            '请随机浏览我们的产品。',
-            '你想尝试一些我们的新品苹果吗？',
-          ],
-        },
-      },
-    },
-    // 新增的空模块
-    empty_market: {
-      title: 'Empty Market',
-      description: 'An empty magical market for testing',
-      scenes: {
-        entrance: {
-          text: '', // 空文本
-          vocabulary: [],
-          interactions: [],
-        },
-      },
-      npcs: {},
-    },
-  })
-
-  const actionResponses = ref({
-    eat: {
-      apple: '你咬了一口脆甜的apple。味道很棒！你的能量增加了5点。',
-      bread: '你吃着新鲜的bread。它让你感到温暖，恢复了10点生命值。',
-      default: '你吃掉了这个物品。味道不错，恢复了一些能量。',
-    },
-    attack: {
-      apple: '你攻击了apple！它无害地滚开了。clerk奇怪地看着你。',
-      clerk: '你试图攻击友好的clerk。他们后退了一步，对你的攻击感到困惑。',
-      default: '你攻击了目标。没发生什么特别的事情，但你感到有点傻。',
-    },
-    talk: {
-      clerk: 'clerk微笑着说："欢迎！我们的apple都是从魔法果园新鲜采摘的。"',
-      apple: '你试图和apple说话。它没有回应，但你感到与大自然有一种奇怪的联系。',
-      default: '你对目标说话。他们似乎理解了你的意图。',
-    },
-    imitate: {
-      apple: '你小心地发音"apple"。这个词在你舌头上感觉很自然。你学到了一个新词！',
-      cleaning: '你练习说"cleaning"。复杂的音节完美地从你舌尖滚落。',
-      default: '你模仿了这个词。你的发音随着每次尝试都在进步。',
-    },
-  })
+  // 明信片状态
+  const postcards = ref<Postcard[]>([])
+  let postcardCounter = 0 // 添加计数器
 
   // 当前选中的标签页
   const activeTab = ref('GENERATED')
@@ -132,16 +61,16 @@ export const useGameStore = defineStore('game', () => {
   // 存储AI生成的内容
   const generatedContent = ref('')
 
-  // 存储原始的AI生成内容（未处理的）
-  const rawGeneratedContent = ref('')
+  // 等级要求数据
+  const levelRequirements = ref<LevelRequirement[]>([])
+
+  // 用户名
+  const userName = ref('')
 
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
-  const energyPercent = computed(() => (character.value.energy / character.value.maxEnergy) * 100)
-  const xpPercent = computed(
-    () => (character.value.experience / character.value.maxExperience) * 100,
-  )
   const vocabCount = computed(() => vocabulary.value.learned.size)
+  const postcardCount = computed(() => postcards.value.length)
 
   // Actions
   function selectWord(word: string) {
@@ -167,18 +96,6 @@ export const useGameStore = defineStore('game', () => {
 
     progress.value.actionsTaken++
 
-    // Get appropriate response
-    const responses = actionResponses.value[action as keyof typeof actionResponses.value]
-    let response = responses[selectedWord as keyof typeof responses] || responses.default
-
-    // 保存游戏历史记录
-    const historyEntry: GameHistoryEntry = {
-      gm_narrative: rawGeneratedContent.value || story.value.text, // 使用原始AI生成内容
-      player_action: `${action} ${selectedWord}`,
-      action_result: response,
-    }
-    gameHistory.value.push(historyEntry)
-
     // Handle special cases
     if (action === 'imitate') {
       learnWord(selectedWord)
@@ -192,58 +109,56 @@ export const useGameStore = defineStore('game', () => {
 
     // Save game state
     saveGame()
-
-    return response
-  }
-
-  // 添加一个函数来更新原始AI生成内容
-  function updateRawGeneratedContent(content: string) {
-    rawGeneratedContent.value = content
   }
 
   // 修改updateGeneratedContent函数
   function updateGeneratedContent(content: string) {
-    generatedContent.value = content
+    // 提取明信片内容（被[]包裹的内容）
+    const postcardRegex = /\[(.*?)\]/gs
+    let match: RegExpExecArray | null
+    const newPostcards: Postcard[] = []
+
+    // 查找所有明信片内容
+    while ((match = postcardRegex.exec(content)) !== null) {
+      const postcardContent = match[1]
+      if (postcardContent && postcardContent.trim()) {
+        postcardCounter++ // 递增计数器
+        const id = String(postcardCounter).padStart(3, '0') // 生成001, 002格式的ID
+
+        newPostcards.push({
+          id,
+          content: postcardContent,
+          createdAt: Date.now(),
+        })
+      }
+    }
+
+    // 如果找到明信片，添加到postcards数组中
+    if (newPostcards.length > 0) {
+      postcards.value = [...postcards.value, ...newPostcards]
+    }
+
+    const contentWithEmptyLines = content.replace(postcardRegex, '').trim()
+
+    generatedContent.value = contentWithEmptyLines
     // 如果当前是GENERATED标签，则更新显示文本
     if (activeTab.value === 'GENERATED') {
-      story.value.text = content
+      story.value.text = contentWithEmptyLines
     }
+    // 保存到localStorage
+    saveGame()
   }
 
-  // 添加获取续写上下文的函数
-  function getContextForContinuation(): string {
-    if (gameHistory.value.length === 0) {
-      return 'START_JOURNEY\n\nGenerate the opening scene for a new adventurer in Middle-earth.\nBegin the story in a suitable location and provide the first interactive elements.'
-    }
-
-    // 获取最后几条历史记录作为上下文
-    const recentHistory = gameHistory.value.slice(-3) // 获取最近3条记录
-
-    // 构建上下文提示
-    let context = 'Continue the story based on the following history:\n\n'
-
-    recentHistory.forEach((entry, index) => {
-      context += `Turn ${index + 1}:\n`
-      context += `GM Narrative: ${entry.gm_narrative}\n`
-      context += `Player Action: ${entry.player_action}\n`
-      context += `Action Result: ${entry.action_result}\n\n`
-    })
-
-    context +=
-      'Based on this history, continue the adventure in Middle-earth. Follow the same format as before:\n'
-    context += '1. Describe the new scene (3-4 sentences)\n'
-    context += '2. Include 2-4 new interactable objects wrapped in **double asterisks**\n'
-    context += "3. Maintain Tolkien's tone and lore\n"
-    context += '4. All output must be in English only'
-
-    return context
+  // 删除明信片
+  function deletePostcard(id: string) {
+    postcards.value = postcards.value.filter((postcard) => postcard.id !== id)
+    saveGame()
   }
 
-  // 修改saveGame函数以保存游戏历史
+  // 修改saveGame函数以保存游戏
   function saveGame() {
     const gameState = {
       character: character.value,
-      currentModule: currentModule.value,
       story: story.value,
       vocabulary: {
         ...vocabulary.value,
@@ -253,8 +168,9 @@ export const useGameStore = defineStore('game', () => {
       settings: settings.value,
       activeTab: activeTab.value,
       generatedContent: generatedContent.value,
-      rawGeneratedContent: rawGeneratedContent.value, // 保存原始内容
-      gameHistory: gameHistory.value, // 保存游戏历史
+      userName: userName.value, // 保存用户名
+      postcards: postcards.value, // 保存明信片
+      postcardCounter, // 保存计数器
     }
 
     localStorage.setItem('lexiquest-save', JSON.stringify(gameState))
@@ -264,113 +180,259 @@ export const useGameStore = defineStore('game', () => {
   // 修改loadGame函数以加载游戏历史
   function loadGame() {
     const savedState = localStorage.getItem('lexiquest-save')
+    // Load username from localStorage regardless of saved state
+    const username = localStorage.getItem('lexiquest-username')
+
+    // Load preferences to get country and languageLevel
+    const preferences = localStorage.getItem('lexiquest-preferences')
+    let parsedPreferences: any = null
+    if (preferences) {
+      try {
+        parsedPreferences = JSON.parse(preferences)
+      } catch (e) {
+        console.error('Failed to parse preferences', e)
+      }
+    }
+
+    if (username) {
+      userName.value = username
+    }
+
     if (savedState) {
       try {
         const parsed = JSON.parse(savedState)
-        character.value = parsed.character
-        currentModule.value = parsed.currentModule
+        // 确保character对象包含languageLevel属性，如果不存在则设置默认值
+        character.value = {
+          ...parsed.character,
+          languageLevel:
+            parsedPreferences?.languageLevel || parsed.character?.languageLevel || 'CET-6',
+          country: parsedPreferences?.country || parsed.character?.country || 'America',
+        }
         story.value = parsed.story
         vocabulary.value = parsed.vocabulary
         progress.value = parsed.progress
         settings.value = parsed.settings || settings.value
         activeTab.value = parsed.activeTab || 'GENERATED'
         generatedContent.value = parsed.generatedContent || ''
-        rawGeneratedContent.value = parsed.rawGeneratedContent || '' // 加载原始内容
-
-        // 加载游戏历史
-        gameHistory.value = parsed.gameHistory || []
+        userName.value = parsed.userName || '' // 加载用户名
+        postcards.value = parsed.postcards || [] // 加载明信片
+        postcardCounter = parsed.postcardCounter || postcards.value.length // 加载计数器
 
         // 根据保存的标签页状态设置正确的文本
         if (activeTab.value === 'GENERATED') {
-          story.value.text =
-            generatedContent.value || modules.value.empty_market.scenes.entrance.text
+          story.value.text = generatedContent.value || ''
         } else if (activeTab.value === 'DUMMY') {
-          story.value.text = modules.value.supermarket_v1.scenes.entrance.text
+          story.value.text = ''
         }
 
         // Restore Map objects
         if (parsed.vocabulary && parsed.vocabulary.learned) {
           vocabulary.value.learned = new Map(parsed.vocabulary.learned)
         }
+
+        // Ensure the character name is updated from localStorage even with saved state
+        if (username) {
+          userName.value = username
+        }
       } catch (e) {
         console.error('Failed to load game state', e)
       }
     } else {
-      // Load username from localStorage
-      const username = localStorage.getItem('lexiquest-username')
-      if (username) {
-        character.value.name = username
-      }
-
       // 默认情况下，设置为GENERATED标签页并显示空文本
       activeTab.value = 'GENERATED'
-      story.value.text = modules.value.empty_market.scenes.entrance.text
+      story.value.text = ''
+
+      // 从preferences中加载languageLevel和country
+      if (parsedPreferences) {
+        character.value.languageLevel = parsedPreferences.languageLevel || 'CET-6'
+        character.value.country = parsedPreferences.country || 'America'
+      }
     }
   }
 
   function updateCharacterStatsByAction(action: string) {
-    switch (action) {
-      case 'eat':
-        character.value.energy = Math.min(100, character.value.energy + 5)
-        character.value.experience += 2
-        break
-      case 'attack':
-        character.value.energy = Math.max(0, character.value.energy - 2)
-        character.value.experience += 1
-        break
-      case 'talk':
-        character.value.experience += 3
-        break
-      case 'imitate':
-        character.value.experience += 5
-        break
-    }
-
-    // Check for level up
-    if (character.value.experience >= character.value.maxExperience) {
+    // 检查是否可以升级（基于单词数）
+    const learnedWords = vocabulary.value.learned.size
+    const nextRequirement = levelRequirements.value.find(
+      (req) => req.level === character.value.level + 1,
+    )
+    if (nextRequirement && learnedWords >= nextRequirement.words_required) {
       levelUp()
     }
   }
 
   function levelUp() {
     character.value.level++
-    character.value.experience = 0
-    character.value.maxExperience += 50
     character.value.maxHp += 20
     character.value.hp = character.value.maxHp
-    character.value.maxEnergy += 10
-    character.value.energy = character.value.maxEnergy
+
+    // 保存游戏状态以确保等级更新被持久化
+    saveGame()
   }
 
   function learnWord(word: string) {
-    const currentModuleData = modules.value[currentModule.value.id as keyof typeof modules.value]
-    const currentScene =
-      currentModuleData.scenes[story.value.currentScene as keyof typeof currentModuleData.scenes]
-    const vocabularyData = currentScene.vocabulary.find((v: any) => v.word === word)
+    // 将单词转换为小写
+    const lowerCaseWord = word.toLowerCase()
 
-    if (vocabularyData && !vocabulary.value.learned.has(word)) {
-      vocabulary.value.learned.set(word, {
-        ...vocabularyData,
+    // 检查单词是否已经存在于词典中
+    if (!vocabulary.value.learned.has(lowerCaseWord)) {
+      // 创建一个简单的单词对象，只包含必要的字段
+      const wordData = {
+        word: lowerCaseWord,
         learnedAt: Date.now(),
         reviewCount: 0,
-        mastery: 0,
-      })
+      }
 
+      vocabulary.value.learned.set(lowerCaseWord, wordData)
       progress.value.wordsLearnedToday++
+
+      // 保存游戏状态以确保词典更新被持久化
+      saveGame()
+
+      // 检查是否达到升级要求
+      checkLevelUp()
     }
+  }
+
+  // 检查是否达到升级要求
+  function checkLevelUp() {
+    if (canLevelUp()) {
+      levelUp()
+    }
+  }
+
+  // 清空词典
+  function clearDictionary() {
+    vocabulary.value.learned.clear()
+    progress.value.wordsLearnedToday = 0
+    saveGame()
+  }
+
+  // 获取词典数据（用于控制台输出）
+  function getDictionaryData() {
+    return Array.from(vocabulary.value.learned.values())
+  }
+
+  // 从CSV文件加载等级要求
+  async function loadLevelRequirements() {
+    try {
+      const response = await fetch('/src/assets/level-requirements.csv')
+      const csvText = await response.text()
+
+      // 解析CSV数据
+      const lines = csvText.split('\n').filter((line) => line.trim() !== '')
+      if (lines.length === 0 || !lines[0]) {
+        throw new Error('CSV file is empty')
+      }
+
+      const headers = lines[0].split(',').map((header) => header.trim())
+
+      const requirements: LevelRequirement[] = []
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i]
+        if (!line) continue
+        const values = line.split(',').map((value) => value.trim())
+        if (values.length === headers.length && values[0]) {
+          const requirement: LevelRequirement = {
+            level: parseInt(values[0] || '0'),
+            words_required: parseInt(values[1] || '0'),
+          }
+          requirements.push(requirement)
+        }
+      }
+
+      levelRequirements.value = requirements
+      console.log('Level requirements loaded:', requirements)
+    } catch (error) {
+      console.error('Failed to load level requirements:', error)
+      // 如果加载失败，使用默认值
+      levelRequirements.value = [
+        { level: 1, words_required: 0 },
+        { level: 2, words_required: 5 },
+        { level: 3, words_required: 10 },
+        { level: 4, words_required: 15 },
+        { level: 5, words_required: 20 },
+      ]
+    }
+  }
+
+  // 检查是否可以升级
+  function canLevelUp() {
+    const currentLevel = character.value.level
+    const learnedWords = vocabulary.value.learned.size
+
+    // 查找当前等级的要求
+    const currentRequirement = levelRequirements.value.find((req) => req.level === currentLevel)
+    if (!currentRequirement) return false
+
+    // 查找下一等级的要求
+    const nextRequirement = levelRequirements.value.find((req) => req.level === currentLevel + 1)
+    if (!nextRequirement) return false
+
+    // 检查是否满足单词数量要求
+    return learnedWords >= nextRequirement.words_required
+  }
+
+  // 获取下一等级的要求
+  function getNextLevelRequirements() {
+    const currentLevel = character.value.level
+    const nextRequirement = levelRequirements.value.find((req) => req.level === currentLevel + 1)
+    return nextRequirement || null
+  }
+
+  // 获取当前等级的要求
+  function getCurrentLevelRequirements() {
+    const currentLevel = character.value.level
+    const currentRequirement = levelRequirements.value.find((req) => req.level === currentLevel)
+    return currentRequirement || null
   }
 
   // 切换标签页
   function switchTab(tab: string) {
     activeTab.value = tab
-    // 根据标签页更新显示的文本
-    if (tab === 'GENERATED') {
-      // 显示AI生成的内容或空模块的文本
-      story.value.text = generatedContent.value || modules.value.empty_market.scenes.entrance.text
-    } else if (tab === 'DUMMY') {
-      // 显示当前模块的文本
-      story.value.text = modules.value.supermarket_v1.scenes.entrance.text
-    }
+  }
+
+  // 更新外星人名称
+  function updateAlienName(name: string) {
+    character.value.name = name
+    // 保存到localStorage
+    saveGame()
+  }
+
+  // 更新语言级别
+  function updateLanguageLevel(level: string) {
+    character.value.languageLevel = level
+    // 保存到localStorage
+    saveGame()
+  }
+
+  // Review功能：获取需要复习的单词
+  function getReviewWords() {
+    // 将Map转换为数组并按reviewCount排序（从低到高）
+    const sortedWords = Array.from(vocabulary.value.learned.entries())
+      .map(([word, data]) => ({
+        word,
+        reviewCount: data.reviewCount || 0,
+      }))
+      .sort((a, b) => a.reviewCount - b.reviewCount)
+      .slice(0, 10) // 取前10个
+
+    return sortedWords
+  }
+
+  // Review功能：增加单词的复习计数
+  function incrementReviewCount(words: string[]) {
+    words.forEach((word) => {
+      const lowerCaseWord = word.toLowerCase()
+      if (vocabulary.value.learned.has(lowerCaseWord)) {
+        const wordData = vocabulary.value.learned.get(lowerCaseWord)
+        if (wordData) {
+          wordData.reviewCount = (wordData.reviewCount || 0) + 1
+          vocabulary.value.learned.set(lowerCaseWord, wordData)
+        }
+      }
+    })
+    saveGame()
   }
 
   function startProgressTracking() {
@@ -383,23 +445,19 @@ export const useGameStore = defineStore('game', () => {
   return {
     // State
     character,
-    currentModule,
     story,
     vocabulary,
     progress,
     settings,
-    modules,
-    actionResponses,
+    postcards,
     activeTab,
     generatedContent,
-    rawGeneratedContent,
-    gameHistory, // 导出游戏历史
+    userName, // 导出用户名
 
     // Getters
     hpPercent,
-    energyPercent,
-    xpPercent,
     vocabCount,
+    postcardCount,
 
     // Actions
     selectWord,
@@ -412,10 +470,20 @@ export const useGameStore = defineStore('game', () => {
     updateCharacterStatsByAction,
     levelUp,
     learnWord,
+    clearDictionary, // 导出清空词典函数
+    getDictionaryData, // 导出获取词典数据函数
+    loadLevelRequirements, // 导出加载等级要求函数
+    canLevelUp, // 导出检查升级函数
+    checkLevelUp, // 导出检查升级函数
+    getNextLevelRequirements, // 导出获取下一等级要求函数
+    getCurrentLevelRequirements, // 导出获取当前等级要求函数
     switchTab,
     updateGeneratedContent,
-    updateRawGeneratedContent, // 导出更新原始内容的函数
+    updateAlienName, // 导出更新外星人名称的函数
+    updateLanguageLevel, // 导出更新语言级别的函数
+    getReviewWords, // 导出获取复习单词的函数
+    incrementReviewCount, // 导出增加复习计数的函数
+    deletePostcard, // 导出删除明信片函数
     startProgressTracking,
-    getContextForContinuation,
   }
 })
