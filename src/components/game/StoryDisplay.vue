@@ -557,7 +557,7 @@ onMounted(() => {
 
     <!-- Buttons - Outside of scrollable area -->
     <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4 flex gap-2 relative">
-      <button v-if="gameStore.vocabulary.selectedWord" @click="imitateWord" class="action-button bg-[#669bbc] hover:bg-[#2b6589] active:bg-[#0f3d5a] action-button">
+      <button v-if="gameStore.vocabulary.selectedWord" @click="imitateWord" class="action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]">
         Memorize
       </button>
       <button
@@ -682,7 +682,7 @@ onMounted(() => {
 
 /* 使用深度选择器来确保样式能应用到动态插入的元素 */
 :deep(.interactive-word) {
-  color: var(--primary-green); /* 使用森林绿 */
+  color: var(--cerulean); /* 使用森林绿 */
   cursor: pointer;
   transition: none; /* 移除过渡效果 */
   position: relative;
