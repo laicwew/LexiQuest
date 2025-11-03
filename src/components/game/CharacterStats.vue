@@ -12,6 +12,7 @@ const props = defineProps<{
     maxHp: number
   }
   vocabCount: number
+  isLoading?: boolean // 添加加载状态属性
 }>()
 
 const hpPercent = computed(() => (props.character.hp / props.character.maxHp) * 100)
@@ -29,8 +30,11 @@ const nextLevelRequirement = computed(() => {
   return gameStore.getNextLevelRequirements()
 })
 
-// 为头像URL添加时间戳以避免缓存
+// 根据加载状态选择头像
 const avatarUrl = computed(() => {
+  if (props.isLoading) {
+    return `/src/assets/avatar-happy.gif`
+  }
   return `/src/assets/avatar-${props.character.level}.gif?t=${Date.now()}`
 })
 </script>

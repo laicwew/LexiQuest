@@ -135,7 +135,11 @@ onUnmounted(() => {
         <div class="lg:col-span-1 flex flex-col">
           <!-- Character Stats Panel -->
           <div class="flex-shrink-0">
-            <CharacterStats :character="gameStore.character" :vocab-count="gameStore.vocabCount" />
+            <CharacterStats 
+              :character="gameStore.character" 
+              :vocab-count="gameStore.vocabCount"
+              :is-loading="isLoading"
+            />
           </div>
 
           <!-- Progress & Achievements Panel -->
