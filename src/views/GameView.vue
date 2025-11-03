@@ -51,7 +51,6 @@ const closeNotification = () => {
 
 // 处理AI响应
 const handleAIResponse = (response: string) => {
-
   // 解析response中被**包裹的词汇，将其转换为可点击的交互式词汇
   const processedResponse = response.replace(
     /\*\*(.*?)\*\*/g,
@@ -59,7 +58,6 @@ const handleAIResponse = (response: string) => {
   )
 
   gameStore.updateGeneratedContent(processedResponse)
-
 }
 
 // 处理词典通知
@@ -135,8 +133,8 @@ onUnmounted(() => {
         <div class="lg:col-span-1 flex flex-col">
           <!-- Character Stats Panel -->
           <div class="flex-shrink-0">
-            <CharacterStats 
-              :character="gameStore.character" 
+            <CharacterStats
+              :character="gameStore.character"
               :vocab-count="gameStore.vocabCount"
               :is-loading="isLoading"
             />
