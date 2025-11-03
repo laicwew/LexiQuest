@@ -605,6 +605,7 @@ onMounted(() => {
   border: 3px solid var(--primary-gold); /* 添加边框 */
   background: #14101e; /* 背景色 */
   min-height: 200px; /* 设置最小高度 */
+  max-height: 400px; /* 设置最大高度，超过时显示滚动条 */
 }
 
 .story-text {
