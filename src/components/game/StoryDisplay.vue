@@ -2,6 +2,7 @@
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import OpenAI from 'openai'
+import PostcardModal from './PostcardModal.vue'
 
 const gameStore = useGameStore()
 
@@ -31,6 +32,15 @@ const showNameInput = ref(true) // 控制是否显示输入框
 
 // Review相关状态
 const isReviewing = ref(false)
+
+// Postcard相关状态
+const showPostcardModal = ref(false)
+const selectedPostcard = ref<{
+  id: string
+  title: string
+  content: string
+  createdAt: number
+} | null>(null)
 
 // 初始化OpenAI客户端
 const openai = new OpenAI({
@@ -419,6 +429,38 @@ const reviewWords = async () => {
   }
 }
 
+// Postcard功能
+const openPostcard = (postcard: {
+  id: string
+  title: string
+  content: string
+  createdAt: number
+}) => {
+  selectedPostcard.value = postcard
+  showPostcardModal.value = true
+}
+
+const closePostcardModal = () => {
+  showPostcardModal.value = false
+  selectedPostcard.value = null
+}
+
+const deletePostcard = (id: string, event: Event) => {
+  // 阻止事件冒泡，避免触发打开明信片的操作
+  event.stopPropagation()
+  // 调用gameStore中的删除函数
+  gameStore.deletePostcard(id)
+}
+
+const getFirstLineExcerpt = (content: string): string => {
+  const lines = content.split('\n')
+  return lines && lines.length > 0 && lines[0] ? lines[0].trim() : ''
+}
+
+const formatDateTime = (timestamp: number): string => {
+  return new Date(timestamp).toLocaleString()
+}
+
 onMounted(() => {
   // 初始化各标签页的内容
   if (gameStore.activeTab === 'DUMMY') {
@@ -461,6 +503,13 @@ onMounted(() => {
         @click="switchTab('DUMMY')"
       >
         DUMMY
+      </button>
+      <button
+        class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
+        :class="getTabClass('POSTCARDS')"
+        @click="switchTab('POSTCARDS')"
+      >
+        POSTCARDS ({{ gameStore.postcardCount }})
       </button>
     </div>
 
@@ -545,6 +594,27 @@ onMounted(() => {
         <div class="story-text" v-html="storyContent"></div>
       </div>
 
+      <!-- POSTCARDS Tab Content -->
+      <div v-else-if="gameStore.activeTab === 'POSTCARDS'" class="postcards-container">
+        <div
+          v-for="postcard in gameStore.postcards"
+          :key="postcard.id"
+          class="postcard-item parchment-bg border-2 border-[var(--primary-gold)] p-4 mb-4 cursor-pointer hover:bg-[var(--yale-blue)] flex justify-between items-center"
+          @click="openPostcard(postcard)"
+        >
+          <div class="postcard-date text-2xl text-yellow-400">
+            <span class="text-white">{{ postcard.id }}</span>
+            {{ formatDateTime(postcard.createdAt) }}
+          </div>
+          <button
+            class="delete-button text-red-500 hover:text-red-700 text-2xl font-bold"
+            @click="deletePostcard(postcard.id, $event)"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
       <!-- Loading States -->
       <div
         v-if="isLoading && gameStore.activeTab !== 'FEEDER'"
@@ -557,7 +627,11 @@ onMounted(() => {
 
     <!-- Buttons - Outside of scrollable area -->
     <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4 flex gap-2 relative">
-      <button v-if="gameStore.vocabulary.selectedWord" @click="imitateWord" class="action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]">
+      <button
+        v-if="gameStore.vocabulary.selectedWord"
+        @click="imitateWord"
+        class="action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]"
+      >
         Memorize
       </button>
       <button
@@ -598,6 +672,13 @@ onMounted(() => {
       </button>
     </div>
   </div>
+
+  <!-- Postcard Modal -->
+  <PostcardModal
+    :show="showPostcardModal"
+    :postcard="selectedPostcard"
+    @close="closePostcardModal"
+  />
 </template>
 
 <style scoped>
@@ -723,5 +804,13 @@ onMounted(() => {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.postcard-item {
+  transition: background-color 0.2s ease;
+}
+
+.postcard-title {
+  color: var(--text-charcoal);
 }
 </style>

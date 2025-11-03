@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
+// 定义明信片接口
+interface Postcard {
+  id: string
+  title: string
+  content: string
+  createdAt: number
+}
+
 // 定义等级要求的接口
 interface LevelRequirement {
   level: number
@@ -44,6 +52,10 @@ export const useGameStore = defineStore('game', () => {
     animationsEnabled: true,
   })
 
+  // 明信片状态
+  const postcards = ref<Postcard[]>([])
+  let postcardCounter = 0 // 添加计数器
+
   // 当前选中的标签页
   const activeTab = ref('GENERATED')
 
@@ -59,6 +71,7 @@ export const useGameStore = defineStore('game', () => {
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
   const vocabCount = computed(() => vocabulary.value.learned.size)
+  const postcardCount = computed(() => postcards.value.length)
 
   // Actions
   function selectWord(word: string) {
@@ -101,12 +114,50 @@ export const useGameStore = defineStore('game', () => {
 
   // 修改updateGeneratedContent函数
   function updateGeneratedContent(content: string) {
-    generatedContent.value = content
+    // 提取明信片内容（被[]包裹的内容）
+    const postcardRegex = /\[(.*?)\]/gs
+    let match: RegExpExecArray | null
+    const newPostcards: Postcard[] = []
+
+    // 查找所有明信片内容
+    while ((match = postcardRegex.exec(content)) !== null) {
+      const postcardContent = match[1]
+      if (postcardContent && postcardContent.trim()) {
+        // 获取第一行作为标题
+        const lines = postcardContent.split('\n')
+        const firstLine = lines.length > 0 && lines[0] ? lines[0].trim() : 'Postcard'
+        postcardCounter++ // 递增计数器
+        const id = String(postcardCounter).padStart(3, '0') // 生成001, 002格式的ID
+
+        newPostcards.push({
+          id,
+          title: firstLine,
+          content: postcardContent,
+          createdAt: Date.now(),
+        })
+      }
+    }
+
+    // 如果找到明信片，添加到postcards数组中
+    if (newPostcards.length > 0) {
+      postcards.value = [...postcards.value, ...newPostcards]
+    }
+
+    // 移除content中的明信片内容（被[]包裹的部分）
+    const contentWithoutPostcards = content.replace(postcardRegex, '').trim()
+
+    generatedContent.value = contentWithoutPostcards
     // 如果当前是GENERATED标签，则更新显示文本
     if (activeTab.value === 'GENERATED') {
-      story.value.text = content
+      story.value.text = contentWithoutPostcards
     }
     // 保存到localStorage
+    saveGame()
+  }
+
+  // 删除明信片
+  function deletePostcard(id: string) {
+    postcards.value = postcards.value.filter((postcard) => postcard.id !== id)
     saveGame()
   }
 
@@ -124,6 +175,8 @@ export const useGameStore = defineStore('game', () => {
       activeTab: activeTab.value,
       generatedContent: generatedContent.value,
       userName: userName.value, // 保存用户名
+      postcards: postcards.value, // 保存明信片
+      postcardCounter, // 保存计数器
     }
 
     localStorage.setItem('lexiquest-save', JSON.stringify(gameState))
@@ -135,7 +188,7 @@ export const useGameStore = defineStore('game', () => {
     const savedState = localStorage.getItem('lexiquest-save')
     // Load username from localStorage regardless of saved state
     const username = localStorage.getItem('lexiquest-username')
-    
+
     // Load preferences to get country and languageLevel
     const preferences = localStorage.getItem('lexiquest-preferences')
     let parsedPreferences: any = null
@@ -146,7 +199,7 @@ export const useGameStore = defineStore('game', () => {
         console.error('Failed to parse preferences', e)
       }
     }
-    
+
     if (username) {
       userName.value = username
     }
@@ -157,7 +210,8 @@ export const useGameStore = defineStore('game', () => {
         // 确保character对象包含languageLevel属性，如果不存在则设置默认值
         character.value = {
           ...parsed.character,
-          languageLevel: parsedPreferences?.languageLevel || parsed.character?.languageLevel || 'CET-6',
+          languageLevel:
+            parsedPreferences?.languageLevel || parsed.character?.languageLevel || 'CET-6',
           country: parsedPreferences?.country || parsed.character?.country || 'America',
         }
         story.value = parsed.story
@@ -167,6 +221,8 @@ export const useGameStore = defineStore('game', () => {
         activeTab.value = parsed.activeTab || 'GENERATED'
         generatedContent.value = parsed.generatedContent || ''
         userName.value = parsed.userName || '' // 加载用户名
+        postcards.value = parsed.postcards || [] // 加载明信片
+        postcardCounter = parsed.postcardCounter || postcards.value.length // 加载计数器
 
         // 根据保存的标签页状态设置正确的文本
         if (activeTab.value === 'GENERATED') {
@@ -191,7 +247,7 @@ export const useGameStore = defineStore('game', () => {
       // 默认情况下，设置为GENERATED标签页并显示空文本
       activeTab.value = 'GENERATED'
       story.value.text = ''
-      
+
       // 从preferences中加载languageLevel和country
       if (parsedPreferences) {
         character.value.languageLevel = parsedPreferences.languageLevel || 'CET-6'
@@ -399,6 +455,7 @@ export const useGameStore = defineStore('game', () => {
     vocabulary,
     progress,
     settings,
+    postcards,
     activeTab,
     generatedContent,
     userName, // 导出用户名
@@ -406,6 +463,7 @@ export const useGameStore = defineStore('game', () => {
     // Getters
     hpPercent,
     vocabCount,
+    postcardCount,
 
     // Actions
     selectWord,
@@ -431,6 +489,7 @@ export const useGameStore = defineStore('game', () => {
     updateLanguageLevel, // 导出更新语言级别的函数
     getReviewWords, // 导出获取复习单词的函数
     incrementReviewCount, // 导出增加复习计数的函数
+    deletePostcard, // 导出删除明信片函数
     startProgressTracking,
   }
 })

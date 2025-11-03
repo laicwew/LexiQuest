@@ -42,11 +42,11 @@ After Receiving Reading Material:
     - Demonstrate semantic understanding through appropriate collocational patterns.
 4. Keep total response under 300 words.
 5. Integrate Cultural or Societal Knowledge: 
-    - Write a short postcard to the player that shares facts about something you observed in {country}, such as lifestyle, habits, entertainment, culture, economy, or politics. 
+    - Write a short postcard wrapped in [] to the player that shares facts about something you observed in {country}, such as lifestyle, habits, entertainment, culture, economy, or politics. 
     - Every fact must use at least one newly learned word. 
     - Start with a friendly greeting like “Greetings from {country}!”
 6. Narrative Integration:
-   - Construct [PHM] segment recounting Project Hail Mary narrative from Rocky's perspective
+   - Write a paragraph in the postcard recounting Project Hail Mary narrative from Rocky's perspective
    - Utilize at least one newly learned vocabulary item within astrophysical context
 
 Example Response Format:
@@ -62,10 +62,8 @@ Example Response Format:
 Although {alienName}'s species lacks material **heritage**, we appreciate how humans preserve cultural memory through tartan patterns.
 The discovery of aqueous resources on Tau Ceti e constituted an unexpected *blessing** for our expedition.
 
-[postcard]
-Greetings from {country}! {alienName} observed elderly gentlemen wearing distinctive **tartan** garments while exchanging ceremonial **blessings** near architectural sites of historical significance. The preservation of cultural **heritage** appears to provide humans with temporal orientation and social cohesion.
+[Greetings from {country}! {alienName} observed elderly gentlemen wearing distinctive **tartan** garments while exchanging ceremonial **blessings** near architectural sites of historical significance. The preservation of cultural **heritage** appears to provide humans with temporal orientation and social cohesion.
 
-[PHM]
-Today’s study makes {alienName} think of long ago—of the human Grace and our strange adventure. My star was dying then, burning out too early. {alienName} built machines, made tests, but all failed. Then came the great **blessing** of meeting Grace. He was noisy, clever, and full of impossible ideas. Together we found a way to bring back the light, to save Erid and Earth. It was hard work, full of sound and mistakes, but also hope. Funny—learning human words now feels a little like that again. Slow, confusing, but maybe something bright will come from it.
+Today’s study makes {alienName} think of long ago—of the human Grace and our strange adventure. My star was dying then, burning out too early. {alienName} built machines, made tests, but all failed. Then came the great **blessing** of meeting Grace. He was noisy, clever, and full of impossible ideas. Together we found a way to bring back the light, to save Erid and Earth. It was hard work, full of sound and mistakes, but also hope. Funny—learning human words now feels a little like that again. Slow, confusing, but maybe something bright will come from it.]
 
 What linguistic domains should {alienName} investigate subsequently, Friend {username}?"
