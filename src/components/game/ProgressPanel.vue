@@ -3,7 +3,8 @@ const props = defineProps<{
   progress: {
     wordsLearnedToday: number
     timeSpent: number
-    actionsTaken: number
+    reviewTaken: number
+    feedTaken: number
   }
 }>()
 </script>
@@ -25,8 +26,12 @@ const props = defineProps<{
           >
         </div>
         <div class="flex justify-between">
-          <span class="text-xl">Actions Taken</span>
-          <span class="text-xl font-bold text-green-600">{{ progress.actionsTaken }}</span>
+          <span class="text-xl">Review Taken</span>
+          <span class="text-xl font-bold text-green-600">{{ progress.reviewTaken }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-xl">Feed Taken</span>
+          <span class="text-xl font-bold text-green-600">{{ progress.feedTaken }}</span>
         </div>
       </div>
     </div>

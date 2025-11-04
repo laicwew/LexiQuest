@@ -81,7 +81,8 @@ const startNewGame = () => {
     progress: {
       wordsLearnedToday: 0,
       timeSpent: 0,
-      actionsTaken: 0,
+      reviewTaken: 0, // 新增：记录Review操作次数
+      feedTaken: 0, // 新增：记录Feed操作次数
     },
     settings: {
       nativeLanguage: 'zh',

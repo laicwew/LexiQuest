@@ -256,6 +256,9 @@ async function feedToAI() {
   emit('loading', true)
 
   try {
+    // 增加Feed操作计数
+    gameStore.updateProgress({ feedTaken: gameStore.progress.feedTaken + 1 })
+
     // 根据角色等级加载相应的系统提示文件
     const systemPromptFile = `/assets/system-prompt-level-${gameStore.character.level}.txt`
     const responseSystem = await fetch(systemPromptFile)
@@ -336,6 +339,14 @@ const clearGameHistory = () => {
   // 清除选中的单词
   gameStore.clearSelectedWord()
 
+  // 重置progress计数器
+  gameStore.updateProgress({
+    wordsLearnedToday: 0,
+    timeSpent: 0,
+    reviewTaken: 0,
+    feedTaken: 0,
+  })
+
   // 保存到localStorage
   gameStore.saveGame()
 
@@ -368,6 +379,9 @@ const reviewWords = async () => {
   emit('loading', true)
 
   try {
+    // 增加Review操作计数
+    gameStore.updateProgress({ reviewTaken: gameStore.progress.reviewTaken + 1 })
+
     // 获取需要复习的单词
     const reviewWords = gameStore.getReviewWords()
     const wordsList = reviewWords.map((item) => item.word).join(', ')

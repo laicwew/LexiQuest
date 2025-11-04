@@ -40,7 +40,8 @@ export const useGameStore = defineStore('game', () => {
   const progress = ref({
     wordsLearnedToday: 0,
     timeSpent: 0, // seconds
-    actionsTaken: 0,
+    reviewTaken: 0, // 新增：记录Review操作次数
+    feedTaken: 0, // 新增：记录Feed操作次数
   })
 
   const settings = ref({
@@ -93,8 +94,6 @@ export const useGameStore = defineStore('game', () => {
   function performAction(action: string) {
     const selectedWord = vocabulary.value.selectedWord
     if (!selectedWord) return
-
-    progress.value.actionsTaken++
 
     // Handle special cases
     if (action === 'imitate') {
