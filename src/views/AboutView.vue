@@ -71,19 +71,19 @@ const getTabClass = (tabName: string) => {
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">2. Feeding Text to Your Alien</h3>
-            <p class="mb-3">Switch to the FEEDER tab to provide reading material for your alien friend. Enter any English text you'd like your alien to learn from, then click the "Feed" button. The alien will process the text and extract vocabulary words at your target level.
+            <p class="mb-3">Switch to the <span class="text-[var(--primary-gold)]">FEEDER</span> tab to provide reading material for your alien friend. Enter any text you'd like your alien to learn from, then click the <span class="text-[#0e7b4a]">FEED</span> button. The alien will process the text and extract vocabulary words at your target level.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">3. Learning Vocabulary</h3>
-            <p class="mb-3">After feeding text, switch to the STUDY tab to see the vocabulary your alien has extracted. Words will be highlighted in blue. Click on any word to select it, then click the "Memorize" button to add it to your personal dictionary.
+            <p class="mb-3">After feeding text, switch to the <span class="text-[var(--primary-gold)]">STUDY</span> tab to see the vocabulary your alien has extracted. Words will be highlighted in blue. Click on any word to select it, then click the <span class="text-[#1282a2ff]">MEMORIZE</span> button to add it to your personal dictionary.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">4. Reviewing Words</h3>
-            <p class="mb-3">Use the "Review" button to have your alien friend help you review words you've already learned. The alien will create exercises and examples to help reinforce your memory of these words.
+            <p class="mb-3">Use the <span class="text-[#8446a9]">REVIEW</span> button to have your alien friend help you review words you've already learned. The alien will create exercises and examples to help reinforce your memory of these words.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">5. Collecting Postcards</h3>
-            <p class="mb-3">As you progress, your alien friend will send you postcards with interesting facts about the country you've chosen to visit. Check the POSTCARDS tab to view your collection.
+            <p class="mb-3">As you progress above level 2, your alien friend will send you postcards with interesting facts about the country you've chosen to visit. Check the <span class="text-[var(--primary-gold)]">POSTCARDS</span> tab to view your collection.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">6. Tracking Progress</h3>
