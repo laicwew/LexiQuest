@@ -1,6 +1,7 @@
-import fetch from 'node-fetch'
+// 使用 CommonJS 方式导入 node-fetch
+const fetch = require('node-fetch')
 
-export async function handler(event, context) {
+exports.handler = async function (event, context) {
   try {
     // 检查请求方法
     if (event.httpMethod !== 'POST') {
@@ -14,10 +15,10 @@ export async function handler(event, context) {
     const { system, prompt } = JSON.parse(event.body)
 
     // 构建DeepSeek API请求
-    const deepseekUrl = process.env.DEEPSEEK_BASE_URL ||
-      'https://api.deepseek.com/v1/chat/completions'
+    const deepseekUrl =
+      process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1/chat/completions'
 
-    // 确保 API 密钥存在（支持两种环境变量名称）
+    // 确保 API 密钥存在
     const apiKey = process.env.DEEPSEEK_API_KEY
     if (!apiKey) {
       console.error('API key not configured in environment variables')
@@ -56,7 +57,10 @@ export async function handler(event, context) {
 
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({
+        error: error.message,
+        errorType: error.constructor.name,
+      }),
     }
   }
 }
