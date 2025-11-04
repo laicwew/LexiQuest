@@ -27,7 +27,8 @@ The game follows a structured progression system:
      <img width="2556" height="1176" alt="图片" src="https://github.com/user-attachments/assets/422d9bd6-870e-4499-8d7f-a3d6eba8e903" />
      <img width="2556" height="1178" alt="图片" src="https://github.com/user-attachments/assets/1ddb257d-504d-4c41-868d-dd28ef49d9bf" />
      <img width="2550" height="1176" alt="图片" src="https://github.com/user-attachments/assets/86493559-84ff-4081-8c40-0153948a3f8e" />
-     <img width="2556" height="1182" alt="图片" src="https://github.com/user-attachments/assets/894258bd-0797-4b4c-a4b4-7972b97e2d58" />
+     <img width="2559" height="1197" alt="图片" src="https://github.com/user-attachments/assets/ede30d63-1d82-4b20-80ca-eccd1df1dfcd" />
+
 
 
 3. **Progression**
