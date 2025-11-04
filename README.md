@@ -23,10 +23,13 @@ The game follows a structured progression system:
    - Memorize new words to Dictionary
    - Review previously learned vocabulary
    - Continue memorizing more words
+   - If not sure what to do, check "About"
 <img width="2559" height="1176" alt="图片" src="https://github.com/user-attachments/assets/fd530ad2-22b6-48c0-879b-c2ae3f45602a" />
 <img width="2559" height="1176" alt="图片" src="https://github.com/user-attachments/assets/690dee03-0407-4941-9d8b-2c373dc12382" />
 <img width="2559" height="1191" alt="图片" src="https://github.com/user-attachments/assets/15a26f32-3efc-4716-9d9a-0d7b85217547" />
 <img width="2559" height="1187" alt="图片" src="https://github.com/user-attachments/assets/13317e39-8800-490c-9d2c-0de25c7a7ec0" />
+<img width="2559" height="1185" alt="图片" src="https://github.com/user-attachments/assets/29d639df-b466-49bc-8675-52c8108b188b" />
+
 
 3. **Progression**
    - Reach level 2 to unlock postcards feature
