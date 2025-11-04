@@ -55,16 +55,71 @@ const startNewGame = () => {
     return
   }
 
-  // Save user preferences to localStorage
-  const preferences = {
-    username: username.value,
-    languageLevel: targetLevel.value, // 直接使用选择的等级
-    country: targetCountry.value, // 保存目标国家
-    timestamp: Date.now(),
+  // Save username to localStorage
+  localStorage.setItem('lexiquest-username', username.value)
+
+  // Load existing game state or create new one
+  let gameState = {
+    character: {
+      name: '',
+      level: 1,
+      hp: 100,
+      maxHp: 100,
+      languageLevel: targetLevel.value, // 使用当前选择的值
+      country: targetCountry.value, // 使用当前选择的值
+    },
+    story: {
+      currentScene: 'entrance',
+      text: '',
+      history: [],
+    },
+    vocabulary: {
+      selectedWord: null,
+      dictionary: [],
+      learned: [],
+    },
+    progress: {
+      wordsLearnedToday: 0,
+      timeSpent: 0,
+      actionsTaken: 0,
+    },
+    settings: {
+      nativeLanguage: 'zh',
+      targetLanguage: 'en',
+      difficulty: 'normal',
+      soundEnabled: true,
+      animationsEnabled: true,
+    },
+    activeTab: 'GENERATED',
+    generatedContent: '',
+    userName: username.value,
+    postcards: [],
+    postcardCounter: 0,
   }
 
-  localStorage.setItem('lexiquest-preferences', JSON.stringify(preferences))
-  localStorage.setItem('lexiquest-username', username.value)
+  // Try to load existing game state
+  const savedState = localStorage.getItem('lexiquest-save')
+  if (savedState) {
+    try {
+      const parsed = JSON.parse(savedState)
+      gameState = {
+        ...gameState,
+        ...parsed,
+        character: {
+          ...gameState.character,
+          ...parsed.character,
+          // 确保使用当前选择的值覆盖保存的值
+          languageLevel: targetLevel.value,
+          country: targetCountry.value,
+        },
+      }
+    } catch (e) {
+      console.error('Failed to parse saved game state', e)
+    }
+  }
+
+  // Save updated game state
+  localStorage.setItem('lexiquest-save', JSON.stringify(gameState))
 
   successMessage.value = 'Redirecting to character creation...'
   errorMessage.value = ''
@@ -76,16 +131,24 @@ const startNewGame = () => {
 }
 
 onMounted(() => {
-  // Load saved preferences if they exist
-  const savedPreferences = localStorage.getItem('lexiquest-preferences')
-  if (savedPreferences) {
+  // Load saved game state if it exists
+  const savedState = localStorage.getItem('lexiquest-save')
+  if (savedState) {
     try {
-      const prefs = JSON.parse(savedPreferences)
-      username.value = prefs.username || ''
-      targetLevel.value = prefs.languageLevel || 'CET-6'
-      targetCountry.value = prefs.country || 'America'
+      const gameState = JSON.parse(savedState)
+      username.value = gameState.userName || ''
+      targetLevel.value = gameState.character?.languageLevel || 'CET-6'
+      targetCountry.value = gameState.character?.country || 'America'
     } catch (e) {
-      console.error('Failed to parse saved preferences', e)
+      console.error('Failed to parse saved game state', e)
+    }
+  }
+
+  // Also load username if exists but no game state
+  if (!username.value) {
+    const savedUsername = localStorage.getItem('lexiquest-username')
+    if (savedUsername) {
+      username.value = savedUsername
     }
   }
 })
