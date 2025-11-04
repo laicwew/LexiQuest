@@ -2,11 +2,29 @@
 const fetch = require('node-fetch')
 
 exports.handler = async function (event, context) {
+  // 启用跨域资源共享
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  }
+
+  // 处理预检请求
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: '',
+    }
+  }
+
   try {
     // 检查请求方法
     if (event.httpMethod !== 'POST') {
       return {
         statusCode: 405,
+        headers,
         body: JSON.stringify({ error: 'Method not allowed' }),
       }
     }
@@ -24,6 +42,7 @@ exports.handler = async function (event, context) {
       console.error('API key not configured in environment variables')
       return {
         statusCode: 500,
+        headers,
         body: JSON.stringify({ error: 'API key not configured on server' }),
       }
     }
@@ -47,9 +66,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(data),
     }
   } catch (error) {
@@ -57,6 +74,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({
         error: error.message,
         errorType: error.constructor.name,

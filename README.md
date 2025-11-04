@@ -70,6 +70,29 @@ cp .env.example .env
 
 注意：`.env` 文件已被添加到 `.gitignore` 中，不会被提交到版本控制系统。
 
+## Netlify部署配置
+
+要成功部署到Netlify并使用AI功能，需要进行以下配置：
+
+### 1. 环境变量设置
+
+在Netlify中设置以下环境变量：
+
+- `DEEPSEEK_API_KEY` - 你的DeepSeek API密钥
+- `DEEPSEEK_BASE_URL` - API基础URL（可选，默认为https://api.deepseek.com/v1/chat/completions）
+
+设置方法：
+
+1. 登录Netlify控制台
+2. 进入你的站点设置
+3. 选择"Site settings" → "Build & deploy" → "Environment"
+4. 添加上述环境变量
+5. 重新部署站点
+
+### 2. 函数配置
+
+Netlify函数已经配置在`netlify/functions`目录中，包含`deepseek-proxy.cjs`文件用于安全地代理API请求。
+
 ## 组件说明
 
 ### 主要视图组件

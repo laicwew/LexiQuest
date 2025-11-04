@@ -282,10 +282,16 @@ async function feedToAI() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(
-          `API request failed with status ${response.status}: ${errorData.error || 'Unknown error'}`,
-        )
+        // 尝试解析错误响应
+        let errorMessage = 'Unknown error'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`
+        } catch (parseError) {
+          // 如果解析失败，使用状态文本
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`
+        }
+        throw new Error(`API request failed with status ${response.status}: ${errorMessage}`)
       }
 
       const completion = await response.json()
@@ -433,10 +439,16 @@ const reviewWords = async () => {
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(
-          `Review API request failed with status ${response.status}: ${errorData.error || 'Unknown error'}`,
-        )
+        // 尝试解析错误响应
+        let errorMessage = 'Unknown error'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || `HTTP ${response.status}: ${response.statusText}`
+        } catch (parseError) {
+          // 如果解析失败，使用状态文本
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`
+        }
+        throw new Error(`Review API request failed with status ${response.status}: ${errorMessage}`)
       }
 
       const completion = await response.json()
