@@ -163,7 +163,7 @@ onMounted(() => {
       <div class="max-w-md w-full">
         <!-- Logo and Title -->
         <div class="text-center mb-8">
-          <h1 class="fantasy-title text-6xl font-bold mb-2">LexiQuest</h1>
+          <h1 class="fantasy-title text-6xl font-bold mb-2">HelloMee</h1>
           <div class="typewriter-container">
             <p class="text-white text-3xl">Meet your alien friend here</p>
           </div>

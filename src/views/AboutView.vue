@@ -28,7 +28,7 @@ const getTabClass = (tabName: string) => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center space-x-4">
-            <h1 class="fantasy-title text-5xl font-bold">LexiQuest</h1>
+            <h1 class="fantasy-title text-5xl font-bold">HelloMee</h1>
             <h1 class="text-white text-2xl font-bold">About</h1>
           </div>
           <div class="flex items-center space-x-4">
@@ -41,7 +41,7 @@ const getTabClass = (tabName: string) => {
     <!-- Main Content -->
     <div class="content-wrapper">
       <div class="parchment-bg p-8 magical-glow">
-        <h1 class="fantasy-title text-4xl font-bold mb-6 text-center">About LexiQuest</h1>
+        <h1 class="fantasy-title text-4xl font-bold mb-6 text-center">About HelloMee</h1>
 
         <!-- Tabs -->
         <div class="flex mb-0">
@@ -65,48 +65,69 @@ const getTabClass = (tabName: string) => {
         <div class="story-text-container mt-0">
           <!-- Instruction Tab Content -->
           <div v-if="activeTab === 'INSTRUCTION'" class="story-text">
-
             <h3 class="text-3xl font-bold mt-4 mb-2">1. Getting Started</h3>
-            <p class="mb-3">When you first start the game, you'll need to give your alien friend a name. This name will be used throughout your learning journey.
+            <p class="mb-3">
+              When you first start the game, you'll need to give your alien friend a name. This name
+              will be used throughout your learning journey.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">2. Feeding Text to Your Alien</h3>
-            <p class="mb-3">Switch to the <span class="text-[var(--primary-gold)]">FEEDER</span> tab to provide reading material for your alien friend. Enter any text you'd like your alien to learn from, then click the <span class="text-[#0e7b4a]">FEED</span> button. The alien will process the text and extract vocabulary words at your target level.
+            <p class="mb-3">
+              Switch to the <span class="text-[var(--primary-gold)]">FEEDER</span> tab to provide
+              reading material for your alien friend. Enter any text you'd like your alien to learn
+              from, then click the <span class="text-[#0e7b4a]">FEED</span> button. The alien will
+              process the text and extract vocabulary words at your target level.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">3. Learning Vocabulary</h3>
-            <p class="mb-3">After feeding text, switch to the <span class="text-[var(--primary-gold)]">STUDY</span> tab to see the vocabulary your alien has extracted. Words will be highlighted in blue. Click on any word to select it, then click the <span class="text-[#1282a2ff]">MEMORIZE</span> button to add it to your personal dictionary.
+            <p class="mb-3">
+              After feeding text, switch to the
+              <span class="text-[var(--primary-gold)]">STUDY</span> tab to see the vocabulary your
+              alien has extracted. Words will be highlighted in blue. Click on any word to select
+              it, then click the <span class="text-[#1282a2ff]">MEMORIZE</span> button to add it to
+              your personal dictionary.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">4. Reviewing Words</h3>
-            <p class="mb-3">Use the <span class="text-[#8446a9]">REVIEW</span> button to have your alien friend help you review words you've already learned. The alien will create exercises and examples to help reinforce your memory of these words.
+            <p class="mb-3">
+              Use the <span class="text-[#8446a9]">REVIEW</span> button to have your alien friend
+              help you review words you've already learned. The alien will create exercises and
+              examples to help reinforce your memory of these words.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">5. Collecting Postcards</h3>
-            <p class="mb-3">As you progress above level 2, your alien friend will send you postcards with interesting facts about the country you've chosen to visit. Check the <span class="text-[var(--primary-gold)]">POSTCARDS</span> tab to view your collection.
+            <p class="mb-3">
+              As you progress above level 2, your alien friend will send you postcards with
+              interesting facts about the country you've chosen to visit. Check the
+              <span class="text-[var(--primary-gold)]">POSTCARDS</span> tab to view your collection.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">6. Tracking Progress</h3>
-            <p class="mb-3">The panel on the left shows your learning progress, including words learned, play time, and the number of reviews and feeds you've completed.
+            <p class="mb-3">
+              The panel on the left shows your learning progress, including words learned, play
+              time, and the number of reviews and feeds you've completed.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">7. Managing Your Dictionary</h3>
-            <p class="mb-3">Click the "📚 Dictionary" button to view all the words you've learned. You can search and sort your memorized vocabulary from here.
+            <p class="mb-3">
+              Click the "📚 Dictionary" button to view all the words you've learned. You can search
+              and sort your memorized vocabulary from here.
             </p>
           </div>
 
           <!-- Author Tab Content -->
           <div v-else-if="activeTab === 'AUTHOR'" class="story-text mt-2">
-            <p class="mb-3">LexiQuest was created by <a href="https://github.com/laicwew" class="text-blue-500 hover:underline" target="_blank">laicwew</a>.
+            <p class="mb-3">HelloMee was created by<a
+                href="https://github.com/laicwew"
+                class="text-blue-500 hover:underline"
+                target="_blank">laicwew</a>.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">Technology</h3>
-            <p class="mb-3">Vue.js, TypeScript, and Vite. Integrated with DeepSeek API.
-            </p>
+            <p class="mb-3">Vue.js, TypeScript, and Vite. Integrated with DeepSeek API.</p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">Contact</h3>
-            <p class="mb-3">Email: laicwew@gmail.com
-            </p>
+            <p class="mb-3">Email: laicwew@gmail.com</p>
           </div>
         </div>
       </div>

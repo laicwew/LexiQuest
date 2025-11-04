@@ -1,10 +1,10 @@
-# LexiQuest
+# HelloMee
 
-LexiQuest is an interactive language learning game where players help an alien character learn Earth languages through vocabulary acquisition and story interaction.
+HelloMee is an interactive language learning game where players help an alien character learn Earth languages through vocabulary acquisition and story interaction.
 
 ## Overview
 
-LexiQuest is designed as a vocabulary learning game. Players interact with an alien character who is learning human language and culture. Through feeding text to the alien, players help it understand vocabulary and grammar. The game features a progression system where the alien levels up as it learns more words, and players can review learned vocabulary to reinforce their knowledge. The game also includes a postcard system that captures memorable moments from AI-generated content, creating a personalized learning journal.
+HelloMee is designed as a vocabulary learning game. Players interact with an alien character who is learning human language and culture. Through feeding text to the alien, players help it understand vocabulary and grammar. The game features a progression system where the alien levels up as it learns more words, and players can review learned vocabulary to reinforce their knowledge. The game also includes a postcard system that captures memorable moments from AI-generated content, creating a personalized learning journal.
 
 ## Playthrough
 

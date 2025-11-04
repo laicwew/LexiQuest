@@ -170,9 +170,9 @@ onUnmounted(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center space-x-4">
-            <!-- <img src="@/assets/logo.svg" alt="LexiQuest" class="h-10 w-auto" /> -->
+            <!-- <img src="@/assets/logo.svg" alt="HelloMee" class="h-10 w-auto" /> -->
             <h1 class="fantasy-title text-5xl font-bold cursor-pointer" @click="goToHome">
-              LexiQuest
+              HelloMee
             </h1>
             <h1 class="text-white text-2xl font-bold">PLAYER: {{ gameStore.userName }}</h1>
           </div>
