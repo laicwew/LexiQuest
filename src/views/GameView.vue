@@ -84,6 +84,11 @@ const goToHome = () => {
   router.push('/')
 }
 
+// 跳转到关于页面
+const goToAbout = () => {
+  router.push('/about')
+}
+
 // Initialize game
 onMounted(() => {
   gameStore.loadGame()
@@ -120,6 +125,7 @@ onUnmounted(() => {
           <div class="flex items-center space-x-4">
             <button @click="toggleDictionary" class="action-button">📚 Dictionary</button>
             <button @click="saveGame" class="action-button">💾 Save</button>
+            <button @click="goToAbout" class="action-button">About</button>
           </div>
         </div>
       </div>
