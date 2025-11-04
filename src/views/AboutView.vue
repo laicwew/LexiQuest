@@ -66,58 +66,36 @@ const getTabClass = (tabName: string) => {
           <!-- Instruction Tab Content -->
           <div v-if="activeTab === 'INSTRUCTION'" class="story-text">
             <h3 class="text-3xl font-bold mt-4 mb-2">1. Getting Started</h3>
-            <p class="mb-3">
-              When you first start the game, you'll need to give your alien friend a name. This name
-              will be used throughout your learning journey.
+            <p class="mb-3">When you first start the game, you'll need to give your alien friend a name. This name will be used throughout your learning journey.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">2. Feeding Text to Your Alien</h3>
-            <p class="mb-3">
-              Switch to the <span class="text-[var(--primary-gold)]">FEEDER</span> tab to provide
-              reading material for your alien friend. Enter any text you'd like your alien to learn
-              from, then click the <span class="text-[#0e7b4a]">FEED</span> button. The alien will
-              process the text and extract vocabulary words at your target level.
+            <p class="mb-3">Switch to the <span class="text-[var(--primary-gold)]">FEEDER</span> tab to provide reading material for your alien friend. Enter any text you'd like your alien to learn from, then click the <span class="text-[#0e7b4a]">FEED</span> button. The alien will process the text and extract vocabulary words at your target level.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">3. Learning Vocabulary</h3>
-            <p class="mb-3">
-              After feeding text, switch to the
-              <span class="text-[var(--primary-gold)]">STUDY</span> tab to see the vocabulary your
-              alien has extracted. Words will be highlighted in blue. Click on any word to select
-              it, then click the <span class="text-[#1282a2ff]">MEMORIZE</span> button to add it to
-              your personal dictionary.
+            <p class="mb-3">After feeding text, switch to the <span class="text-[var(--primary-gold)]">STUDY</span> tab to see the vocabulary your alien has extracted. Words will be highlighted in blue. Click on any word to select it, then click the <span class="text-[#1282a2ff]">MEMORIZE</span> button to add it to your personal dictionary.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">4. Reviewing Words</h3>
-            <p class="mb-3">
-              Use the <span class="text-[#8446a9]">REVIEW</span> button to have your alien friend
-              help you review words you've already learned. The alien will create exercises and
-              examples to help reinforce your memory of these words.
+            <p class="mb-3">Use the <span class="text-[#8446a9]">REVIEW</span> button to have your alien friend help you review words you've already learned. The alien will create exercises and examples to help reinforce your memory of these words.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">5. Collecting Postcards</h3>
-            <p class="mb-3">
-              As you progress above level 2, your alien friend will send you postcards with
-              interesting facts about the country you've chosen to visit. Check the
-              <span class="text-[var(--primary-gold)]">POSTCARDS</span> tab to view your collection.
+            <p class="mb-3">As you progress above level 2, your alien friend will send you postcards with interesting facts about the country you've chosen to visit. Check the <span class="text-[var(--primary-gold)]">POSTCARDS</span> tab to view your collection.
             </p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">6. Tracking Progress</h3>
-            <p class="mb-3">
-              The panel on the left shows your learning progress, including words learned, play
-              time, and the number of reviews and feeds you've completed.
-            </p>
+            <p class="mb-3">The panel on the left shows your learning progress, including words learned, play time, and the number of reviews and feeds you've completed.</p>
 
             <h3 class="text-3xl font-bold mt-4 mb-2">7. Managing Your Dictionary</h3>
-            <p class="mb-3">
-              Click the "📚 Dictionary" button to view all the words you've learned. You can search
-              and sort your memorized vocabulary from here.
+            <p class="mb-3">Click the "📚 Dictionary" button to view all the words you've learned. You can search and sort your memorized vocabulary from here.
             </p>
           </div>
 
           <!-- Author Tab Content -->
           <div v-else-if="activeTab === 'AUTHOR'" class="story-text mt-2">
-            <p class="mb-3">HelloMee was created by<a
+            <p class="mb-3">HelloMee was created by <a
                 href="https://github.com/laicwew"
                 class="text-blue-500 hover:underline"
                 target="_blank">laicwew</a>.
