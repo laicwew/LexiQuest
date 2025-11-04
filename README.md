@@ -161,3 +161,10 @@ Routes are configured in `router/index.ts`:
 3. Data persistence uses localStorage
 4. Responsive design adapts to different screen sizes
 5. AI content generation powered by DeepSeek API
+
+## Potential for more target languages
+Modify the `system-prompt-level-?.txt` file to specify the response language, and replace the example response with its Japanese translation. After that, you can receive replies like this in the game:
+
+
+<img width="1791" height="984" alt="e4c56d22e56d257bc71f92d624997779" src="https://github.com/user-attachments/assets/dd358fe0-a11c-4dc1-ab7f-d94b8e22cbd4" />
+
