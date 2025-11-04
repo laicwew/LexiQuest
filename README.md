@@ -13,8 +13,9 @@ The game follows a structured progression system:
 1. **Setup Phase**
    - Select username, target level, and target country
    - Name your alien companion
-     <img width="2550" height="1179" alt="图片" src="https://github.com/user-attachments/assets/8e5342ff-65bf-4188-bd7a-eba818e6731c" />
-     <img width="2553" height="1179" alt="图片" src="https://github.com/user-attachments/assets/a4ab476b-9d38-4f50-9969-4b1e0eff89c6" />
+<img width="2556" height="1185" alt="图片" src="https://github.com/user-attachments/assets/bc642f91-0f81-41aa-9e88-3628008c3a66" />
+<img width="2553" height="1188" alt="图片" src="https://github.com/user-attachments/assets/35a6aa54-2d59-40f8-92bd-c511224020c3" />
+
 
 2. **Learning Loop**
    - Feed alien with text content
@@ -22,24 +23,28 @@ The game follows a structured progression system:
    - Review previously learned vocabulary
    - Continue memorizing more words
    - If not sure what to do, check "About"
-     <img width="2559" height="1176" alt="图片" src="https://github.com/user-attachments/assets/fd530ad2-22b6-48c0-879b-c2ae3f45602a" />
-     <img width="2559" height="1176" alt="图片" src="https://github.com/user-attachments/assets/690dee03-0407-4941-9d8b-2c373dc12382" />
-     <img width="2559" height="1191" alt="图片" src="https://github.com/user-attachments/assets/15a26f32-3efc-4716-9d9a-0d7b85217547" />
-     <img width="2559" height="1187" alt="图片" src="https://github.com/user-attachments/assets/13317e39-8800-490c-9d2c-0de25c7a7ec0" />
-     <img width="2559" height="1185" alt="图片" src="https://github.com/user-attachments/assets/29d639df-b466-49bc-8675-52c8108b188b" />
+     <img width="2559" height="1184" alt="图片" src="https://github.com/user-attachments/assets/2d6c2eb7-ceac-4dc3-8031-b0286fa7bed8" />
+     <img width="2556" height="1176" alt="图片" src="https://github.com/user-attachments/assets/422d9bd6-870e-4499-8d7f-a3d6eba8e903" />
+     <img width="2556" height="1178" alt="图片" src="https://github.com/user-attachments/assets/1ddb257d-504d-4c41-868d-dd28ef49d9bf" />
+     <img width="2550" height="1176" alt="图片" src="https://github.com/user-attachments/assets/86493559-84ff-4081-8c40-0153948a3f8e" />
+     <img width="2556" height="1182" alt="图片" src="https://github.com/user-attachments/assets/894258bd-0797-4b4c-a4b4-7972b97e2d58" />
+
 
 3. **Progression**
    - Reach level 2 to unlock postcards feature
    - Check collected postcards from AI interactions
    - Continue learning until reaching level 4
-     <img width="2559" height="1185" alt="图片" src="https://github.com/user-attachments/assets/7d07840e-de47-4a64-b832-29104cbc6c27" />
+     <img width="2556" height="1179" alt="图片" src="https://github.com/user-attachments/assets/3fc7febb-d075-43b8-9ac9-57ecc9fd48e2" />
+     <img width="2553" height="1182" alt="图片" src="https://github.com/user-attachments/assets/b2933f5d-dff8-4c51-b955-ad37229cac49" />
+
+
 
 4. **Completion**
    - Receive a personalized thank you letter
    - Click "See you again" to clear game history and return to start
-     <img width="2559" height="1194" alt="图片" src="https://github.com/user-attachments/assets/feb55ac5-9a63-4a25-8662-c7c55ca4dab5" />
-     <img width="2559" height="1188" alt="图片" src="https://github.com/user-attachments/assets/53f87ae7-9c65-4f84-9ca1-d739b03613ed" />
-     <img width="2553" height="1182" alt="图片" src="https://github.com/user-attachments/assets/d1da3001-579a-424e-883e-ff783ea51448" />
+     <img width="2553" height="1188" alt="图片" src="https://github.com/user-attachments/assets/beccb964-cedf-4644-9deb-45071924424a" />
+     <img width="2556" height="1188" alt="图片" src="https://github.com/user-attachments/assets/e97a4206-5cb0-4a50-9b52-ac4c17bfdf24" />
+
 
 ## Project Structure
 
