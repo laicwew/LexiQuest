@@ -169,4 +169,5 @@ Routes are configured in `router/index.ts`:
 
 Modify the `system-prompt-level-?.txt` file to specify the response language, and replace the example response with its Japanese translation. After that, you can receive replies like this in the game:
 
-<img width="1791" height="984" alt="e4c56d22e56d257bc71f92d624997779" src="https://github.com/user-attachments/assets/dd358fe0-a11c-4dc1-ab7f-d94b8e22cbd4" />
+<img width="2292" height="1128" alt="图片" src="https://github.com/user-attachments/assets/11ef938b-ff2f-4af1-9030-85c3e7e09eef" />
+
