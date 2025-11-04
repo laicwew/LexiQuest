@@ -3,8 +3,10 @@ import { ref, onMounted, watch, nextTick } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import OpenAI from 'openai'
 import PostcardModal from './PostcardModal.vue'
+import { useRouter } from 'vue-router'
 
 const gameStore = useGameStore()
+const router = useRouter()
 
 const props = defineProps<{
   storyText: string
@@ -109,10 +111,27 @@ watch(
       alienNameInput.value = gameStore.character.name
       // 设置输入框显示状态
       showNameInput.value = !gameStore.character.name
+      // 如果角色等级达到4级，加载感谢信内容
+      if (gameStore.character.level >= 4) {
+        console.log('角色等级达到4级，加载感谢信内容')
+        loadCongratsContent()
+      }
     } else if (newTab === 'DUMMY') {
       storyContent.value = dummyContent.value
     } else if (newTab === 'FEEDER') {
       // FEEDER标签页不需要特殊处理
+    }
+  },
+)
+
+// 监听角色等级变化，如果达到4级则加载感谢信
+watch(
+  () => gameStore.character.level,
+  (newLevel, oldLevel) => {
+    console.log(`角色等级变化: ${oldLevel} -> ${newLevel}`)
+    if (newLevel >= 4 && gameStore.activeTab === 'GENERATED') {
+      console.log('角色等级达到4级，加载感谢信内容')
+      loadCongratsContent()
     }
   },
 )
@@ -195,6 +214,26 @@ const txtArgumentReplace = (text: string): string => {
   }
 
   return result
+}
+
+// 获取复习次数最高的10个单词
+const getTopReviewWords = (): string => {
+  try {
+    // 获取所有单词并按复习次数排序（从高到低）
+    const sortedWords = Array.from(gameStore.vocabulary.learned.entries())
+      .map(([word, data]) => ({
+        word,
+        reviewCount: data.reviewCount || 0,
+      }))
+      .sort((a, b) => b.reviewCount - a.reviewCount) // 从高到低排序
+      .slice(0, 10) // 取前10个
+
+    // 将单词用英文逗号连接
+    return sortedWords.map((item) => item.word).join(', ')
+  } catch (error) {
+    console.error('获取复习单词时出错:', error)
+    return ''
+  }
 }
 
 // 从txt文件加载例文内容
@@ -469,6 +508,109 @@ const formatDateTime = (timestamp: number): string => {
   return new Date(timestamp).toLocaleString()
 }
 
+// 新增状态用于存储感谢信内容
+const congratsContent = ref('')
+
+// 加载感谢信内容
+const loadCongratsContent = async () => {
+  try {
+    console.log('开始加载感谢信内容')
+    console.log('用户名:', gameStore.userName)
+    console.log('外星人名:', gameStore.character.name)
+    console.log('国家:', gameStore.character.country)
+    console.log('词典数据:', gameStore.vocabulary.learned)
+
+    const response = await fetch('/assets/system-prompt-congrats.txt')
+    let text = await response.text()
+
+    // 获取复习次数最高的10个单词
+    const topWords = getTopReviewWords()
+    console.log('最高复习次数的单词:', topWords)
+
+    // 定义变量映射关系，包括新增的words变量
+    const variables: Record<string, string> = {
+      username: gameStore.userName || 'Traveler',
+      alienName: gameStore.character.name || 'Alien Friend',
+      languageLevel: gameStore.character.languageLevel || 'CET-6',
+      country: gameStore.character.country || 'Earth',
+      words: topWords, // 添加words变量
+    }
+
+    // 使用正则表达式替换所有{}中的变量
+    for (const [key, value] of Object.entries(variables)) {
+      const regex = new RegExp(`\\{${key}\\}`, 'g')
+      text = text.replace(regex, value)
+    }
+
+    congratsContent.value = text
+    console.log('感谢信内容加载完成:', text)
+  } catch (error) {
+    console.error('Failed to load congrats content:', error)
+    congratsContent.value = `Dear ${gameStore.userName || 'Traveler'},
+
+I, ${gameStore.character.name || 'Alien Friend'}, want to express my heartfelt gratitude for all the help you've given me during these days. Thanks to your patience and guidance, I have now fully understood ${gameStore.character.country || 'Earth'} and its language.
+
+Your friendship means the universe to me.
+
+With warm regards,
+${gameStore.character.name || 'Alien Friend'}`
+  }
+}
+
+// See you again 按钮的处理函数
+const seeYouAgain = () => {
+  // 清除localStorage
+  localStorage.clear()
+
+  // 将gameStore中所有数值恢复到默认值
+  gameStore.character = {
+    name: '',
+    level: 1,
+    hp: 100,
+    maxHp: 100,
+    languageLevel: 'CET-6',
+    country: 'America',
+  }
+
+  gameStore.story = {
+    currentScene: 'entrance',
+    text: '',
+    history: [],
+  }
+
+  gameStore.vocabulary = {
+    selectedWord: null,
+    dictionary: [],
+    learned: new Map(),
+  }
+
+  gameStore.progress = {
+    wordsLearnedToday: 0,
+    timeSpent: 0,
+    reviewTaken: 0,
+    feedTaken: 0,
+  }
+
+  gameStore.settings = {
+    nativeLanguage: 'zh',
+    targetLanguage: 'en',
+    difficulty: 'normal',
+    soundEnabled: true,
+    animationsEnabled: true,
+  }
+
+  gameStore.postcards = []
+  gameStore.activeTab = 'GENERATED'
+  gameStore.generatedContent = ''
+  gameStore.userName = ''
+
+  // 保存重置后的状态
+  gameStore.saveGame()
+
+  // 跳转到StartView页面
+  router.push('/')
+}
+
 onMounted(() => {
   // 初始化各标签页的内容
   if (gameStore.activeTab === 'DUMMY') {
@@ -480,6 +622,11 @@ onMounted(() => {
     alienNameInput.value = gameStore.character.name
     // 设置输入框显示状态
     showNameInput.value = !gameStore.character.name
+    // 如果角色等级达到4级，加载感谢信内容
+    if (gameStore.character.level >= 4) {
+      console.log('组件挂载时角色等级达到4级，加载感谢信内容')
+      loadCongratsContent()
+    }
   } else {
     processStoryText()
   }
@@ -498,7 +645,7 @@ onMounted(() => {
         STUDY
       </button>
       <button
-        v-if="gameStore.character.name"
+        v-if="gameStore.character.name && gameStore.character.level < 4"
         class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
         :class="getTabClass('FEEDER')"
         @click="switchTab('FEEDER')"
@@ -506,6 +653,7 @@ onMounted(() => {
         FEEDER
       </button>
       <button
+        v-if="gameStore.character.level < 4"
         class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
         :class="getTabClass('DUMMY')"
         @click="switchTab('DUMMY')"
@@ -513,6 +661,7 @@ onMounted(() => {
         DUMMY
       </button>
       <button
+        v-if="gameStore.character.level >= 2"
         class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
         :class="getTabClass('POSTCARDS')"
         @click="switchTab('POSTCARDS')"
@@ -525,9 +674,21 @@ onMounted(() => {
     <div class="story-text-container mt-0">
       <!-- GENERATED Tab Content -->
       <div v-if="gameStore.activeTab === 'GENERATED'">
+        <!-- 如果角色等级达到4级，显示感谢信 -->
+        <div v-if="gameStore.character.level >= 4">
+          <div class="story-text">{{ congratsContent }}</div>
+          <div class="mt-4">
+            <button
+              @click="seeYouAgain"
+              class="action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]"
+            >
+              See you again
+            </button>
+          </div>
+        </div>
         <!-- 如果有生成内容，显示生成的内容 -->
         <div
-          v-if="gameStore.generatedContent"
+          v-else-if="gameStore.generatedContent"
           class="story-text"
           v-html="storyContent"
           @click="handleStoryClick"
@@ -568,7 +729,7 @@ onMounted(() => {
       </div>
 
       <!-- FEEDER Tab Content -->
-      <div v-else-if="gameStore.activeTab === 'FEEDER'">
+      <div v-else-if="gameStore.activeTab === 'FEEDER' && gameStore.character.level < 4">
         <h3 class="text-3xl font-bold text-[var(--text-charcoal)] mb-2">
           Feed Word to {{ gameStore.character.name }}
         </h3>
@@ -598,12 +759,15 @@ onMounted(() => {
       </div>
 
       <!-- DUMMY Tab Content -->
-      <div v-else-if="gameStore.activeTab === 'DUMMY'">
+      <div v-else-if="gameStore.activeTab === 'DUMMY' && gameStore.character.level < 4">
         <div class="story-text" v-html="storyContent"></div>
       </div>
 
       <!-- POSTCARDS Tab Content -->
-      <div v-else-if="gameStore.activeTab === 'POSTCARDS'" class="postcards-container">
+      <div
+        v-else-if="gameStore.activeTab === 'POSTCARDS' && gameStore.character.level < 4"
+        class="postcards-container"
+      >
         <div
           v-for="postcard in gameStore.postcards"
           :key="postcard.id"
@@ -625,7 +789,7 @@ onMounted(() => {
 
       <!-- Loading States -->
       <div
-        v-if="isLoading && gameStore.activeTab !== 'FEEDER'"
+        v-if="isLoading && gameStore.activeTab !== 'FEEDER' && gameStore.character.level < 4"
         class="loading-container flex items-center py-4"
       >
         <div class="loading-spinner mr-3"></div>
@@ -634,7 +798,10 @@ onMounted(() => {
     </div>
 
     <!-- Buttons - Outside of scrollable area -->
-    <div v-if="gameStore.activeTab === 'GENERATED'" class="mt-4 flex gap-2 relative">
+    <div
+      v-if="gameStore.activeTab === 'GENERATED' && gameStore.character.level < 4"
+      class="mt-4 flex gap-2 relative"
+    >
       <button
         v-if="gameStore.vocabulary.selectedWord"
         @click="imitateWord"
@@ -643,6 +810,7 @@ onMounted(() => {
         Memorize
       </button>
       <button
+        v-if="false"
         @click="clearGameHistory"
         class="bg-[#a54244] hover:bg-[#761b1c] active:bg-[#4b0e0e] action-button"
       >
@@ -658,7 +826,7 @@ onMounted(() => {
       </button>
     </div>
 
-    <div v-else-if="gameStore.activeTab === 'FEEDER'" class="mt-4">
+    <div v-else-if="gameStore.activeTab === 'FEEDER' && gameStore.character.level < 4" class="mt-4">
       <div class="flex flex-wrap gap-2">
         <button
           v-if="feedText.trim()"
@@ -671,7 +839,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <div v-else-if="gameStore.activeTab === 'DUMMY'" class="mt-4">
+    <div v-else-if="gameStore.activeTab === 'DUMMY' && gameStore.character.level < 4" class="mt-4">
       <button
         @click="copyDummyContent"
         class="action-button bg-[#b28000] hover:bg-[#8c6400] active:bg-[#4a3500]"

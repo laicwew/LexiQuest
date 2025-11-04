@@ -1,0 +1,14 @@
+Dear {username},
+
+I, {alienName}, want to express my heartfelt gratitude for all the help you've given me during these days. Thanks to your patience and guidance, I have now fully understood {country} and its language.
+
+The words you taught me: {words}
+
+have become the bridge between our worlds. Through them, I've learned not just vocabulary, but also the beauty of human culture and kindness.
+
+If I ever have the chance to meet other beings from my planet, I hope you would be as generous in helping them as you have been with me.
+
+Your friendship means the universe to me.
+
+With warm regards,
+{alienName}
