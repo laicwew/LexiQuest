@@ -723,7 +723,7 @@ onMounted(() => {
         FEEDER
       </button>
       <button
-        v-if="gameStore.character.level < 4"
+        v-if="gameStore.character.name && gameStore.character.level < 4"
         class="px-4 py-2 font-medium text-bg rounded-t-lg transition-colors tab-button"
         :class="getTabClass('DUMMY')"
         @click="switchTab('DUMMY')"
@@ -814,11 +814,11 @@ onMounted(() => {
       <!-- FEEDER Tab Content -->
       <div v-else-if="gameStore.activeTab === 'FEEDER' && gameStore.character.level < 4">
         <h3 class="text-3xl font-bold text-[var(--text-charcoal)] mb-2">
-          Feed Word to {{ gameStore.character.name }}
+          Talk to {{ gameStore.character.name }}
         </h3>
         <p class="text-2xl text-[var(--text-charcoal)] mb-3">
-          Give {{ gameStore.character.name }} text to read so that
-          {{ gameStore.character.name }} can learn new vocabulary.
+          You can give {{ gameStore.character.name }} text to read so that
+          {{ gameStore.character.name }} can have a chance to <span class="text-[#1282a2ff]">MEMORIZE</span> new vocabulary. Or, you can just talk to {{ gameStore.character.name }} about whatever you like.
         </p>
 
         <div class="mb-3">
@@ -851,7 +851,13 @@ onMounted(() => {
         v-else-if="gameStore.activeTab === 'POSTCARDS' && gameStore.character.level < 4"
         class="postcards-container"
       >
+        <div v-if="gameStore.postcards.length === 0" class="text-center py-8">
+          <p class="text-2xl text-yellow-500">
+            No postcards from {{ gameStore.character.name }} yet. Try to talk to {{ gameStore.character.name }} more and come back later.
+          </p>
+        </div>
         <div
+          v-else
           v-for="postcard in gameStore.postcards"
           :key="postcard.id"
           class="postcard-item parchment-bg border border-[var(--primary-gold)] p-4 cursor-pointer flex justify-between items-center transition-colors duration-200"
@@ -923,12 +929,16 @@ onMounted(() => {
     </div>
 
     <div v-else-if="gameStore.activeTab === 'DUMMY' && gameStore.character.level < 4" class="mt-4">
-      <button
+      
+      <span class="text-yellow-500 text-2xl mt-2">
+        You can </span><button
         @click="copyDummyContent"
         class="action-button bg-[#b28000] hover:bg-[#8c6400] active:bg-[#4a3500]"
       >
         Copy
-      </button>
+      </button><span class="text-yellow-500 text-2xl mt-2"> this page content and paste it into the FEEDER to <span class="text-[#0e7b4a]">FEED</span>
+        {{ gameStore.character.name }}, then return to the STUDY page to see the learning results.
+      </span>
     </div>
   </div>
 

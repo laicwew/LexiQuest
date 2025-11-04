@@ -107,8 +107,8 @@ const close = () => {
 }
 
 .modal-body {
-  font-size: 1.5rem;
-  line-height: 1.6;
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .postcard-content {
