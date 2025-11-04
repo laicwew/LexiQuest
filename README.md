@@ -6,6 +6,29 @@ LexiQuest is an interactive language learning game where players help an alien c
 
 LexiQuest is designed as a vocabulary learning game. Players interact with an alien character who is learning human language and culture. Through feeding text to the alien, players help it understand vocabulary and grammar. The game features a progression system where the alien levels up as it learns more words, and players can review learned vocabulary to reinforce their knowledge. The game also includes a postcard system that captures memorable moments from AI-generated content, creating a personalized learning journal.
 
+## Playthrough
+
+The game follows a structured progression system:
+
+1. **Setup Phase**
+   - Select username, target level, and target country
+   - Name your alien companion
+
+2. **Learning Loop**
+   - Feed alien with text content
+   - Memorize new words from the content
+   - Review previously learned vocabulary
+   - Continue memorizing more words
+
+3. **Progression**
+   - Reach level 2 to unlock postcards feature
+   - Check collected postcards from AI interactions
+   - Continue learning until reaching level 4
+
+4. **Completion**
+   - Receive a personalized thank you letter
+   - Click "See you again" to clear game history and return to start
+
 ## Project Structure
 
 ```

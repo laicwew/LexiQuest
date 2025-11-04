@@ -757,7 +757,7 @@ onMounted(() => {
           <div v-if="isGeneratingCongrats" class="mt-4 flex items-center">
             <div class="loading-spinner mr-3"></div>
             <p class="text-yellow-600 text-2xl">
-              {{ gameStore.character.name }} is writing you a thanks letter...
+              {{ gameStore.character.name }} is writing a thank you letter...
             </p>
           </div>
           <div v-else class="mt-4">
