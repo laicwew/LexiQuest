@@ -3,9 +3,6 @@ import { ref, computed } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 
 const gameStore = useGameStore()
-console.log('Game store object:', gameStore)
-console.log('Game store clearDictionary function:', gameStore.clearDictionary)
-console.log('Game store getDictionaryData function:', gameStore.getDictionaryData)
 
 const props = defineProps<{
   show: boolean

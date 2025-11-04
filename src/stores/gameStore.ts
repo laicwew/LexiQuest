@@ -322,7 +322,6 @@ export const useGameStore = defineStore('game', () => {
       }
 
       levelRequirements.value = requirements
-      console.log('Level requirements loaded:', requirements)
     } catch (error) {
       console.error('Failed to load level requirements:', error)
       // 如果加载失败，使用默认值
@@ -433,6 +432,7 @@ export const useGameStore = defineStore('game', () => {
     activeTab,
     generatedContent,
     userName, // 导出用户名
+    levelRequirements, // 导出等级要求数据
 
     // Getters
     hpPercent,

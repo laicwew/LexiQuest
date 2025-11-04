@@ -43,6 +43,11 @@ const selectedPostcard = ref<{
   createdAt: number
 } | null>(null)
 
+// 感谢信相关状态
+const congratsContent = ref('')
+const isGeneratingCongrats = ref(false) // 添加生成感谢信的加载状态
+const haveCongrats = ref(false) // 添加是否已生成感谢信的状态
+
 // 初始化OpenAI客户端
 const openai = new OpenAI({
   baseURL: import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.deepseek.com',
@@ -113,7 +118,6 @@ watch(
       showNameInput.value = !gameStore.character.name
       // 如果角色等级达到4级，加载感谢信内容
       if (gameStore.character.level >= 4) {
-        console.log('角色等级达到4级，加载感谢信内容')
         loadCongratsContent()
       }
     } else if (newTab === 'DUMMY') {
@@ -128,9 +132,7 @@ watch(
 watch(
   () => gameStore.character.level,
   (newLevel, oldLevel) => {
-    console.log(`角色等级变化: ${oldLevel} -> ${newLevel}`)
     if (newLevel >= 4 && gameStore.activeTab === 'GENERATED') {
-      console.log('角色等级达到4级，加载感谢信内容')
       loadCongratsContent()
     }
   },
@@ -308,7 +310,6 @@ async function feedToAI() {
     // 使用用户输入的文本作为reading prompt
     const readingPrompt = feedText.value.trim()
 
-    console.log('开始调用DeepSeek API with reading prompt...')
     const completion = await openai.chat.completions.create({
       messages: [
         { role: 'system', content: systemPrompt },
@@ -317,7 +318,6 @@ async function feedToAI() {
       model: 'deepseek-chat',
     })
 
-    console.log('API调用完成:', completion)
     // 检查completion是否存在以及是否有choices
     if (completion && completion.choices && completion.choices.length > 0) {
       const choice = completion.choices[0]
@@ -433,7 +433,6 @@ const reviewWords = async () => {
     // 替换模板中的单词占位符
     const systemPrompt = systemPromptTemplate.replace('{words}', wordsList)
 
-    console.log('开始调用DeepSeek API for review...')
     const completion = await openai.chat.completions.create({
       messages: [
         { role: 'system', content: systemPrompt },
@@ -442,7 +441,6 @@ const reviewWords = async () => {
       model: 'deepseek-chat',
     })
 
-    console.log('Review API调用完成:', completion)
     if (completion && completion.choices && completion.choices.length > 0) {
       const choice = completion.choices[0]
       if (choice && choice.message && choice.message.content) {
@@ -509,67 +507,76 @@ const formatDateTime = (timestamp: number): string => {
 }
 
 // 新增状态用于存储感谢信内容
-const congratsContent = ref('')
-
 // 加载感谢信内容 - 通过AI生成
 const loadCongratsContent = async () => {
   try {
-    console.log('开始通过AI生成感谢信内容')
+    // 获取最高等级要求
+    const maxLevelRequirement = gameStore.levelRequirements.reduce(
+      (max: any, req: any) => (req.level > max.level ? req : max),
+      { level: 0, words_required: 0 },
+    )
 
-    // 获取复习次数最高的10个单词
-    const topWords = getTopReviewWords()
-    console.log('最高复习次数的单词:', topWords)
+    // 只有当角色等级达到最高等级且尚未生成感谢信时才发送请求
+    if (gameStore.character.level >= maxLevelRequirement.level && !haveCongrats.value) {
+      isGeneratingCongrats.value = true // 设置加载状态为true
 
-    // 如果没有复习过的单词，使用默认值
-    const userPrompt =
-      topWords ||
-      'hello, world, friend, learn, language, culture, explore, discover, understand, connect'
+      // 获取复习次数最高的10个单词
+      const topWords = getTopReviewWords()
 
-    // 加载系统提示词
-    const systemResponse = await fetch('/assets/system-prompt-congrats.txt')
-    let systemPrompt = await systemResponse.text()
+      // 如果没有复习过的单词，使用默认值
+      const userPrompt =
+        topWords ||
+        'hello, world, friend, learn, language, culture, explore, discover, understand, connect'
 
-    // 替换系统提示词中的变量
-    systemPrompt = txtArgumentReplace(systemPrompt)
+      // 加载系统提示词
+      const systemResponse = await fetch('/assets/system-prompt-congrats.txt')
+      let systemPrompt = await systemResponse.text()
 
-    // 初始化OpenAI客户端
-    const openai = new OpenAI({
-      baseURL: import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.deepseek.com',
-      apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY,
-      dangerouslyAllowBrowser: true,
-    })
+      // 替换系统提示词中的变量
+      systemPrompt = txtArgumentReplace(systemPrompt)
 
-    console.log('发送请求到AI:')
-    console.log('System prompt:', systemPrompt)
-    console.log('User prompt (top words):', userPrompt)
+      // 初始化OpenAI客户端
+      const openai = new OpenAI({
+        baseURL: import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.deepseek.com',
+        apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY,
+        dangerouslyAllowBrowser: true,
+      })
 
-    // 调用AI生成感谢信
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      model: 'deepseek-chat',
-    })
+      // 调用AI生成感谢信
+      const completion = await openai.chat.completions.create({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        model: 'deepseek-chat',
+      })
 
-    console.log('AI响应:', completion)
-
-    // 检查响应是否存在以及是否有choices
-    if (completion && completion.choices && completion.choices.length > 0) {
-      const choice = completion.choices[0]
-      if (choice && choice.message && choice.message.content) {
-        congratsContent.value = choice.message.content
-        console.log('感谢信内容生成完成:', choice.message.content)
+      // 检查响应是否存在以及是否有choices
+      if (completion && completion.choices && completion.choices.length > 0) {
+        const choice = completion.choices[0]
+        if (choice && choice.message && choice.message.content) {
+          let processedContent = choice.message.content
+          // 对AI生成的内容进行处理，将**包裹的词汇转换为可点击的交互式词汇
+          processedContent = processedContent.replace(
+            /\*\*(.*?)\*\*/g,
+            '<span class="interactive-word" data-word="$1">$1</span>',
+          )
+          congratsContent.value = processedContent
+          haveCongrats.value = true // 设置已生成感谢信标志
+          // 将状态保存到localStorage
+          localStorage.setItem('lexiquest-have-congrats', JSON.stringify(true))
+          localStorage.setItem('lexiquest-congrats-content', processedContent)
+        } else {
+          throw new Error('No response content from AI')
+        }
       } else {
-        throw new Error('No response content from AI')
+        throw new Error('No response received from AI')
       }
-    } else {
-      throw new Error('No response received from AI')
     }
   } catch (error) {
     console.error('通过AI生成感谢信内容失败:', error)
     // 如果AI生成失败，使用默认的感谢信内容
-    congratsContent.value = `Dear ${gameStore.userName || 'Friend'},
+    let defaultContent = `Dear ${gameStore.userName || 'Friend'},
 
 I, ${gameStore.character.name || 'Your Alien Friend'}, want to express my heartfelt gratitude for all the help you've given me during these days. Thanks to your patience and guidance, I have now fully understood ${gameStore.character.country || 'Earth'} and its language.
 
@@ -583,6 +590,19 @@ Your friendship means the universe to me.
 
 With warm regards,
 ${gameStore.character.name || 'Alien Friend'}`
+
+    // 对默认内容也进行相同的处理
+    defaultContent = defaultContent.replace(
+      /\*\*(.*?)\*\*/g,
+      '<span class="interactive-word" data-word="$1">$1</span>',
+    )
+
+    congratsContent.value = defaultContent
+    // 保存默认内容到localStorage
+    localStorage.setItem('lexiquest-congrats-content', defaultContent)
+  } finally {
+    // 无论成功还是失败，都要将加载状态设置为false
+    isGeneratingCongrats.value = false
   }
 }
 
@@ -590,6 +610,10 @@ ${gameStore.character.name || 'Alien Friend'}`
 const seeYouAgain = () => {
   // 清除localStorage
   localStorage.clear()
+  // 特别移除haveCongrats状态
+  localStorage.removeItem('lexiquest-have-congrats')
+  // 移除congratsContent状态
+  localStorage.removeItem('lexiquest-congrats-content')
 
   // 将gameStore中所有数值恢复到默认值
   gameStore.character = {
@@ -633,6 +657,11 @@ const seeYouAgain = () => {
   gameStore.generatedContent = ''
   gameStore.userName = ''
 
+  // 重置感谢信相关状态
+  congratsContent.value = ''
+  haveCongrats.value = false
+  isGeneratingCongrats.value = false
+
   // 保存重置后的状态
   gameStore.saveGame()
 
@@ -640,7 +669,20 @@ const seeYouAgain = () => {
   router.push('/')
 }
 
+// 初始化时从localStorage恢复状态
 onMounted(() => {
+  // 恢复haveCongrats状态
+  const savedHaveCongrats = localStorage.getItem('lexiquest-have-congrats')
+  if (savedHaveCongrats) {
+    haveCongrats.value = JSON.parse(savedHaveCongrats)
+  }
+
+  // 恢复congratsContent状态
+  const savedCongratsContent = localStorage.getItem('lexiquest-congrats-content')
+  if (savedCongratsContent) {
+    congratsContent.value = savedCongratsContent
+  }
+
   // 初始化各标签页的内容
   if (gameStore.activeTab === 'DUMMY') {
     loadDummyContent()
@@ -653,7 +695,6 @@ onMounted(() => {
     showNameInput.value = !gameStore.character.name
     // 如果角色等级达到4级，加载感谢信内容
     if (gameStore.character.level >= 4) {
-      console.log('组件挂载时角色等级达到4级，加载感谢信内容')
       loadCongratsContent()
     }
   } else {
@@ -704,9 +745,22 @@ onMounted(() => {
       <!-- GENERATED Tab Content -->
       <div v-if="gameStore.activeTab === 'GENERATED'">
         <!-- 如果角色等级达到4级，显示感谢信 -->
-        <div v-if="gameStore.character.level >= 4">
-          <div class="story-text">{{ congratsContent }}</div>
-          <div class="mt-4">
+        <div
+          v-if="gameStore.character.level >= 4"
+          class="flex flex-col items-center justify-center h-full px-20"
+        >
+          <div
+            class="story-text text-center"
+            v-html="congratsContent"
+            @click="handleStoryClick"
+          ></div>
+          <div v-if="isGeneratingCongrats" class="mt-4 flex items-center">
+            <div class="loading-spinner mr-3"></div>
+            <p class="text-yellow-600 text-2xl">
+              {{ gameStore.character.name }} is writing you a thanks letter...
+            </p>
+          </div>
+          <div v-else class="mt-4">
             <button
               @click="seeYouAgain"
               class="action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]"
