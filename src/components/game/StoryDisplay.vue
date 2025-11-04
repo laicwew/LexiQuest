@@ -850,7 +850,7 @@ onMounted(() => {
 
       <!-- POSTCARDS Tab Content -->
       <div
-        v-else-if="gameStore.activeTab === 'POSTCARDS' && gameStore.character.level < 4"
+        v-else-if="gameStore.activeTab === 'POSTCARDS'"
         class="postcards-container"
       >
         <div v-if="gameStore.postcards.length === 0" class="text-center py-8">
