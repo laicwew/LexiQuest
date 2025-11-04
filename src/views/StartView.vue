@@ -22,6 +22,7 @@ const levelOptions = [
 const countryOptions = [
   { value: 'America', label: 'America' },
   { value: 'United Kingdom', label: 'United Kingdom' },
+  { value: 'Sweden', label: 'Sweden' },
   { value: 'Australia', label: 'Australia' },
   { value: 'Canada', label: 'Canada' },
   { value: 'China', label: 'China' },

@@ -89,6 +89,60 @@ const goToAbout = () => {
   router.push('/about')
 }
 
+// See you again 按钮的处理函数
+const seeYouAgain = () => {
+  // 清除localStorage
+  localStorage.clear()
+
+  // 将gameStore中所有数值恢复到默认值
+  gameStore.character = {
+    name: '',
+    level: 1,
+    hp: 100,
+    maxHp: 100,
+    languageLevel: 'CET-6',
+    country: 'America',
+  }
+
+  gameStore.story = {
+    currentScene: 'entrance',
+    text: '',
+    history: [],
+  }
+
+  gameStore.vocabulary = {
+    selectedWord: null,
+    dictionary: [],
+    learned: new Map(),
+  }
+
+  gameStore.progress = {
+    wordsLearnedToday: 0,
+    timeSpent: 0,
+    reviewTaken: 0,
+    feedTaken: 0,
+  }
+
+  gameStore.settings = {
+    nativeLanguage: 'zh',
+    targetLanguage: 'en',
+    difficulty: 'normal',
+    soundEnabled: true,
+    animationsEnabled: true,
+  }
+
+  gameStore.postcards = []
+  gameStore.activeTab = 'GENERATED'
+  gameStore.generatedContent = ''
+  gameStore.userName = ''
+
+  // 保存重置后的状态
+  gameStore.saveGame()
+
+  // 跳转到StartView页面
+  router.push('/')
+}
+
 // Initialize game
 onMounted(() => {
   gameStore.loadGame()
@@ -148,6 +202,16 @@ onUnmounted(() => {
           <!-- Progress & Achievements Panel -->
           <div class="flex-shrink-0 mt-8">
             <ProgressPanel :progress="gameStore.progress" />
+          </div>
+
+          <!-- See you again button for admin1116 -->
+          <div v-if="gameStore.userName === 'admin1116'" class="mt-4">
+            <button
+              @click="seeYouAgain"
+              class="w-full action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]"
+            >
+              See you again
+            </button>
           </div>
 
           <!-- Spacer to push content to top -->

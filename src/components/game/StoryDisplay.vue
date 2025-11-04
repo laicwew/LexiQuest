@@ -892,27 +892,29 @@ onMounted(() => {
     <!-- Buttons - Outside of scrollable area -->
     <div
       v-if="gameStore.activeTab === 'GENERATED' && gameStore.character.level < 4"
-      class="mt-4 flex gap-2 relative"
+      class="mt-4 flex gap-2 justify-between items-end"
     >
-      <button
-        v-if="gameStore.vocabulary.selectedWord"
-        @click="imitateWord"
-        class="action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]"
-      >
-        Memorize
-      </button>
-      <button
-        v-if="false"
-        @click="clearGameHistory"
-        class="bg-[#a54244] hover:bg-[#761b1c] active:bg-[#4b0e0e] action-button"
-      >
-        Clear
-      </button>
+      <div class="flex gap-2">
+        <button
+          v-if="gameStore.vocabulary.selectedWord"
+          @click="imitateWord"
+          class="action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]"
+        >
+          Memorize
+        </button>
+        <button
+          v-if="false"
+          @click="clearGameHistory"
+          class="bg-[#a54244] hover:bg-[#761b1c] active:bg-[#4b0e0e] action-button"
+        >
+          Clear
+        </button>
+      </div>
       <button
         v-if="gameStore.vocabCount > 0"
         @click="reviewWords"
         :disabled="isReviewing"
-        class="action-button absolute bottom-0 right-0 bg-[#8446a9] hover:bg-[#501373] active:bg-[#2f0646]"
+        class="action-button bg-[#8446a9] hover:bg-[#501373] active:bg-[#2f0646]"
       >
         {{ isReviewing ? 'Reviewing...' : 'Review' }}
       </button>
@@ -939,7 +941,7 @@ onMounted(() => {
       >
         Copy</button
       ><span class="text-yellow-500 text-2xl mt-2">
-        this page content and paste it into the FEEDER to <span class="text-[#0e7b4a]">FEED</span>
+        this prepared article and paste it into the FEEDER to <span class="text-[#0e7b4a]">FEED</span>
         {{ gameStore.character.name }}, then return to the STUDY page to see the learning results.
       </span>
     </div>

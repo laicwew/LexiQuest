@@ -1,119 +1,125 @@
-# LexiQuest Vue.js 版本
+# LexiQuest
 
-这是将原有的LexiQuest项目从React.js迁移到Vue.js的版本。
+LexiQuest is an interactive language learning game where players help an alien character learn Earth languages through vocabulary acquisition and story interaction.
 
-## 项目结构
+## Overview
+
+LexiQuest is designed as a vocabulary learning game. Players interact with an alien character who is learning human language and culture. Through feeding text to the alien, players help it understand vocabulary and grammar. The game features a progression system where the alien levels up as it learns more words, and players can review learned vocabulary to reinforce their knowledge. The game also includes a postcard system that captures memorable moments from AI-generated content, creating a personalized learning journal.
+
+## Project Structure
 
 ```
 src/
-├── assets/                 # 静态资源文件
-├── components/             # Vue组件
-│   └── game/              # 游戏相关组件
-│       ├── ActionButtons.vue
-│       ├── AchievementNotification.vue
+├── assets/                 # Static assets and text files
+├── components/             # Vue components
+│   └── game/              # Game-related components
 │       ├── CharacterStats.vue
 │       ├── DictionaryModal.vue
 │       ├── ProgressPanel.vue
-│       └── StoryDisplay.vue
-├── router/                 # 路由配置
-├── stores/                 # Pinia状态管理
-├── views/                  # 页面视图
-│   ├── StartView.vue      # 启动页面
-│   ├── GameView.vue       # 游戏主页面
-│   └── AboutView.vue      # 关于页面
-├── App.vue                # 根组件
-└── main.ts                # 应用入口文件
+│       ├── StoryDisplay.vue
+│       └── PostcardModal.vue
+├── router/                 # Router configuration
+├── stores/                 # Pinia state management
+├── views/                  # Page views
+│   ├── StartView.vue      # Start page
+│   ├── GameView.vue       # Main game page
+│   └── AboutView.vue      # About page
+├── App.vue                # Root component
+└── main.ts                # Application entry point
 ```
 
-## 功能特性
+## Features
 
-1. **角色创建系统** - 创建和自定义你的角色
-2. **词汇学习系统** - 通过交互式故事学习词汇
-3. **RPG元素** - 角色升级、经验值和成就系统
-4. **词典功能** - 查看已学习的词汇
-5. **进度跟踪** - 监控学习进度
+1. **Character Creation System** - Create and customize your alien character
+2. **Vocabulary Learning System** - Learn vocabulary through interactive stories
+3. **RPG Elements** - Character leveling and progression system
+4. **Dictionary Function** - View learned vocabulary
+5. **Progress Tracking** - Monitor learning progress
+6. **AI-Powered Content** - Dynamic story generation with DeepSeek API
+7. **Postcard System** - Collect memorable moments from AI interactions
+8. **Review System** - Reinforce learned vocabulary through spaced repetition
 
-## 技术栈
+## Tech Stack
 
 - Vue 3 + TypeScript
-- Vite 构建工具
-- Vue Router 路由管理
-- Pinia 状态管理
-- Tailwind CSS 样式框架
+- Vite Build Tool
+- Vue Router for Navigation
+- Pinia for State Management
+- Tailwind CSS for Styling
 
-## 安装和运行
+## Installation and Running
 
 ```bash
-# 安装依赖
+# Install dependencies
 npm install
 
-# 启动开发服务器
+# Start development server
 npm run dev
 
-# 构建生产版本
+# Build for production
 npm run build
 
-# 预览生产版本
+# Preview production build
 npm run preview
 ```
 
-## 环境变量配置
+## Environment Variables Configuration
 
-项目使用环境变量来存储敏感信息，如API密钥。请按以下步骤配置：
+The project uses environment variables to store sensitive information such as API keys. To configure:
 
-1. 复制 `.env.example` 文件并重命名为 `.env`
-2. 在 `.env` 文件中填入你的 DeepSeek API Key
+1. Copy the `.env.example` file and rename it to `.env`
+2. Fill in your DeepSeek API Key in the `.env` file
 
 ```bash
 cp .env.example .env
 ```
 
-注意：`.env` 文件已被添加到 `.gitignore` 中，不会被提交到版本控制系统。
+Note: The `.env` file has been added to `.gitignore` and will not be committed to the version control system.
 
-## 组件说明
+## Component Descriptions
 
-### 主要视图组件
+### Main View Components
 
-1. **StartView.vue** - 启动页面，用户可以设置用户名、语言偏好和难度
-2. **GameView.vue** - 游戏主界面，包含所有游戏功能
+1. **StartView.vue** - Start page where users can set their username, language preferences, and difficulty
+2. **GameView.vue** - Main game interface containing all game functionality
 
-### 游戏组件
+### Game Components
 
-1. **CharacterStats.vue** - 显示角色状态（生命值、能量、经验值等）
-2. **StoryDisplay.vue** - 显示游戏故事内容和交互式词汇
-3. **ActionButtons.vue** - 显示操作按钮（吃掉、攻击、对话、模仿）
-4. **ProgressPanel.vue** - 显示进度信息（当前模块、成就、今日统计）
-5. **DictionaryModal.vue** - 词典模态框，查看已学习的词汇
-6. **AchievementNotification.vue** - 成就通知组件
+1. **CharacterStats.vue** - Displays character status (health, level, etc.)
+2. **StoryDisplay.vue** - Displays game story content and interactive vocabulary
+3. **ProgressPanel.vue** - Displays progress information (current level, achievements, daily stats)
+4. **DictionaryModal.vue** - Dictionary modal to view learned vocabulary
+5. **PostcardModal.vue** - Postcard modal to view collected moments
 
-## 状态管理
+## State Management
 
-使用Pinia进行状态管理，在`stores/gameStore.ts`中定义了游戏状态：
+Pinia is used for state management. Game state is defined in `stores/gameStore.ts`:
 
-- 角色属性
-- 当前模块信息
-- 故事内容
-- 词汇数据
-- 进度信息
+- Character attributes
+- Story content
+- Vocabulary data
+- Progress information
+- Postcard collection
 
-## 路由配置
+## Router Configuration
 
-在`router/index.ts`中配置了以下路由：
+Routes are configured in `router/index.ts`:
 
-- `/` - 启动页面
-- `/game` - 游戏主页面
-- `/about` - 关于页面
+- `/` - Start page
+- `/game` - Main game page
+- `/about` - About page
 
-## 开发说明
+## Development Notes
 
-1. 所有游戏组件位于`src/components/game/`目录下
-2. 视图组件位于`src/views/`目录下
-3. 状态管理使用Pinia，在`src/stores/`目录下
-4. 路由配置在`src/router/`目录下
+1. All game components are located in the `src/components/game/` directory
+2. View components are located in the `src/views/` directory
+3. State management uses Pinia in the `src/stores/` directory
+4. Router configuration is in the `src/router/` directory
 
-## 注意事项
+## Important Notes
 
-1. 项目使用Tailwind CSS进行样式设计
-2. 字体使用Google Fonts加载
-3. 数据持久化使用localStorage
-4. 响应式设计适配不同屏幕尺寸
+1. The project uses Tailwind CSS for styling
+2. Fonts are loaded via Google Fonts
+3. Data persistence uses localStorage
+4. Responsive design adapts to different screen sizes
+5. AI content generation powered by DeepSeek API
