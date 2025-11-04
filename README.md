@@ -1,6 +1,7 @@
 # LexiQuest
 
-LexiQuest is an interactive language learning game where players help an alien character learn Earth languages through vocabulary acquisition and story interaction.
+
+[LexiQuest](https://lexi-quest-five.vercel.app/) is an interactive language learning game where players help an alien character learn Earth languages through vocabulary acquisition and story interaction.
 
 ## Overview
 
@@ -13,21 +14,32 @@ The game follows a structured progression system:
 1. **Setup Phase**
    - Select username, target level, and target country
    - Name your alien companion
+<img width="2550" height="1179" alt="图片" src="https://github.com/user-attachments/assets/8e5342ff-65bf-4188-bd7a-eba818e6731c" />
+<img width="2553" height="1179" alt="图片" src="https://github.com/user-attachments/assets/a4ab476b-9d38-4f50-9969-4b1e0eff89c6" />
+
 
 2. **Learning Loop**
    - Feed alien with text content
-   - Memorize new words from the content
+   - Memorize new words to Dictionary
    - Review previously learned vocabulary
    - Continue memorizing more words
+<img width="2559" height="1176" alt="图片" src="https://github.com/user-attachments/assets/fd530ad2-22b6-48c0-879b-c2ae3f45602a" />
+<img width="2559" height="1176" alt="图片" src="https://github.com/user-attachments/assets/690dee03-0407-4941-9d8b-2c373dc12382" />
+<img width="2559" height="1191" alt="图片" src="https://github.com/user-attachments/assets/15a26f32-3efc-4716-9d9a-0d7b85217547" />
+<img width="2559" height="1187" alt="图片" src="https://github.com/user-attachments/assets/13317e39-8800-490c-9d2c-0de25c7a7ec0" />
 
 3. **Progression**
    - Reach level 2 to unlock postcards feature
    - Check collected postcards from AI interactions
    - Continue learning until reaching level 4
+<img width="2559" height="1185" alt="图片" src="https://github.com/user-attachments/assets/7d07840e-de47-4a64-b832-29104cbc6c27" />
 
 4. **Completion**
    - Receive a personalized thank you letter
    - Click "See you again" to clear game history and return to start
+<img width="2559" height="1194" alt="图片" src="https://github.com/user-attachments/assets/feb55ac5-9a63-4a25-8662-c7c55ca4dab5" />
+<img width="2559" height="1188" alt="图片" src="https://github.com/user-attachments/assets/53f87ae7-9c65-4f84-9ca1-d739b03613ed" />
+<img width="2553" height="1182" alt="图片" src="https://github.com/user-attachments/assets/d1da3001-579a-424e-883e-ff783ea51448" />
 
 ## Project Structure
 
