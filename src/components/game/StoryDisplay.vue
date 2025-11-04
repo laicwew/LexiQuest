@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
-import OpenAI from 'openai'
 import PostcardModal from './PostcardModal.vue'
 
 const gameStore = useGameStore()
@@ -40,13 +39,6 @@ const selectedPostcard = ref<{
   content: string
   createdAt: number
 } | null>(null)
-
-// 初始化OpenAI客户端
-const openai = new OpenAI({
-  baseURL: import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.deepseek.com',
-  apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY,
-  dangerouslyAllowBrowser: true, // 注意：在生产环境中应该通过后端代理API密钥
-})
 
 // 获取tab按钮的类名
 const getTabClass = (tabName: string) => {
@@ -270,26 +262,52 @@ async function feedToAI() {
     const readingPrompt = feedText.value.trim()
 
     console.log('开始调用DeepSeek API with reading prompt...')
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: readingPrompt },
-      ],
-      model: 'deepseek-chat',
-    })
 
-    console.log('API调用完成:', completion)
-    // 检查completion是否存在以及是否有choices
-    if (completion && completion.choices && completion.choices.length > 0) {
-      const choice = completion.choices[0]
-      if (choice && choice.message && choice.message.content) {
-        // 发射事件，将AI响应传递给父组件
-        emit('aiResponse', choice.message.content)
+    // 检查是否在Netlify环境中运行
+    const isNetlifyEnvironment =
+      window.location.hostname.includes('netlify') ||
+      window.location.hostname.includes('localhost:8888') // Netlify CLI dev
+
+    if (isNetlifyEnvironment) {
+      // 使用Netlify函数代理调用DeepSeek API
+      const response = await fetch('/.netlify/functions/deepseek-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          system: systemPrompt,
+          prompt: readingPrompt,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(
+          `API request failed with status ${response.status}: ${errorData.error || 'Unknown error'}`,
+        )
+      }
+
+      const completion = await response.json()
+      console.log('API调用完成:', completion)
+
+      // 检查completion是否存在以及是否有choices
+      if (completion && completion.choices && completion.choices.length > 0) {
+        const choice = completion.choices[0]
+        if (choice && choice.message && choice.message.content) {
+          // 发射事件，将AI响应传递给父组件
+          emit('aiResponse', choice.message.content)
+        } else {
+          error.value = 'No response content'
+        }
       } else {
-        error.value = 'No response content'
+        error.value = 'No response received'
       }
     } else {
-      error.value = 'No response received'
+      // 本地开发环境的错误提示
+      error.value =
+        'AI功能仅在Netlify部署环境中可用。请在Netlify上部署应用或使用Netlify CLI进行本地开发。'
+      console.warn('AI功能需要Netlify函数支持，当前为本地开发环境')
     }
   } catch (err) {
     console.error('API调用错误:', err)
@@ -395,40 +413,65 @@ const reviewWords = async () => {
     const systemPrompt = systemPromptTemplate.replace('{words}', wordsList)
 
     console.log('开始调用DeepSeek API for review...')
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Review these words: ${wordsList}` },
-      ],
-      model: 'deepseek-chat',
-    })
 
-    console.log('Review API调用完成:', completion)
-    if (completion && completion.choices && completion.choices.length > 0) {
-      const choice = completion.choices[0]
-      if (choice && choice.message && choice.message.content) {
-        // 对AI生成的内容进行变量替换处理
-        let processedContent = txtArgumentReplace(choice.message.content)
+    // 检查是否在Netlify环境中运行
+    const isNetlifyEnvironment =
+      window.location.hostname.includes('netlify') ||
+      window.location.hostname.includes('localhost:8888') // Netlify CLI dev
 
-        // 解析processedContent中被**包裹的词汇，将其转换为可点击的交互式词汇
-        processedContent = processedContent.replace(
-          /\*\*(.*?)\*\*/g,
-          '<span class="interactive-word" data-word="$1">$1</span>',
+    if (isNetlifyEnvironment) {
+      // 使用Netlify函数代理调用DeepSeek API
+      const response = await fetch('/.netlify/functions/deepseek-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          system: systemPrompt,
+          prompt: `Review these words: ${wordsList}`,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(
+          `Review API request failed with status ${response.status}: ${errorData.error || 'Unknown error'}`,
         )
+      }
 
-        // 直接更新生成内容，而不是追加
-        gameStore.updateGeneratedContent(processedContent)
+      const completion = await response.json()
+      console.log('Review API调用完成:', completion)
 
-        // 增加这些单词的复习计数
-        gameStore.incrementReviewCount(reviewWords.map((item) => item.word))
+      if (completion && completion.choices && completion.choices.length > 0) {
+        const choice = completion.choices[0]
+        if (choice && choice.message && choice.message.content) {
+          // 对AI生成的内容进行变量替换处理
+          let processedContent = txtArgumentReplace(choice.message.content)
 
-        // 显示通知
-        emit('showNotification', `Reviewed ${reviewWords.length} words successfully!`)
+          // 解析processedContent中被**包裹的词汇，将其转换为可点击的交互式词汇
+          processedContent = processedContent.replace(
+            /\*\*(.*?)\*\*/g,
+            '<span class="interactive-word" data-word="$1">$1</span>',
+          )
+
+          // 直接更新生成内容，而不是追加
+          gameStore.updateGeneratedContent(processedContent)
+
+          // 增加这些单词的复习计数
+          gameStore.incrementReviewCount(reviewWords.map((item) => item.word))
+
+          // 显示通知
+          emit('showNotification', `Reviewed ${reviewWords.length} words successfully!`)
+        } else {
+          emit('showNotification', 'No response content from review')
+        }
       } else {
-        emit('showNotification', 'No response content from review')
+        emit('showNotification', 'No response received from review')
       }
     } else {
-      emit('showNotification', 'No response received from review')
+      // 本地开发环境的错误提示
+      emit('showNotification', 'Review功能仅在Netlify部署环境中可用。')
+      console.warn('Review功能需要Netlify函数支持，当前为本地开发环境')
     }
   } catch (err) {
     console.error('Review API调用错误:', err)
