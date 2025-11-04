@@ -511,44 +511,73 @@ const formatDateTime = (timestamp: number): string => {
 // 新增状态用于存储感谢信内容
 const congratsContent = ref('')
 
-// 加载感谢信内容
+// 加载感谢信内容 - 通过AI生成
 const loadCongratsContent = async () => {
   try {
-    console.log('开始加载感谢信内容')
-    console.log('用户名:', gameStore.userName)
-    console.log('外星人名:', gameStore.character.name)
-    console.log('国家:', gameStore.character.country)
-    console.log('词典数据:', gameStore.vocabulary.learned)
-
-    const response = await fetch('/assets/system-prompt-congrats.txt')
-    let text = await response.text()
+    console.log('开始通过AI生成感谢信内容')
 
     // 获取复习次数最高的10个单词
     const topWords = getTopReviewWords()
     console.log('最高复习次数的单词:', topWords)
 
-    // 定义变量映射关系，包括新增的words变量
-    const variables: Record<string, string> = {
-      username: gameStore.userName || 'Traveler',
-      alienName: gameStore.character.name || 'Alien Friend',
-      languageLevel: gameStore.character.languageLevel || 'CET-6',
-      country: gameStore.character.country || 'Earth',
-      words: topWords, // 添加words变量
-    }
+    // 如果没有复习过的单词，使用默认值
+    const userPrompt =
+      topWords ||
+      'hello, world, friend, learn, language, culture, explore, discover, understand, connect'
 
-    // 使用正则表达式替换所有{}中的变量
-    for (const [key, value] of Object.entries(variables)) {
-      const regex = new RegExp(`\\{${key}\\}`, 'g')
-      text = text.replace(regex, value)
-    }
+    // 加载系统提示词
+    const systemResponse = await fetch('/assets/system-prompt-congrats.txt')
+    let systemPrompt = await systemResponse.text()
 
-    congratsContent.value = text
-    console.log('感谢信内容加载完成:', text)
+    // 替换系统提示词中的变量
+    systemPrompt = txtArgumentReplace(systemPrompt)
+
+    // 初始化OpenAI客户端
+    const openai = new OpenAI({
+      baseURL: import.meta.env.VITE_DEEPSEEK_BASE_URL || 'https://api.deepseek.com',
+      apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY,
+      dangerouslyAllowBrowser: true,
+    })
+
+    console.log('发送请求到AI:')
+    console.log('System prompt:', systemPrompt)
+    console.log('User prompt (top words):', userPrompt)
+
+    // 调用AI生成感谢信
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      model: 'deepseek-chat',
+    })
+
+    console.log('AI响应:', completion)
+
+    // 检查响应是否存在以及是否有choices
+    if (completion && completion.choices && completion.choices.length > 0) {
+      const choice = completion.choices[0]
+      if (choice && choice.message && choice.message.content) {
+        congratsContent.value = choice.message.content
+        console.log('感谢信内容生成完成:', choice.message.content)
+      } else {
+        throw new Error('No response content from AI')
+      }
+    } else {
+      throw new Error('No response received from AI')
+    }
   } catch (error) {
-    console.error('Failed to load congrats content:', error)
-    congratsContent.value = `Dear ${gameStore.userName || 'Traveler'},
+    console.error('通过AI生成感谢信内容失败:', error)
+    // 如果AI生成失败，使用默认的感谢信内容
+    congratsContent.value = `Dear ${gameStore.userName || 'Friend'},
 
-I, ${gameStore.character.name || 'Alien Friend'}, want to express my heartfelt gratitude for all the help you've given me during these days. Thanks to your patience and guidance, I have now fully understood ${gameStore.character.country || 'Earth'} and its language.
+I, ${gameStore.character.name || 'Your Alien Friend'}, want to express my heartfelt gratitude for all the help you've given me during these days. Thanks to your patience and guidance, I have now fully understood ${gameStore.character.country || 'Earth'} and its language.
+
+The words you taught me: ${getTopReviewWords() || 'hello, world, friend, learn, language, culture, explore, discover, understand, connect'}
+
+have become the bridge between our worlds. Through them, I've learned not just vocabulary, but also the beauty of human culture and kindness.
+
+If I ever have the chance to meet other beings from my planet, I hope you would be as generous in helping them as you have been with me.
 
 Your friendship means the universe to me.
 
