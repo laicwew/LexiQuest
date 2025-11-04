@@ -14,13 +14,11 @@ export async function handler(event, context) {
     const { system, prompt } = JSON.parse(event.body)
 
     // 构建DeepSeek API请求
-    const deepseekUrl =
-      process.env.VITE_DEEPSEEK_BASE_URL ||
-      process.env.DEEPSEEK_BASE_URL ||
+    const deepseekUrl = process.env.DEEPSEEK_BASE_URL ||
       'https://api.deepseek.com/v1/chat/completions'
 
     // 确保 API 密钥存在（支持两种环境变量名称）
-    const apiKey = process.env.VITE_DEEPSEEK_API_KEY || process.env.DEEPSEEK_API_KEY
+    const apiKey = process.env.DEEPSEEK_API_KEY
     if (!apiKey) {
       console.error('API key not configured in environment variables')
       return {
