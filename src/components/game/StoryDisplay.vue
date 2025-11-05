@@ -239,11 +239,25 @@ const getTopReviewWords = (): string => {
   }
 }
 
-// 从txt文件加载例文内容
+// 从json文件加载例文内容
 const loadDummyContent = async () => {
   try {
-    const response = await fetch('/assets/sample-text.txt')
-    const text = await response.text()
+    // 从gameStore中获取目标语言
+    const targetLanguage = gameStore.targetLanguage || 'English'
+
+    // 加载dummy-text.json文件
+    const response = await fetch('/assets/dummy-text.json')
+    const dummyTextData = await response.json()
+
+    // 根据目标语言获取相应的文本
+    let text = ''
+    if (dummyTextData[targetLanguage] && dummyTextData[targetLanguage].text) {
+      text = dummyTextData[targetLanguage].text
+    } else {
+      // 如果找不到对应语言的文本，使用英语作为默认值
+      text = dummyTextData['English']?.text || 'Failed to load example text.'
+    }
+
     dummyContent.value = text
     if (gameStore.activeTab === 'DUMMY') {
       storyContent.value = text
@@ -605,61 +619,6 @@ ${gameStore.character.name || 'Alien Friend'}`
     // 无论成功还是失败，都要将加载状态设置为false
     isGeneratingCongrats.value = false
   }
-}
-
-// See you again 按钮的处理函数
-const seeYouAgain = () => {
-  // 清除localStorage
-  localStorage.clear()
-  // 特别移除haveCongrats状态
-  localStorage.removeItem('lexiquest-have-congrats')
-  // 移除congratsContent状态
-  localStorage.removeItem('lexiquest-congrats-content')
-
-  // 将gameStore中所有数值恢复到默认值
-  gameStore.character = {
-    name: '',
-    level: 1,
-    hp: 100,
-    maxHp: 100,
-    languageLevel: 'CET-6',
-    country: 'America',
-  }
-
-  gameStore.story = {
-    currentScene: 'entrance',
-    text: '',
-    history: [],
-  }
-
-  gameStore.vocabulary = {
-    selectedWord: null,
-    dictionary: [],
-    learned: new Map(),
-  }
-
-  gameStore.progress = {
-    wordsLearnedToday: 0,
-    timeSpent: 0,
-    reviewTaken: 0,
-    feedTaken: 0,
-  }
-
-  gameStore.postcards = []
-  gameStore.activeTab = 'GENERATED'
-  gameStore.generatedContent = ''
-  gameStore.userName = ''
-
-  // 重置感谢信相关状态
-  congratsContent.value = ''
-  haveCongrats.value = false
-  isGeneratingCongrats.value = false
-
-  // 保存重置后的状态
-  gameStore.saveGame()
-
-  // 跳转到StartView页面
-  router.push('/')
 }
 
 // 初始化时从localStorage恢复状态

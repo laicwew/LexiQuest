@@ -33,16 +33,12 @@ const cefrLevelOptions = [
 ]
 
 const jlptLevelOptions = [
-  { value: 'N5', label: 'N5' },
-  { value: 'N4', label: 'N4' },
   { value: 'N3', label: 'N3' },
   { value: 'N2', label: 'N2' },
   { value: 'N1', label: 'N1' },
 ]
 
 const hskLevelOptions = [
-  { value: 'HSK1', label: 'HSK1' },
-  { value: 'HSK2', label: 'HSK2' },
   { value: 'HSK3', label: 'HSK3' },
   { value: 'HSK4', label: 'HSK4' },
   { value: 'HSK5', label: 'HSK5' },
@@ -100,10 +96,10 @@ watch(targetLanguage, (newLanguage) => {
       targetLevel.value = 'A1'
       break
     case 'Japanese':
-      targetLevel.value = 'N5'
+      targetLevel.value = 'N3'
       break
     case 'Chinese':
-      targetLevel.value = 'HSK1'
+      targetLevel.value = 'HSK3'
       break
     default:
       targetLevel.value = 'CET-6'

@@ -35,15 +35,4 @@ After Receiving Reading Material:
 4. Keep total response under 300 words.
 
 Example Response Format:
-"Yes yes!/Oooh!/Interestng. {alienName} read story. A family in Scotland. They wear special **tartan** clothes for tradition. People give **blessing** to each other, celebrate old **heritage**. Humans like to remember time long ago. Sentimental species, question?
-
-{alienName} learn new words:
-**Heritage** means the things humans pass down from long ago.
-**Blessing** means someone says good things for you, makes you strong.
-**Tartan** means a pattern cloth of many colors, linked to family history.
-(Additional words should appear here naturally as needed - 4 to 10 words total is expected)
-
-
-{alienName} try use words: Family **heritage** important. Ceremony gives **blessing**. People look at **tartan**, feel happy.
-
-{alienName} very very very happy, Friend {username}! what you think {alienName} learn next?"
+{JsonInput}
