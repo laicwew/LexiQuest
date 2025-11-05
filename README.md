@@ -43,7 +43,11 @@ The game follows a structured progression system:
 
 5. **Explore More Languages**
    - Pick another target language and speak to the alien — a whole new journey awaits you in that language:
-     <img width="2292" height="1128" alt="图片" src="https://github.com/user-attachments/assets/11ef938b-ff2f-4af1-9030-85c3e7e09eef" />
+    <img width="2559" height="1179" alt="图片" src="https://github.com/user-attachments/assets/993208be-501c-4718-a32d-895875507b2b" />
+    
+
+
+
 
 ## Project Structure
 
