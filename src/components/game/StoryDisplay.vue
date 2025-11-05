@@ -113,10 +113,25 @@ watch(
   (newTab) => {
     if (newTab === 'GENERATED') {
       storyContent.value = gameStore.generatedContent
-      // 初始化外星人名称输入框的值
-      alienNameInput.value = gameStore.character.name
-      // 设置输入框显示状态
-      showNameInput.value = !gameStore.character.name
+      // 每次切换到GENERATED标签页时检测character.name
+      const savedState = localStorage.getItem('lexiquest-save')
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState)
+          if (parsed.character && parsed.character.name) {
+            gameStore.character.name = parsed.character.name
+            alienNameInput.value = parsed.character.name
+            showNameInput.value = false
+          } else {
+            showNameInput.value = true
+          }
+        } catch (e) {
+          console.error('Failed to parse saved game state', e)
+          showNameInput.value = true
+        }
+      } else {
+        showNameInput.value = true
+      }
       // 如果角色等级达到4级，加载感谢信内容
       if (gameStore.character.level >= 4) {
         loadCongratsContent()
@@ -355,29 +370,39 @@ const loadDummyContent = async () => {
 // 从introduction.txt文件加载介绍内容
 const loadIntroductionContent = async () => {
   try {
-    // 获取目标语言
-    const targetLanguage = gameStore.targetLanguage || 'English'
+    // 从localStorage中获取introduction内容
+    const storedIntroContent = localStorage.getItem('lexiquest-introduction-content')
 
-    // 加载prompt-response-example.json文件
-    const response = await fetch('/assets/prompt-response-example.json')
-    const jsonData = await response.json()
-
-    // 获取对应语言的introduction内容
-    let introContent = ''
-    if (jsonData[targetLanguage] && jsonData[targetLanguage].introduction) {
-      introContent = jsonData[targetLanguage].introduction
-    } else if (jsonData['English'] && jsonData['English'].introduction) {
-      // 如果找不到对应语言的introduction内容，使用英语作为默认值
-      introContent = jsonData['English'].introduction
+    if (storedIntroContent) {
+      // 使用localStorage中的内容
+      const processedText = txtArgumentReplace(storedIntroContent)
+      introductionContent.value = processedText
     } else {
-      // 如果还找不到，使用默认的英文介绍内容
-      introContent =
-        'Hello Friend! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
-    }
+      // 如果localStorage中没有内容，从JSON文件加载（备用方案）
+      // 获取目标语言
+      const targetLanguage = gameStore.targetLanguage || 'English'
 
-    // 应用变量替换
-    const processedText = txtArgumentReplace(introContent)
-    introductionContent.value = processedText
+      // 加载prompt-response-example.json文件
+      const response = await fetch('/assets/prompt-response-example.json')
+      const jsonData = await response.json()
+
+      // 获取对应语言的introduction内容
+      let introContent = ''
+      if (jsonData[targetLanguage] && jsonData[targetLanguage].introduction) {
+        introContent = jsonData[targetLanguage].introduction
+      } else if (jsonData['English'] && jsonData['English'].introduction) {
+        // 如果找不到对应语言的introduction内容，使用英语作为默认值
+        introContent = jsonData['English'].introduction
+      } else {
+        // 如果还找不到，使用默认的英文介绍内容
+        introContent =
+          'Hello Friend! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+      }
+
+      // 应用变量替换
+      const processedText = txtArgumentReplace(introContent)
+      introductionContent.value = processedText
+    }
   } catch (error) {
     console.error('Failed to load introduction content:', error)
     introductionContent.value =
@@ -737,16 +762,32 @@ onMounted(() => {
     congratsContent.value = savedCongratsContent
   }
 
+  // 每次加载页面时从localStorage检测character.name来决定是否显示输入框
+  const savedState = localStorage.getItem('lexiquest-save')
+  if (savedState) {
+    try {
+      const parsed = JSON.parse(savedState)
+      if (parsed.character && parsed.character.name) {
+        gameStore.character.name = parsed.character.name
+        alienNameInput.value = parsed.character.name
+        showNameInput.value = false
+      } else {
+        showNameInput.value = true
+      }
+    } catch (e) {
+      console.error('Failed to parse saved game state', e)
+      showNameInput.value = true
+    }
+  } else {
+    showNameInput.value = true
+  }
+
   // 初始化各标签页的内容
   if (gameStore.activeTab === 'DUMMY') {
     loadDummyContent()
   } else if (gameStore.activeTab === 'GENERATED') {
     loadIntroductionContent()
     storyContent.value = gameStore.generatedContent
-    // 初始化外星人名称输入框的值
-    alienNameInput.value = gameStore.character.name
-    // 设置输入框显示状态
-    showNameInput.value = !gameStore.character.name
     // 如果角色等级达到4级，加载感谢信内容
     if (gameStore.character.level >= 4) {
       loadCongratsContent()

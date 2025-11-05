@@ -10,6 +10,7 @@ const targetCountry = ref('America') // 默认为美国
 const targetLanguage = ref('English') // 默认为目标语言为英语
 const errorMessage = ref('')
 const successMessage = ref('')
+const isIntroductionLoading = ref(false) // 添加introduction加载状态
 
 // 目标语言选项
 const languageOptions = [
@@ -126,13 +127,50 @@ const validateForm = () => {
   return true
 }
 
-const startNewGame = () => {
+// 在后台加载introduction内容的函数
+const loadIntroductionContent = async () => {
+  isIntroductionLoading.value = true
+  try {
+    // 加载prompt-response-example.json文件
+    const response = await fetch('/assets/prompt-response-example.json')
+    const jsonData = await response.json()
+
+    // 获取对应语言的introduction内容
+    let introContent = ''
+    if (jsonData[targetLanguage.value] && jsonData[targetLanguage.value].introduction) {
+      introContent = jsonData[targetLanguage.value].introduction
+    } else if (jsonData['English'] && jsonData['English'].introduction) {
+      // 如果找不到对应语言的introduction内容，使用英语作为默认值
+      introContent = jsonData['English'].introduction
+    } else {
+      // 如果还找不到，使用默认的英文介绍内容
+      introContent =
+        'Hello Friend! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+    }
+
+    // 将introduction内容保存到localStorage，供GameView使用
+    localStorage.setItem('lexiquest-introduction-content', introContent)
+  } catch (error) {
+    console.error('Failed to load introduction content:', error)
+    // 如果加载失败，使用默认内容
+    const defaultContent =
+      'Hello Friend! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+    localStorage.setItem('lexiquest-introduction-content', defaultContent)
+  } finally {
+    isIntroductionLoading.value = false
+  }
+}
+
+const startNewGame = async () => {
   if (!validateForm()) {
     return
   }
 
   // Save username to localStorage
   localStorage.setItem('lexiquest-username', username.value)
+
+  // 开始在后台加载introduction内容
+  loadIntroductionContent()
 
   // Load existing game state or create new one
   let gameState = {
@@ -196,9 +234,9 @@ const startNewGame = () => {
   successMessage.value = 'Redirecting to character creation...'
   errorMessage.value = ''
 
-  // Redirect to game view after a short delay
+  // Redirect to game view after a short delay with page refresh
   setTimeout(() => {
-    router.push('/game')
+    window.location.href = '/game'
   }, 1500)
 }
 

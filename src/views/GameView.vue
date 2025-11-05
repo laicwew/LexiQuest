@@ -96,6 +96,13 @@ onMounted(() => {
   gameStore.loadLevelRequirements() // 加载等级要求
   gameStore.startProgressTracking()
 
+  // 从localStorage中读取introduction内容并更新intro
+  const storedIntroContent = localStorage.getItem('lexiquest-introduction-content')
+  if (storedIntroContent) {
+    // 将introduction内容保存到localStorage，供StoryDisplay使用
+    localStorage.setItem('lexiquest-introduction-content', storedIntroContent)
+  }
+
   // Set up progress tracking
   progressTimer = window.setInterval(() => {
     gameStore.updateProgress({ timeSpent: gameStore.progress.timeSpent + 1 })
