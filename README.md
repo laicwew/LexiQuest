@@ -11,10 +11,10 @@ HelloMee is designed as a vocabulary learning game. Players interact with an ali
 The game follows a structured progression system:
 
 1. **Setup Phase**
-   - Select username, target level, and target country
+   - Select username, target language, target level, and target country
    - Name your alien companion
-<img width="2556" height="1185" alt="图片" src="https://github.com/user-attachments/assets/bc642f91-0f81-41aa-9e88-3628008c3a66" />
-<img width="2553" height="1188" alt="图片" src="https://github.com/user-attachments/assets/35a6aa54-2d59-40f8-92bd-c511224020c3" />
+   <img width="2553" height="1181" alt="图片" src="https://github.com/user-attachments/assets/314bd4f1-eb3d-4cb7-ad8d-f1967d40bc23" />
+   <img width="2553" height="1188" alt="图片" src="https://github.com/user-attachments/assets/35a6aa54-2d59-40f8-92bd-c511224020c3" />
 
 
 2. **Learning Loop**
@@ -46,7 +46,9 @@ The game follows a structured progression system:
      <img width="2553" height="1188" alt="图片" src="https://github.com/user-attachments/assets/beccb964-cedf-4644-9deb-45071924424a" />
      <img width="2556" height="1188" alt="图片" src="https://github.com/user-attachments/assets/e97a4206-5cb0-4a50-9b52-ac4c17bfdf24" />
 
-
+5. **Explore More Languages**
+   - Pick another target language and speak to the alien — a whole new journey awaits you in that language:
+      <img width="2292" height="1128" alt="图片" src="https://github.com/user-attachments/assets/11ef938b-ff2f-4af1-9030-85c3e7e09eef" />
 ## Project Structure
 
 ```
@@ -164,10 +166,4 @@ Routes are configured in `router/index.ts`:
 3. Data persistence uses localStorage
 4. Responsive design adapts to different screen sizes
 5. AI content generation powered by DeepSeek API
-
-## Potential for more target languages
-
-Modify the `system-prompt-level-?.txt` file to specify the response language, and replace the example response with its Japanese translation. After that, you can receive replies like this in the game:
-
-<img width="2292" height="1128" alt="图片" src="https://github.com/user-attachments/assets/11ef938b-ff2f-4af1-9030-85c3e7e09eef" />
 
