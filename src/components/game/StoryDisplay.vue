@@ -356,32 +356,32 @@ const loadDummyContent = async () => {
 const loadIntroductionContent = async () => {
   try {
     // 获取目标语言
-    const targetLanguage = gameStore.targetLanguage || 'English';
-    
+    const targetLanguage = gameStore.targetLanguage || 'English'
+
     // 加载prompt-response-example.json文件
-    const response = await fetch('/assets/prompt-response-example.json');
-    const jsonData = await response.json();
-    
+    const response = await fetch('/assets/prompt-response-example.json')
+    const jsonData = await response.json()
+
     // 获取对应语言的introduction内容
-    let introContent = '';
+    let introContent = ''
     if (jsonData[targetLanguage] && jsonData[targetLanguage].introduction) {
-      introContent = jsonData[targetLanguage].introduction;
-      console.log('introContent:', introContent)
+      introContent = jsonData[targetLanguage].introduction
     } else if (jsonData['English'] && jsonData['English'].introduction) {
       // 如果找不到对应语言的introduction内容，使用英语作为默认值
-      introContent = jsonData['English'].introduction;
+      introContent = jsonData['English'].introduction
     } else {
       // 如果还找不到，使用默认的英文介绍内容
-      introContent = 'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?';
+      introContent =
+        'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
     }
-    
+
     // 应用变量替换
-    const processedText = txtArgumentReplace(introContent);
-    introductionContent.value = processedText;
+    const processedText = txtArgumentReplace(introContent)
+    introductionContent.value = processedText
   } catch (error) {
-    console.error('Failed to load introduction content:', error);
+    console.error('Failed to load introduction content:', error)
     introductionContent.value =
-      'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?';
+      'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
   }
 }
 
