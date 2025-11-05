@@ -220,36 +220,63 @@ const txtArgumentReplace = (text: string): string => {
 }
 
 // 异步文本变量替换函数，用于处理需要加载外部JSON的场景
-const txtArgumentReplaceAsync = async (text: string): Promise<string> => {
+const txtArgumentReplaceAsync = async (
+  text: string,
+  context: 'feed' | 'review' | 'congrats' = 'feed',
+): Promise<string> => {
   // 先处理{JsonInput}占位符
   if (text.includes('{JsonInput}')) {
     try {
       // 加载prompt-response-example.json文件
-      const response = await fetch('/assets/prompt-response-example.json');
-      const jsonData = await response.json();
+      const response = await fetch('/assets/prompt-response-example.json')
+      const jsonData = await response.json()
 
       // 获取目标语言和等级
-      const targetLanguage = gameStore.targetLanguage || 'English';
-      const level = gameStore.character.level || 1;
+      const targetLanguage = gameStore.targetLanguage || 'English'
 
-      // 获取对应语言和等级的内容
-      let jsonContent = '';
-      if (jsonData[targetLanguage] && jsonData[targetLanguage][level]) {
-        jsonContent = jsonData[targetLanguage][level];
-      } else if (jsonData['English'] && jsonData['English'][level]) {
-        // 如果找不到对应语言的内容，使用英语作为默认值
-        jsonContent = jsonData['English'][level];
+      let jsonContent = ''
+
+      // 根据上下文选择不同的内容
+      if (context === 'review') {
+        // Review场景使用review对应的文本
+        if (jsonData[targetLanguage] && jsonData[targetLanguage].review) {
+          jsonContent = jsonData[targetLanguage].review
+        } else if (jsonData['English'] && jsonData['English'].review) {
+          // 如果找不到对应语言的review内容，使用英语作为默认值
+          jsonContent = jsonData['English'].review
+        }
+      } else if (context === 'congrats') {
+        // Congrats场景暂时不处理，保持原有逻辑
+        const level = gameStore.character.level || 1
+        if (jsonData[targetLanguage] && jsonData[targetLanguage][level]) {
+          jsonContent = jsonData[targetLanguage][level]
+        } else if (jsonData['English'] && jsonData['English'][level]) {
+          jsonContent = jsonData['English'][level]
+        } else {
+          jsonContent =
+            jsonData['English'] && jsonData['English']['1'] ? jsonData['English']['1'] : ''
+        }
       } else {
-        // 如果还找不到，默认使用English下的1级内容
-        jsonContent = jsonData['English'] && jsonData['English']['1'] ? jsonData['English']['1'] : '';
+        // Feed场景使用对应等级的文本
+        const level = gameStore.character.level || 1
+        if (jsonData[targetLanguage] && jsonData[targetLanguage][level]) {
+          jsonContent = jsonData[targetLanguage][level]
+        } else if (jsonData['English'] && jsonData['English'][level]) {
+          // 如果找不到对应语言的内容，使用英语作为默认值
+          jsonContent = jsonData['English'][level]
+        } else {
+          // 如果还找不到，默认使用English下的1级内容
+          jsonContent =
+            jsonData['English'] && jsonData['English']['1'] ? jsonData['English']['1'] : ''
+        }
       }
 
       // 替换{JsonInput}占位符
-      text = text.replace('{JsonInput}', jsonContent);
+      text = text.replace('{JsonInput}', jsonContent)
     } catch (error) {
-      console.error('Failed to load JSON input content:', error);
+      console.error('Failed to load JSON input content:', error)
       // 如果加载失败，移除{JsonInput}占位符
-      text = text.replace('{JsonInput}', '');
+      text = text.replace('{JsonInput}', '')
     }
   }
 
@@ -328,15 +355,33 @@ const loadDummyContent = async () => {
 // 从introduction.txt文件加载介绍内容
 const loadIntroductionContent = async () => {
   try {
-    const response = await fetch('/assets/introduction.txt')
-    const text = await response.text()
+    // 获取目标语言
+    const targetLanguage = gameStore.targetLanguage || 'English';
+    
+    // 加载prompt-response-example.json文件
+    const response = await fetch('/assets/prompt-response-example.json');
+    const jsonData = await response.json();
+    
+    // 获取对应语言的introduction内容
+    let introContent = '';
+    if (jsonData[targetLanguage] && jsonData[targetLanguage].introduction) {
+      introContent = jsonData[targetLanguage].introduction;
+      console.log('introContent:', introContent)
+    } else if (jsonData['English'] && jsonData['English'].introduction) {
+      // 如果找不到对应语言的introduction内容，使用英语作为默认值
+      introContent = jsonData['English'].introduction;
+    } else {
+      // 如果还找不到，使用默认的英文介绍内容
+      introContent = 'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?';
+    }
+    
     // 应用变量替换
-    const processedText = txtArgumentReplace(text)
-    introductionContent.value = processedText
+    const processedText = txtArgumentReplace(introContent);
+    introductionContent.value = processedText;
   } catch (error) {
-    console.error('Failed to load introduction content:', error)
+    console.error('Failed to load introduction content:', error);
     introductionContent.value =
-      'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?'
+      'Hello Friend {username}! I from Planet Erid: high gravity, thick ammonia air, no sunlight. We hear and talk with musical sounds. My mind stores all I see. Your Earth words strange but shiny. I travel far to learn. Please give me reading material. I want know humans, human words, huamn ways. A name for me, question?';
   }
 }
 
@@ -499,8 +544,11 @@ const reviewWords = async () => {
     const responseSystem = await fetch(systemPromptFile)
     const systemPromptTemplate = await responseSystem.text()
 
-    // 替换模板中的单词占位符（异步版本，用于处理JsonInput）
-    const systemPrompt = await txtArgumentReplaceAsync(systemPromptTemplate.replace('{words}', wordsList))
+    // 替换模板中的单词占位符（异步版本，用于处理JsonInput，指定为review场景）
+    const systemPrompt = await txtArgumentReplaceAsync(
+      systemPromptTemplate.replace('{words}', wordsList),
+      'review',
+    )
 
     const completion = await openai.chat.completions.create({
       messages: [
@@ -513,8 +561,8 @@ const reviewWords = async () => {
     if (completion && completion.choices && completion.choices.length > 0) {
       const choice = completion.choices[0]
       if (choice && choice.message && choice.message.content) {
-        // 对AI生成的内容进行变量替换处理（异步版本，用于处理JsonInput）
-        let processedContent = await txtArgumentReplaceAsync(choice.message.content)
+        // 对AI生成的内容进行变量替换处理（异步版本，用于处理JsonInput，指定为review场景）
+        let processedContent = await txtArgumentReplaceAsync(choice.message.content, 'review')
 
         // 解析processedContent中被**包裹的词汇，将其转换为可点击的交互式词汇
         processedContent = processedContent.replace(
@@ -601,8 +649,8 @@ const loadCongratsContent = async () => {
       const systemResponse = await fetch('/assets/system-prompt-congrats.txt')
       let systemPrompt = await systemResponse.text()
 
-      // 替换系统提示词中的变量（异步版本，用于处理JsonInput）
-      systemPrompt = await txtArgumentReplaceAsync(systemPrompt)
+      // 替换系统提示词中的变量（异步版本，用于处理JsonInput，指定为congrats场景）
+      systemPrompt = await txtArgumentReplaceAsync(systemPrompt, 'congrats')
 
       // 初始化OpenAI客户端
       const openai = new OpenAI({
