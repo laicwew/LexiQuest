@@ -176,7 +176,6 @@ export const useGameStore = defineStore('game', () => {
     // Load username from localStorage regardless of saved state
     const username = localStorage.getItem('lexiquest-username')
 
-
     if (username) {
       userName.value = username
     }

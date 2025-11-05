@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -22,13 +22,59 @@ const languageOptions = [
   { value: 'Chinese', label: 'Chinese' },
 ]
 
-// 目标等级选项（移除custom选项）
-const levelOptions = [
+// 不同语言的等级选项
+const cefrLevelOptions = [
+  { value: 'A1', label: 'A1' },
+  { value: 'A2', label: 'A2' },
+  { value: 'B1', label: 'B1' },
+  { value: 'B2', label: 'B2' },
+  { value: 'C1', label: 'C1' },
+  { value: 'C2', label: 'C2' },
+]
+
+const jlptLevelOptions = [
+  { value: 'N5', label: 'N5' },
+  { value: 'N4', label: 'N4' },
+  { value: 'N3', label: 'N3' },
+  { value: 'N2', label: 'N2' },
+  { value: 'N1', label: 'N1' },
+]
+
+const hskLevelOptions = [
+  { value: 'HSK1', label: 'HSK1' },
+  { value: 'HSK2', label: 'HSK2' },
+  { value: 'HSK3', label: 'HSK3' },
+  { value: 'HSK4', label: 'HSK4' },
+  { value: 'HSK5', label: 'HSK5' },
+  { value: 'HSK6', label: 'HSK6' },
+  { value: 'HSK7', label: 'HSK7' },
+  { value: 'HSK8', label: 'HSK8' },
+  { value: 'HSK9', label: 'HSK9' },
+]
+
+const defaultLevelOptions = [
   { value: 'IELTS', label: 'IELTS' },
   { value: 'TOEFL', label: 'TOEFL' },
   { value: 'CET-4', label: 'CET-4' },
   { value: 'CET-6', label: 'CET-6' },
 ]
+
+// 根据目标语言动态计算等级选项
+const computedLevelOptions = computed(() => {
+  switch (targetLanguage.value) {
+    case 'French':
+    case 'German':
+    case 'Spanish':
+    case 'Swedish':
+      return cefrLevelOptions
+    case 'Japanese':
+      return jlptLevelOptions
+    case 'Chinese':
+      return hskLevelOptions
+    default:
+      return defaultLevelOptions
+  }
+})
 
 // 目标国家选项
 const countryOptions = [
@@ -39,10 +85,31 @@ const countryOptions = [
   { value: 'Canada', label: 'Canada' },
   { value: 'China', label: 'China' },
   { value: 'Japan', label: 'Japan' },
-  { value: 'South Korea', label: 'South Korea' },
+  { value: 'Spain', label: 'Spain' },
   { value: 'Germany', label: 'Germany' },
   { value: 'France', label: 'France' },
 ]
+
+// 当目标语言改变时，设置默认等级
+watch(targetLanguage, (newLanguage) => {
+  switch (newLanguage) {
+    case 'French':
+    case 'German':
+    case 'Spanish':
+    case 'Swedish':
+      targetLevel.value = 'A1'
+      break
+    case 'Japanese':
+      targetLevel.value = 'N5'
+      break
+    case 'Chinese':
+      targetLevel.value = 'HSK1'
+      break
+    default:
+      targetLevel.value = 'CET-6'
+      break
+  }
+})
 
 const validateForm = () => {
   if (!username.value.trim()) {
@@ -206,7 +273,11 @@ onMounted(() => {
               v-model="targetLanguage"
               class="text-black text-2xl w-full px-4 py-3 border-2 border-yellow-600 rounded-lg focus:ring-2 focus:ring-yellow-500"
             >
-              <option v-for="language in languageOptions" :key="language.value" :value="language.value">
+              <option
+                v-for="language in languageOptions"
+                :key="language.value"
+                :value="language.value"
+              >
                 {{ language.label }}
               </option>
             </select>
@@ -223,7 +294,11 @@ onMounted(() => {
                 v-model="targetLevel"
                 class="text-black text-2xl w-full px-4 py-3 border-2 border-yellow-600 rounded-lg focus:ring-2 focus:ring-yellow-500"
               >
-                <option v-for="level in levelOptions" :key="level.value" :value="level.value">
+                <option
+                  v-for="level in computedLevelOptions"
+                  :key="level.value"
+                  :value="level.value"
+                >
                   {{ level.label }}
                 </option>
               </select>

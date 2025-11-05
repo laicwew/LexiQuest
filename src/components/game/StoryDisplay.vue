@@ -645,7 +645,6 @@ const seeYouAgain = () => {
     feedTaken: 0,
   }
 
-
   gameStore.postcards = []
   gameStore.activeTab = 'GENERATED'
   gameStore.generatedContent = ''
@@ -838,10 +837,7 @@ onMounted(() => {
       </div>
 
       <!-- POSTCARDS Tab Content -->
-      <div
-        v-else-if="gameStore.activeTab === 'POSTCARDS'"
-        class="postcards-container"
-      >
+      <div v-else-if="gameStore.activeTab === 'POSTCARDS'" class="postcards-container">
         <div v-if="gameStore.postcards.length === 0" class="text-center py-8">
           <p class="text-2xl text-yellow-500">
             No postcards from {{ gameStore.character.name }} yet. Try to talk to
@@ -930,8 +926,9 @@ onMounted(() => {
       >
         Copy</button
       ><span class="text-yellow-500 text-2xl mt-2">
-        this prepared article and paste it into the FEEDER to <span class="text-[#0e7b4a]">FEED</span>
-        {{ gameStore.character.name }}, then return to the STUDY page to see the learning results.
+        this prepared article and paste it into the FEEDER to
+        <span class="text-[#0e7b4a]">FEED</span> {{ gameStore.character.name }}, then return to the
+        STUDY page to see the learning results.
       </span>
     </div>
   </div>
