@@ -123,14 +123,6 @@ const seeYouAgain = () => {
     feedTaken: 0,
   }
 
-  gameStore.settings = {
-    nativeLanguage: 'zh',
-    targetLanguage: 'en',
-    difficulty: 'normal',
-    soundEnabled: true,
-    animationsEnabled: true,
-  }
-
   gameStore.postcards = []
   gameStore.activeTab = 'GENERATED'
   gameStore.generatedContent = ''

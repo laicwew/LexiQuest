@@ -44,14 +44,6 @@ export const useGameStore = defineStore('game', () => {
     feedTaken: 0, // 新增：记录Feed操作次数
   })
 
-  const settings = ref({
-    nativeLanguage: 'zh',
-    targetLanguage: 'en',
-    difficulty: 'normal',
-    soundEnabled: true,
-    animationsEnabled: true,
-  })
-
   // 明信片状态
   const postcards = ref<Postcard[]>([])
   let postcardCounter = 0 // 添加计数器
@@ -67,6 +59,8 @@ export const useGameStore = defineStore('game', () => {
 
   // 用户名
   const userName = ref('')
+
+  const targetLanguage = ref('English')
 
   // Getters
   const hpPercent = computed(() => (character.value.hp / character.value.maxHp) * 100)
@@ -164,7 +158,6 @@ export const useGameStore = defineStore('game', () => {
         learned: Array.from(vocabulary.value.learned.entries()),
       },
       progress: progress.value,
-      settings: settings.value,
       activeTab: activeTab.value,
       generatedContent: generatedContent.value,
       userName: userName.value, // 保存用户名
@@ -197,7 +190,6 @@ export const useGameStore = defineStore('game', () => {
         story.value = parsed.story
         vocabulary.value = parsed.vocabulary
         progress.value = parsed.progress
-        settings.value = parsed.settings || settings.value
         activeTab.value = parsed.activeTab || 'GENERATED'
         generatedContent.value = parsed.generatedContent || ''
         userName.value = parsed.userName || '' // 加载用户名
@@ -427,7 +419,6 @@ export const useGameStore = defineStore('game', () => {
     story,
     vocabulary,
     progress,
-    settings,
     postcards,
     activeTab,
     generatedContent,
