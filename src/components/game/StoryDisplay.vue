@@ -137,6 +137,8 @@ watch(
         loadCongratsContent()
       }
     } else if (newTab === 'DUMMY') {
+      // 当切换到DUMMY标签页时，加载例文内容
+      loadDummyContent()
       storyContent.value = dummyContent.value
     } else if (newTab === 'FEEDER') {
       // FEEDER标签页不需要特殊处理
@@ -338,25 +340,37 @@ const getTopReviewWords = (): string => {
 // 从json文件加载例文内容
 const loadDummyContent = async () => {
   try {
-    // 从gameStore中获取目标语言
-    const targetLanguage = gameStore.targetLanguage || 'English'
+    // 首先尝试从localStorage获取dummy内容
+    const storedDummyContent = localStorage.getItem('lexiquest-dummy-content')
 
-    // 加载dummy-text.json文件
-    const response = await fetch('/assets/dummy-text.json')
-    const dummyTextData = await response.json()
-
-    // 根据目标语言获取相应的文本
-    let text = ''
-    if (dummyTextData[targetLanguage] && dummyTextData[targetLanguage].text) {
-      text = dummyTextData[targetLanguage].text
+    if (storedDummyContent) {
+      // 使用localStorage中的内容
+      dummyContent.value = storedDummyContent
+      if (gameStore.activeTab === 'DUMMY') {
+        storyContent.value = storedDummyContent
+      }
     } else {
-      // 如果找不到对应语言的文本，使用英语作为默认值
-      text = dummyTextData['English']?.text || 'Failed to load example text.'
-    }
+      // 如果localStorage中没有内容，从JSON文件加载（备用方案）
+      // 从gameStore中获取目标语言
+      const targetLanguage = gameStore.targetLanguage || 'English'
 
-    dummyContent.value = text
-    if (gameStore.activeTab === 'DUMMY') {
-      storyContent.value = text
+      // 加载dummy-text.json文件
+      const response = await fetch('/assets/dummy-text.json')
+      const dummyTextData = await response.json()
+
+      // 根据目标语言获取相应的文本
+      let text = ''
+      if (dummyTextData[targetLanguage] && dummyTextData[targetLanguage].text) {
+        text = dummyTextData[targetLanguage].text
+      } else {
+        // 如果找不到对应语言的文本，使用英语作为默认值
+        text = dummyTextData['English']?.text || 'Failed to load example text.'
+      }
+
+      dummyContent.value = text
+      if (gameStore.activeTab === 'DUMMY') {
+        storyContent.value = text
+      }
     }
   } catch (error) {
     console.error('Failed to load dummy content:', error)
@@ -785,6 +799,7 @@ onMounted(() => {
   // 初始化各标签页的内容
   if (gameStore.activeTab === 'DUMMY') {
     loadDummyContent()
+    storyContent.value = dummyContent.value
   } else if (gameStore.activeTab === 'GENERATED') {
     loadIntroductionContent()
     storyContent.value = gameStore.generatedContent

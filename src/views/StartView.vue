@@ -161,6 +161,32 @@ const loadIntroductionContent = async () => {
   }
 }
 
+// 在后台加载dummy内容的函数
+const loadDummyContent = async () => {
+  try {
+    // 加载dummy-text.json文件
+    const response = await fetch('/assets/dummy-text.json')
+    const dummyTextData = await response.json()
+
+    // 根据目标语言获取相应的文本
+    let dummyContent = ''
+    if (dummyTextData[targetLanguage.value] && dummyTextData[targetLanguage.value].text) {
+      dummyContent = dummyTextData[targetLanguage.value].text
+    } else {
+      // 如果找不到对应语言的文本，使用英语作为默认值
+      dummyContent = dummyTextData['English']?.text || 'Failed to load example text.'
+    }
+
+    // 将dummy内容保存到localStorage，供GameView使用
+    localStorage.setItem('lexiquest-dummy-content', dummyContent)
+  } catch (error) {
+    console.error('Failed to load dummy content:', error)
+    // 如果加载失败，使用默认内容
+    const defaultContent = 'Failed to load example text.'
+    localStorage.setItem('lexiquest-dummy-content', defaultContent)
+  }
+}
+
 const startNewGame = async () => {
   if (!validateForm()) {
     return
@@ -171,6 +197,8 @@ const startNewGame = async () => {
 
   // 开始在后台加载introduction内容
   loadIntroductionContent()
+  // 开始在后台加载dummy内容
+  loadDummyContent()
 
   // Load existing game state or create new one
   let gameState = {
