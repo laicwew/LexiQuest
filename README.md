@@ -10,8 +10,8 @@ Currently supported target languages:
 - English
 - German
 - French
-- 5panish
-- 5wedish
+- Spanish
+- Swedish
 - Japanese
 - Chinese
 
