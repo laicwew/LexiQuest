@@ -163,6 +163,7 @@ export const useGameStore = defineStore('game', () => {
       userName: userName.value, // 保存用户名
       postcards: postcards.value, // 保存明信片
       postcardCounter, // 保存计数器
+      targetLanguage: targetLanguage.value, // 保存目标语言
     }
 
     localStorage.setItem('lexiquest-save', JSON.stringify(gameState))
@@ -174,6 +175,7 @@ export const useGameStore = defineStore('game', () => {
     const savedState = localStorage.getItem('lexiquest-save')
     // Load username from localStorage regardless of saved state
     const username = localStorage.getItem('lexiquest-username')
+
 
     if (username) {
       userName.value = username
@@ -195,6 +197,7 @@ export const useGameStore = defineStore('game', () => {
         userName.value = parsed.userName || '' // 加载用户名
         postcards.value = parsed.postcards || [] // 加载明信片
         postcardCounter = parsed.postcardCounter || postcards.value.length // 加载计数器
+        targetLanguage.value = parsed.targetLanguage || 'English' // 加载目标语言
 
         // 根据保存的标签页状态设置正确的文本
         if (activeTab.value === 'GENERATED') {
@@ -219,6 +222,7 @@ export const useGameStore = defineStore('game', () => {
       // 默认情况下，设置为GENERATED标签页并显示空文本
       activeTab.value = 'GENERATED'
       story.value.text = ''
+      targetLanguage.value = 'English' // 设置默认目标语言
     }
   }
 
@@ -377,6 +381,13 @@ export const useGameStore = defineStore('game', () => {
     saveGame()
   }
 
+  // 更新目标语言
+  function updateTargetLanguage(language: string) {
+    targetLanguage.value = language
+    // 保存到localStorage
+    saveGame()
+  }
+
   // Review功能：获取需要复习的单词
   function getReviewWords() {
     // 将Map转换为数组并按reviewCount排序（从低到高）
@@ -424,6 +435,7 @@ export const useGameStore = defineStore('game', () => {
     generatedContent,
     userName, // 导出用户名
     levelRequirements, // 导出等级要求数据
+    targetLanguage, // 导出目标语言
 
     // Getters
     hpPercent,
@@ -452,6 +464,7 @@ export const useGameStore = defineStore('game', () => {
     updateGeneratedContent,
     updateAlienName, // 导出更新外星人名称的函数
     updateLanguageLevel, // 导出更新语言级别的函数
+    updateTargetLanguage, // 导出更新目标语言的函数
     getReviewWords, // 导出获取复习单词的函数
     incrementReviewCount, // 导出增加复习计数的函数
     deletePostcard, // 导出删除明信片函数

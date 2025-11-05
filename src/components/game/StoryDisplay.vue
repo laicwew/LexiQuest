@@ -3,6 +3,7 @@ import { ref, onMounted, watch, nextTick } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import OpenAI from 'openai'
 import PostcardModal from './PostcardModal.vue'
+import SeeYouAgainButton from './SeeYouAgainButton.vue'
 import { useRouter } from 'vue-router'
 
 const gameStore = useGameStore()
@@ -754,12 +755,7 @@ onMounted(() => {
             </p>
           </div>
           <div v-else class="mt-4">
-            <button
-              @click="seeYouAgain"
-              class="action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]"
-            >
-              See you again
-            </button>
+            <SeeYouAgainButton />
           </div>
         </div>
         <!-- 如果有生成内容，显示生成的内容 -->

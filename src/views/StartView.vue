@@ -7,8 +7,20 @@ const router = useRouter()
 const username = ref('')
 const targetLevel = ref('CET-6') // 默认为CET-6
 const targetCountry = ref('America') // 默认为美国
+const targetLanguage = ref('English') // 默认为目标语言为英语
 const errorMessage = ref('')
 const successMessage = ref('')
+
+// 目标语言选项
+const languageOptions = [
+  { value: 'English', label: 'English' },
+  { value: 'German', label: 'German' },
+  { value: 'French', label: 'French' },
+  { value: 'Spanish', label: 'Spanish' },
+  { value: 'Swedish', label: 'Swedish' },
+  { value: 'Japanese', label: 'Japanese' },
+  { value: 'Chinese', label: 'Chinese' },
+]
 
 // 目标等级选项（移除custom选项）
 const levelOptions = [
@@ -90,6 +102,7 @@ const startNewGame = () => {
     userName: username.value,
     postcards: [],
     postcardCounter: 0,
+    targetLanguage: targetLanguage.value, // 保存目标语言
   }
 
   // Try to load existing game state
@@ -107,6 +120,7 @@ const startNewGame = () => {
           languageLevel: targetLevel.value,
           country: targetCountry.value,
         },
+        targetLanguage: targetLanguage.value, // 确保使用当前选择的目标语言
       }
     } catch (e) {
       console.error('Failed to parse saved game state', e)
@@ -134,6 +148,7 @@ onMounted(() => {
       username.value = gameState.userName || ''
       targetLevel.value = gameState.character?.languageLevel || 'CET-6'
       targetCountry.value = gameState.character?.country || 'America'
+      targetLanguage.value = gameState.targetLanguage || 'English' // 加载目标语言
     } catch (e) {
       console.error('Failed to parse saved game state', e)
     }
@@ -179,6 +194,22 @@ onMounted(() => {
             />
             <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
             <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
+          </div>
+
+          <!-- Target Language Selection -->
+          <div class="mb-6">
+            <label for="target-language" class="block text-3xl text-yellow-600 font-medium mb-2">
+              Target Language
+            </label>
+            <select
+              id="target-language"
+              v-model="targetLanguage"
+              class="text-black text-2xl w-full px-4 py-3 border-2 border-yellow-600 rounded-lg focus:ring-2 focus:ring-yellow-500"
+            >
+              <option v-for="language in languageOptions" :key="language.value" :value="language.value">
+                {{ language.label }}
+              </option>
+            </select>
           </div>
 
           <!-- Target Level and Target Country Selection (on the same line) -->

@@ -6,6 +6,7 @@ import StoryDisplay from '@/components/game/StoryDisplay.vue'
 import ProgressPanel from '@/components/game/ProgressPanel.vue'
 import DictionaryModal from '@/components/game/DictionaryModal.vue'
 import Notification from '@/components/game/Notification.vue'
+import SeeYouAgainButton from '@/components/game/SeeYouAgainButton.vue'
 import { useRouter } from 'vue-router'
 
 // Game store
@@ -89,52 +90,6 @@ const goToAbout = () => {
   router.push('/about')
 }
 
-// See you again 按钮的处理函数
-const seeYouAgain = () => {
-  // 清除localStorage
-  localStorage.clear()
-
-  // 将gameStore中所有数值恢复到默认值
-  gameStore.character = {
-    name: '',
-    level: 1,
-    hp: 100,
-    maxHp: 100,
-    languageLevel: 'CET-6',
-    country: 'America',
-  }
-
-  gameStore.story = {
-    currentScene: 'entrance',
-    text: '',
-    history: [],
-  }
-
-  gameStore.vocabulary = {
-    selectedWord: null,
-    dictionary: [],
-    learned: new Map(),
-  }
-
-  gameStore.progress = {
-    wordsLearnedToday: 0,
-    timeSpent: 0,
-    reviewTaken: 0,
-    feedTaken: 0,
-  }
-
-  gameStore.postcards = []
-  gameStore.activeTab = 'GENERATED'
-  gameStore.generatedContent = ''
-  gameStore.userName = ''
-
-  // 保存重置后的状态
-  gameStore.saveGame()
-
-  // 跳转到StartView页面
-  router.push('/')
-}
-
 // Initialize game
 onMounted(() => {
   gameStore.loadGame()
@@ -198,12 +153,7 @@ onUnmounted(() => {
 
           <!-- See you again button for admin1116 -->
           <div v-if="gameStore.userName === 'admin1116'" class="mt-4">
-            <button
-              @click="seeYouAgain"
-              class="w-full action-button bg-[#1282a2ff] hover:bg-[#2b6589] active:bg-[#0f3d5a]"
-            >
-              See you again
-            </button>
+            <SeeYouAgainButton />
           </div>
 
           <!-- Spacer to push content to top -->
