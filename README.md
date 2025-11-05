@@ -6,6 +6,15 @@
 
 HelloMee is designed as a vocabulary learning game. Players interact with an alien character who is learning human language and culture. Through feeding text to the alien, players help it understand vocabulary and grammar. The game features a progression system where the alien levels up as it learns more words, and players can review learned vocabulary to reinforce their knowledge. The game also includes a postcard system that captures memorable moments from AI-generated content, creating a personalized learning journal.
 
+Currently supported target languages: 
+- English
+- German
+- French
+- 5panish
+- 5wedish
+- Japanese
+- Chinese
+
 ## Playthrough
 
 The game follows a structured progression system:
