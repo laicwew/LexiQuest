@@ -219,6 +219,60 @@ const txtArgumentReplace = (text: string): string => {
   return result
 }
 
+// 异步文本变量替换函数，用于处理需要加载外部JSON的场景
+const txtArgumentReplaceAsync = async (text: string): Promise<string> => {
+  // 先处理{JsonInput}占位符
+  if (text.includes('{JsonInput}')) {
+    try {
+      // 加载prompt-response-example.json文件
+      const response = await fetch('/assets/prompt-response-example.json');
+      const jsonData = await response.json();
+
+      // 获取目标语言和等级
+      const targetLanguage = gameStore.targetLanguage || 'English';
+      const level = gameStore.character.level || 1;
+
+      // 获取对应语言和等级的内容
+      let jsonContent = '';
+      if (jsonData[targetLanguage] && jsonData[targetLanguage][level]) {
+        jsonContent = jsonData[targetLanguage][level];
+      } else if (jsonData['English'] && jsonData['English'][level]) {
+        // 如果找不到对应语言的内容，使用英语作为默认值
+        jsonContent = jsonData['English'][level];
+      } else {
+        // 如果还找不到，默认使用English下的1级内容
+        jsonContent = jsonData['English'] && jsonData['English']['1'] ? jsonData['English']['1'] : '';
+      }
+
+      // 替换{JsonInput}占位符
+      text = text.replace('{JsonInput}', jsonContent);
+    } catch (error) {
+      console.error('Failed to load JSON input content:', error);
+      // 如果加载失败，移除{JsonInput}占位符
+      text = text.replace('{JsonInput}', '');
+    }
+  }
+
+  // 定义变量映射关系
+  const variables: Record<string, string> = {
+    username: gameStore.userName,
+    targetLanguage: gameStore.targetLanguage,
+    alienName: gameStore.character.name,
+    languageLevel: gameStore.character.languageLevel,
+    country: gameStore.character.country,
+    // 可以根据需要添加更多变量
+  }
+
+  // 使用正则表达式替换所有{}中的变量
+  let result = text
+  for (const [key, value] of Object.entries(variables)) {
+    const regex = new RegExp(`\\{${key}\\}`, 'g')
+    result = result.replace(regex, value)
+  }
+
+  return result
+}
+
 // 获取复习次数最高的10个单词
 const getTopReviewWords = (): string => {
   try {
@@ -319,8 +373,8 @@ async function feedToAI() {
     const systemPromptFile = `/assets/system-prompt-level-${gameStore.character.level}.txt`
     const responseSystem = await fetch(systemPromptFile)
     const systemPromptText = await responseSystem.text()
-    // 应用变量替换
-    const systemPrompt = txtArgumentReplace(systemPromptText)
+    // 应用变量替换（异步版本，用于处理JsonInput）
+    const systemPrompt = await txtArgumentReplaceAsync(systemPromptText)
 
     // 使用用户输入的文本作为reading prompt
     const readingPrompt = feedText.value.trim()
@@ -445,8 +499,8 @@ const reviewWords = async () => {
     const responseSystem = await fetch(systemPromptFile)
     const systemPromptTemplate = await responseSystem.text()
 
-    // 替换模板中的单词占位符
-    const systemPrompt = systemPromptTemplate.replace('{words}', wordsList)
+    // 替换模板中的单词占位符（异步版本，用于处理JsonInput）
+    const systemPrompt = await txtArgumentReplaceAsync(systemPromptTemplate.replace('{words}', wordsList))
 
     const completion = await openai.chat.completions.create({
       messages: [
@@ -459,8 +513,8 @@ const reviewWords = async () => {
     if (completion && completion.choices && completion.choices.length > 0) {
       const choice = completion.choices[0]
       if (choice && choice.message && choice.message.content) {
-        // 对AI生成的内容进行变量替换处理
-        let processedContent = txtArgumentReplace(choice.message.content)
+        // 对AI生成的内容进行变量替换处理（异步版本，用于处理JsonInput）
+        let processedContent = await txtArgumentReplaceAsync(choice.message.content)
 
         // 解析processedContent中被**包裹的词汇，将其转换为可点击的交互式词汇
         processedContent = processedContent.replace(
@@ -547,8 +601,8 @@ const loadCongratsContent = async () => {
       const systemResponse = await fetch('/assets/system-prompt-congrats.txt')
       let systemPrompt = await systemResponse.text()
 
-      // 替换系统提示词中的变量
-      systemPrompt = txtArgumentReplace(systemPrompt)
+      // 替换系统提示词中的变量（异步版本，用于处理JsonInput）
+      systemPrompt = await txtArgumentReplaceAsync(systemPrompt)
 
       // 初始化OpenAI客户端
       const openai = new OpenAI({
