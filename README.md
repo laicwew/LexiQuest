@@ -1,6 +1,6 @@
 # HelloMee
 
-[HelloMee](https://hello-mee.vercel.app/) is an interactive language learning game where players help an alien character learn Earth languages through vocabulary acquisition and story interaction.
+[HelloMee](https://hello-mee.vercel.app/) is an AI-powered language learning game where players help an alien character learn Earth languages through vocabulary acquisition.
 
 ## Overview
 
